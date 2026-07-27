@@ -14,7 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      concursos: {
+        Row: {
+          created_at: string
+          data_apuracao: string
+          dezenas: number[]
+          numero: number
+          soma: number
+        }
+        Insert: {
+          created_at?: string
+          data_apuracao: string
+          dezenas: number[]
+          numero: number
+          soma: number
+        }
+        Update: {
+          created_at?: string
+          data_apuracao?: string
+          dezenas?: number[]
+          numero?: number
+          soma?: number
+        }
+        Relationships: []
+      }
+      jogos_salvos: {
+        Row: {
+          created_at: string
+          dezenas: number[]
+          id: string
+          metadata: Json | null
+          nome: string | null
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dezenas: number[]
+          id?: string
+          metadata?: Json | null
+          nome?: string | null
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dezenas?: number[]
+          id?: string
+          metadata?: Json | null
+          nome?: string | null
+          score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
