@@ -12,6 +12,7 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/auth")({
+  ssr: false,
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
@@ -39,8 +40,17 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const email = String(data.get("email") ?? "").trim();
+    const password = String(data.get("password") ?? "");
+    const displayName = String(data.get("name") ?? "").trim();
+    if (!email || !password) {
+      toast.error("Preencha e-mail e senha.");
+      return;
+    }
     setLoading(true);
     try {
       if (isSignup) {
@@ -85,6 +95,7 @@ function AuthPage() {
                 <Label htmlFor="name">Nome</Label>
                 <Input
                   id="name"
+                  name="name"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Como quer ser chamado"
@@ -95,6 +106,7 @@ function AuthPage() {
               <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 required
                 value={email}
@@ -106,6 +118,7 @@ function AuthPage() {
               <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
+                name="password"
                 type="password"
                 required
                 minLength={6}
