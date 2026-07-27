@@ -63,7 +63,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Conta criada! Já pode entrar.");
+        toast.success("Conta criada! Agora entre com seus dados.");
+        setEmail("");
+        setPassword("");
+        setDisplayName("");
+        setIsSignup(false);
+        navigate({ to: "/auth", search: { mode: "login" }, replace: true });
+        return;
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
