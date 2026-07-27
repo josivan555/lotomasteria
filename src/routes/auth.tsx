@@ -40,8 +40,17 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const email = String(data.get("email") ?? "").trim();
+    const password = String(data.get("password") ?? "");
+    const displayName = String(data.get("name") ?? "").trim();
+    if (!email || !password) {
+      toast.error("Preencha e-mail e senha.");
+      return;
+    }
     setLoading(true);
     try {
       if (isSignup) {
