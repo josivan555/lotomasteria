@@ -95,6 +95,7 @@ function AuthPage() {
                 <Label htmlFor="name">Nome</Label>
                 <Input
                   id="name"
+                  name="name"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Como quer ser chamado"
@@ -105,6 +106,7 @@ function AuthPage() {
               <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 required
                 value={email}
@@ -116,6 +118,7 @@ function AuthPage() {
               <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
+                name="password"
                 type="password"
                 required
                 minLength={6}
