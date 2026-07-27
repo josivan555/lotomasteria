@@ -1,24 +1,108 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Sparkles, BarChart3, Filter, Trophy } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "LotoMaster IA — Análise inteligente para Lotofácil" },
+      {
+        name: "description",
+        content:
+          "Análise estatística inteligente do histórico completo da Lotofácil: frequência, atraso, tendência, score IA e geração de jogos com filtros avançados.",
+      },
+      { property: "og:title", content: "LotoMaster IA" },
+      {
+        property: "og:description",
+        content: "Score IA, filtros avançados e geração inteligente de jogos para Lotofácil.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Landing,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Landing() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+        <div className="flex items-center gap-2 text-lg font-bold tracking-tight">
+          <span className="ball ball-gold h-8! w-8! text-sm!">L</span>
+          LotoMaster <span className="text-primary">IA</span>
+        </div>
+        <div className="flex gap-2">
+          <Button asChild variant="ghost">
+            <Link to="/auth" search={{ mode: "login" }}>Entrar</Link>
+          </Button>
+          <Button asChild>
+            <Link to="/auth" search={{ mode: "signup" }}>Criar conta</Link>
+          </Button>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-6">
+        <section className="py-20 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary">
+            <Sparkles className="h-3 w-3" /> Análise estatística inteligente
+          </div>
+          <h1 className="mt-6 text-5xl font-black tracking-tight md:text-6xl">
+            Domine a{" "}
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Lotofácil
+            </span>
+            <br />
+            com IA estatística
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
+            O LotoMaster IA analisa todo o histórico oficial da Lotofácil, calcula um{" "}
+            <strong className="text-foreground">Score IA</strong> para cada dezena e gera jogos
+            equilibrados com dezenas de filtros estatísticos.
+          </p>
+          <div className="mt-8 flex justify-center gap-3">
+            <Button asChild size="lg">
+              <Link to="/auth" search={{ mode: "signup" }}>Começar grátis</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link to="/auth" search={{ mode: "login" }}>Já tenho conta</Link>
+            </Button>
+          </div>
+        </section>
+
+        <section className="grid gap-4 pb-24 md:grid-cols-3">
+          <Feature
+            icon={<BarChart3 className="h-5 w-5" />}
+            title="Estatísticas completas"
+            desc="Frequência, atraso, tendência e ciclos de cada dezena, com janelas de 10 até o histórico completo."
+          />
+          <Feature
+            icon={<Sparkles className="h-5 w-5" />}
+            title="Score IA por dezena"
+            desc="Nota de 0 a 100 combinando 6 indicadores estatísticos com pesos calibrados."
+          />
+          <Feature
+            icon={<Filter className="h-5 w-5" />}
+            title="Gerador com filtros"
+            desc="Soma, pares/ímpares, moldura, consecutivas, incluir/excluir — gere 10 a 500 jogos ranqueados."
+          />
+        </section>
+      </main>
+
+      <footer className="border-t border-border/40 py-8 text-center text-xs text-muted-foreground">
+        LotoMaster IA · Ferramenta de análise estatística. Loteria é um jogo de azar — jogue com responsabilidade.
+      </footer>
+    </div>
+  );
+}
+
+function Feature({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-card/60 p-6 backdrop-blur">
+      <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 text-primary">
+        {icon}
+      </div>
+      <h3 className="font-semibold">{title}</h3>
+      <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
     </div>
   );
 }
