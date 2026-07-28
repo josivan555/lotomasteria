@@ -11,10 +11,10 @@ export const Route = createFileRoute("/")({
         content:
           "Análise estatística inteligente do histórico completo da Lotofácil: frequência, atraso, tendência, score IA e geração de jogos com filtros avançados.",
       },
-      { property: "og:title", content: "LotoMaster IA" },
+      { property: "og:title", content: "LotoMaster IA — Análise inteligente para Lotofácil" },
       {
         property: "og:description",
-        content: "Score IA, filtros avançados e geração inteligente de jogos para Lotofácil.",
+        content: "Análise estatística inteligente do histórico completo da Lotofácil: frequência, atraso, tendência, score IA e geração de jogos com filtros avançados.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
