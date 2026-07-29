@@ -91,9 +91,9 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     slug: "quina",
     total: 80,
     tamanho: 5,
-    cor: "#a855f7",
-    corFundo: "from-violet-500/20 to-violet-500/5",
-    ballVariant: "purple",
+    cor: "#0b3a8c",
+    corFundo: "from-blue-700/25 to-indigo-800/10",
+    ballVariant: "blue",
     faixaPrincipal: 5,
     descricaoCurta: "5 dezenas entre 01 e 80.",
     descricaoLonga:
