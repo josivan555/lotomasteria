@@ -30,6 +30,7 @@ export type LoteriaConfig = {
   faixaPrincipal: number;
   descricaoCurta: string;
   descricaoLonga: string;
+  logo: string;
   moldura?: Set<number>;
   filtrosDefault: FiltrosDefault;
 };
