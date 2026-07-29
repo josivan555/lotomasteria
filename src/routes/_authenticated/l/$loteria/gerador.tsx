@@ -14,7 +14,7 @@ import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Bookmark, Dice5, Download, Sparkles } from "lucide-react";
+import { Bookmark, Dice5, Download, Sparkles, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useMemo, useState } from "react";
 
@@ -23,6 +23,22 @@ export const Route = createFileRoute("/_authenticated/l/$loteria/gerador")({
 });
 
 type Result = { dezenas: number[]; score: number };
+
+function InfoLabel({ label, description }: { label: string; description: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Label>{label}</Label>
+      <button
+        type="button"
+        onClick={() => toast(label, { description })}
+        className="inline-flex text-muted-foreground transition hover:text-foreground"
+        aria-label={`Informações sobre ${label}`}
+      >
+        <Info className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
 
 function Gerador() {
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria/gerador" });
@@ -222,7 +238,10 @@ function Gerador() {
         <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-5 backdrop-blur">
           <div>
             <div className="flex items-center justify-between gap-2">
-              <Label>Quantidade</Label>
+              <InfoLabel
+                label="Quantidade"
+                description="Define quantos jogos serão gerados de uma só vez, de 1 até 500."
+              />
               <Button
                 size="sm"
                 variant="outline"
@@ -248,9 +267,17 @@ function Gerador() {
           </div>
 
 
-          <RangeRow label="Soma" min={somaMin} max={somaMax} setMin={setSomaMin} setMax={setSomaMax} />
+          <RangeRow
+            label="Soma"
+            info="Limita a soma total das dezenas do jogo. Apenas jogos cuja soma esteja dentro do intervalo mínimo e máximo são aceitos."
+            min={somaMin}
+            max={somaMax}
+            setMin={setSomaMin}
+            setMax={setSomaMax}
+          />
           <RangeRow
             label="Pares"
+            info="Define quantos números pares devem aparecer em cada jogo, ajudando no equilíbrio entre pares e ímpares."
             min={paresMin}
             max={paresMax}
             setMin={setParesMin}
@@ -261,6 +288,7 @@ function Gerador() {
           {cfg.moldura && (
             <RangeRow
               label="Moldura"
+              info="Lotofácil: quantas dezenas do jogo devem estar na borda do volante (moldura), um padrão estatístico recorrente nos sorteios."
               min={molduraMin}
               max={molduraMax}
               setMin={setMolduraMin}
@@ -271,6 +299,7 @@ function Gerador() {
           )}
           <RangeRow
             label="Repetir do anterior"
+            info="Quantas dezenas do último concurso oficial devem se repetir no próximo jogo gerado."
             min={repetirMin}
             max={repetirMax}
             setMin={setRepetirMin}
@@ -279,7 +308,10 @@ function Gerador() {
             maxLimit={cfg.tamanho}
           />
           <div>
-            <Label>Máx. consecutivas</Label>
+            <InfoLabel
+              label="Máx. consecutivas"
+              description="Limita o maior grupo de números seguidos permitido no jogo (exemplo: no máximo 3 números consecutivos)."
+            />
             <Input
               type="number"
               value={maxConsecutivas}
@@ -291,7 +323,10 @@ function Gerador() {
           </div>
 
           <div>
-            <Label className="mb-2 block">Incluir sempre</Label>
+            <InfoLabel
+              label="Incluir sempre"
+              description="Dezenas obrigatórias: serão incluídas em todos os jogos gerados."
+            />
             <NumbersPicker
               numbers={nums}
               selected={incluir}
@@ -301,7 +336,10 @@ function Gerador() {
           </div>
 
           <div>
-            <Label className="mb-2 block">Excluir sempre</Label>
+            <InfoLabel
+              label="Excluir sempre"
+              description="Dezenas bloqueadas: nunca aparecerão nos jogos gerados."
+            />
             <NumbersPicker
               numbers={nums}
               selected={excluir}
@@ -372,6 +410,7 @@ function Gerador() {
 
 function RangeRow({
   label,
+  info,
   min,
   max,
   setMin,
@@ -380,6 +419,7 @@ function RangeRow({
   maxLimit = 400,
 }: {
   label: string;
+  info?: string;
   min: number;
   max: number;
   setMin: (n: number) => void;
@@ -389,7 +429,11 @@ function RangeRow({
 }) {
   return (
     <div>
-      <Label>{label}</Label>
+      {info ? (
+        <InfoLabel label={label} description={info} />
+      ) : (
+        <Label>{label}</Label>
+      )}
       <div className="mt-2 flex items-center gap-2">
         <Input
           type="number"
