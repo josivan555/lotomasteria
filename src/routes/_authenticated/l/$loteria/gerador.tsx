@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter, Link, useParams } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarConcursos, salvarJogo } from "@/lib/loterias.functions";
 import {
@@ -51,6 +51,7 @@ function Gerador() {
   const listar = useServerFn(listarConcursos);
   const salvar = useServerFn(salvarJogo);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data: concursos = [] } = useQuery({
     queryKey: ["concursos", loteria],
@@ -189,10 +190,36 @@ function Gerador() {
       }),
     onSuccess: () => {
       toast.success("Jogo salvo!");
+      queryClient.invalidateQueries({ queryKey: ["jogos-salvos"] });
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
   });
+
+  const salvarTodosMut = useMutation({
+    mutationFn: async (lista: Result[]) => {
+      let ok = 0;
+      for (const r of lista) {
+        await salvar({
+          data: {
+            loteria,
+            dezenas: r.dezenas,
+            score: r.score,
+            nome: `${cfg.nome} · Score ${r.score}`,
+          },
+        });
+        ok++;
+      }
+      return ok;
+    },
+    onSuccess: (n) => {
+      toast.success(`${n} jogos salvos em Meus Jogos!`);
+      queryClient.invalidateQueries({ queryKey: ["jogos-salvos"] });
+      router.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
 
   function exportarCSV() {
     if (!resultados.length) return;
@@ -398,11 +425,22 @@ function Gerador() {
 
         <div className="space-y-3">
           {resultados.length > 0 && (
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               <Button variant="outline" size="sm" onClick={exportarCSV}>
                 <Download className="mr-2 h-4 w-4" /> Exportar CSV
               </Button>
+              <Button
+                size="sm"
+                disabled={salvarTodosMut.isPending}
+                onClick={() => salvarTodosMut.mutate(resultados)}
+              >
+                <Bookmark className="mr-2 h-4 w-4" />
+                {salvarTodosMut.isPending
+                  ? "Salvando..."
+                  : `Salvar todos (${resultados.length})`}
+              </Button>
             </div>
+
           )}
           {resultados.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border/60 p-10 text-center text-sm text-muted-foreground">
