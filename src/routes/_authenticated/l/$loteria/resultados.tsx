@@ -117,27 +117,56 @@ function Resultados() {
           </p>
         </div>
         {jogos.length > 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              exportarResultadosPDF({
-                loteriaNome: cfg.nome,
-                cor: cfg.cor,
-                concurso: resultado
-                  ? { numero: resultado.numero, data: resultado.data_apuracao, dezenas: resultado.dezenas }
-                  : null,
-                sorteadas: drawn,
-                itens: items.map((it) => ({ nums: it.nums, hits: it.hits })),
-                tierLabel,
-              })
-            }
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Baixar PDF
-          </Button>
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="res-from" className="text-xs text-muted-foreground">De</Label>
+              <Input
+                id="res-from"
+                type="date"
+                value={pdfFrom}
+                onChange={(e) => setPdfFrom(e.target.value)}
+                className="h-9 w-[150px]"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="res-to" className="text-xs text-muted-foreground">Até</Label>
+              <Input
+                id="res-to"
+                type="date"
+                value={pdfTo}
+                onChange={(e) => setPdfTo(e.target.value)}
+                className="h-9 w-[150px]"
+              />
+            </div>
+            {(pdfFrom || pdfTo) && (
+              <Button variant="ghost" size="sm" onClick={() => { setPdfFrom(""); setPdfTo(""); }}>
+                Limpar
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={itemsParaPdf.length === 0}
+              onClick={() =>
+                exportarResultadosPDF({
+                  loteriaNome: cfg.nome,
+                  cor: cfg.cor,
+                  concurso: resultado
+                    ? { numero: resultado.numero, data: resultado.data_apuracao, dezenas: resultado.dezenas }
+                    : null,
+                  sorteadas: drawn,
+                  itens: itemsParaPdf.map((it) => ({ nums: it.nums, hits: it.hits })),
+                  tierLabel,
+                })
+              }
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Baixar PDF
+            </Button>
+          </div>
         )}
       </div>
+
 
       <div className="rounded-2xl border border-border/60 bg-card/60 p-5 backdrop-blur">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
