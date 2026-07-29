@@ -433,6 +433,25 @@ export function VolanteCanvas({
           </div>
 
           <div className="rounded-lg border border-dashed border-border/60 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold">2ª seção do volante</p>
+              <Button
+                size="sm"
+                variant={cal.usarSecao2 ? "default" : "outline"}
+                className="h-7"
+                onClick={() => set("usarSecao2", !cal.usarSecao2)}
+              >
+                {cal.usarSecao2 ? "Ativa" : "Desativada"}
+              </Button>
+            </div>
+            {cal.usarSecao2 && num("Distância da 1ª p/ 2ª seção (cm)", "secao2Y", 0.05)}
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Com a 2ª seção ativa, cada volante recebe 2 jogos (o 1º na seção de cima e o 2º na de
+              baixo).
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-dashed border-border/60 p-3">
             <p className="mb-2 text-xs font-semibold">Ajuste da impressora</p>
             <div className="grid grid-cols-2 gap-3">
               {num("Deslocar horizontal (cm)", "ajusteEsquerda", 0.1)}
@@ -446,7 +465,7 @@ export function VolanteCanvas({
 
           <div>
             <Label className="text-xs text-muted-foreground">
-              Jogos a imprimir (1 volante por página)
+              Jogos a imprimir ({cal.usarSecao2 ? "2 jogos" : "1 jogo"} por volante)
             </Label>
             <div className="mt-2 max-h-56 space-y-1 overflow-auto rounded-lg border border-border/60 p-2">
               {jogos.length === 0 && (
