@@ -136,6 +136,15 @@ export function VolanteCanvas({
   const [art, setArt] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
+    if (!expandido) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpandido(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [expandido]);
+
+  useEffect(() => {
     const info = VOLANTE_ART[cfg.id];
     const im = new Image();
     im.src = info.url;
