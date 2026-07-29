@@ -39,9 +39,15 @@ function InfoLabel({ label, description }: { label: string; description: string 
             <Info className="h-4 w-4" />
           </button>
         </PopoverTrigger>
-        <PopoverContent side="right" align="start" sideOffset={12} className="w-72">
+        <PopoverContent
+          side="bottom"
+          align="start"
+          sideOffset={8}
+          className="w-[min(18rem,calc(100vw-2rem))] md:w-72"
+        >
           <p className="text-sm font-semibold">{label}</p>
           <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+
         </PopoverContent>
       </Popover>
     </div>
