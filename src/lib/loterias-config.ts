@@ -68,9 +68,9 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     slug: "megasena",
     total: 60,
     tamanho: 6,
-    cor: "#0ea5e9",
-    corFundo: "from-sky-500/20 to-sky-500/5",
-    ballVariant: "blue",
+    cor: "#067d3f",
+    corFundo: "from-emerald-600/25 to-green-700/10",
+    ballVariant: "green",
     faixaPrincipal: 6,
     descricaoCurta: "6 dezenas entre 01 e 60.",
     descricaoLonga:
