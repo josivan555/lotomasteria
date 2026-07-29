@@ -36,7 +36,7 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/dashboard", replace: true });
+      if (data.user) navigate({ to: "/loterias", replace: true });
     });
   }, [navigate]);
 
@@ -74,7 +74,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
-        navigate({ to: "/dashboard", replace: true });
+        navigate({ to: "/loterias", replace: true });
       }
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Erro ao autenticar");
