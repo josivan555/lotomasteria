@@ -395,7 +395,13 @@ export function VolanteCanvas({
 
 
   return (
-    <section className="space-y-4 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
+    <section
+      className={
+        expandido
+          ? "fixed inset-0 z-50 space-y-4 overflow-auto bg-background p-4 md:p-6"
+          : "space-y-4 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5"
+      }
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="text-base font-bold md:text-lg">Volante para impressão · {cfg.nome}</h3>
@@ -407,6 +413,22 @@ export function VolanteCanvas({
         <div className="flex w-full flex-wrap gap-2 md:w-auto">
           <Button variant="ghost" size="sm" onClick={resetar}>
             <RotateCcw className="mr-2 h-4 w-4" /> Padrão
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 md:flex-none"
+            onClick={() => setExpandido((v) => !v)}
+          >
+            {expandido ? (
+              <>
+                <Minimize2 className="mr-2 h-4 w-4" /> Sair da tela cheia
+              </>
+            ) : (
+              <>
+                <Maximize2 className="mr-2 h-4 w-4" /> Tela cheia
+              </>
+            )}
           </Button>
           <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={salvar}>
             <Save className="mr-2 h-4 w-4" /> Salvar calibração
