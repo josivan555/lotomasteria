@@ -5,7 +5,7 @@ import {
   notFound,
   useParams,
 } from "@tanstack/react-router";
-import { BarChart3, Bookmark, Dice5, History } from "lucide-react";
+import { BarChart3, Bookmark, ClipboardCheck, Dice5, History } from "lucide-react";
 import { isLoteriaId, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria")({

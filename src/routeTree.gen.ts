@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedLoteriasRouteImport } from './routes/_authenticated/loterias'
 import { Route as AuthenticatedLLoteriaRouteRouteImport } from './routes/_authenticated/l/$loteria/route'
 import { Route as AuthenticatedLLoteriaIndexRouteImport } from './routes/_authenticated/l/$loteria/index'
+import { Route as AuthenticatedLLoteriaResultadosRouteImport } from './routes/_authenticated/l/$loteria/resultados'
 import { Route as AuthenticatedLLoteriaJogosRouteImport } from './routes/_authenticated/l/$loteria/jogos'
 import { Route as AuthenticatedLLoteriaHistoricoRouteImport } from './routes/_authenticated/l/$loteria/historico'
 import { Route as AuthenticatedLLoteriaGeradorRouteImport } from './routes/_authenticated/l/$loteria/gerador'
@@ -69,6 +70,12 @@ const AuthenticatedLLoteriaIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
   } as any)
+const AuthenticatedLLoteriaResultadosRoute =
+  AuthenticatedLLoteriaResultadosRouteImport.update({
+    id: '/resultados',
+    path: '/resultados',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
 const AuthenticatedLLoteriaJogosRoute =
   AuthenticatedLLoteriaJogosRouteImport.update({
     id: '/jogos',
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/l/$loteria/gerador': typeof AuthenticatedLLoteriaGeradorRoute
   '/l/$loteria/historico': typeof AuthenticatedLLoteriaHistoricoRoute
   '/l/$loteria/jogos': typeof AuthenticatedLLoteriaJogosRoute
+  '/l/$loteria/resultados': typeof AuthenticatedLLoteriaResultadosRoute
   '/l/$loteria/': typeof AuthenticatedLLoteriaIndexRoute
 }
 export interface FileRoutesByTo {
@@ -119,6 +127,7 @@ export interface FileRoutesByTo {
   '/l/$loteria/gerador': typeof AuthenticatedLLoteriaGeradorRoute
   '/l/$loteria/historico': typeof AuthenticatedLLoteriaHistoricoRoute
   '/l/$loteria/jogos': typeof AuthenticatedLLoteriaJogosRoute
+  '/l/$loteria/resultados': typeof AuthenticatedLLoteriaResultadosRoute
   '/l/$loteria': typeof AuthenticatedLLoteriaIndexRoute
 }
 export interface FileRoutesById {
@@ -135,6 +144,7 @@ export interface FileRoutesById {
   '/_authenticated/l/$loteria/gerador': typeof AuthenticatedLLoteriaGeradorRoute
   '/_authenticated/l/$loteria/historico': typeof AuthenticatedLLoteriaHistoricoRoute
   '/_authenticated/l/$loteria/jogos': typeof AuthenticatedLLoteriaJogosRoute
+  '/_authenticated/l/$loteria/resultados': typeof AuthenticatedLLoteriaResultadosRoute
   '/_authenticated/l/$loteria/': typeof AuthenticatedLLoteriaIndexRoute
 }
 export interface FileRouteTypes {
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/l/$loteria/gerador'
     | '/l/$loteria/historico'
     | '/l/$loteria/jogos'
+    | '/l/$loteria/resultados'
     | '/l/$loteria/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/l/$loteria/gerador'
     | '/l/$loteria/historico'
     | '/l/$loteria/jogos'
+    | '/l/$loteria/resultados'
     | '/l/$loteria'
   id:
     | '__root__'
@@ -179,6 +191,7 @@ export interface FileRouteTypes {
     | '/_authenticated/l/$loteria/gerador'
     | '/_authenticated/l/$loteria/historico'
     | '/_authenticated/l/$loteria/jogos'
+    | '/_authenticated/l/$loteria/resultados'
     | '/_authenticated/l/$loteria/'
   fileRoutesById: FileRoutesById
 }
@@ -256,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLLoteriaIndexRouteImport
       parentRoute: typeof AuthenticatedLLoteriaRouteRoute
     }
+    '/_authenticated/l/$loteria/resultados': {
+      id: '/_authenticated/l/$loteria/resultados'
+      path: '/resultados'
+      fullPath: '/l/$loteria/resultados'
+      preLoaderRoute: typeof AuthenticatedLLoteriaResultadosRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
+    }
     '/_authenticated/l/$loteria/jogos': {
       id: '/_authenticated/l/$loteria/jogos'
       path: '/jogos'
@@ -292,6 +312,7 @@ interface AuthenticatedLLoteriaRouteRouteChildren {
   AuthenticatedLLoteriaGeradorRoute: typeof AuthenticatedLLoteriaGeradorRoute
   AuthenticatedLLoteriaHistoricoRoute: typeof AuthenticatedLLoteriaHistoricoRoute
   AuthenticatedLLoteriaJogosRoute: typeof AuthenticatedLLoteriaJogosRoute
+  AuthenticatedLLoteriaResultadosRoute: typeof AuthenticatedLLoteriaResultadosRoute
   AuthenticatedLLoteriaIndexRoute: typeof AuthenticatedLLoteriaIndexRoute
 }
 
@@ -301,6 +322,7 @@ const AuthenticatedLLoteriaRouteRouteChildren: AuthenticatedLLoteriaRouteRouteCh
     AuthenticatedLLoteriaGeradorRoute: AuthenticatedLLoteriaGeradorRoute,
     AuthenticatedLLoteriaHistoricoRoute: AuthenticatedLLoteriaHistoricoRoute,
     AuthenticatedLLoteriaJogosRoute: AuthenticatedLLoteriaJogosRoute,
+    AuthenticatedLLoteriaResultadosRoute: AuthenticatedLLoteriaResultadosRoute,
     AuthenticatedLLoteriaIndexRoute: AuthenticatedLLoteriaIndexRoute,
   }
 
