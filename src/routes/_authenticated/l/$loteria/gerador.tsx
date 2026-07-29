@@ -63,6 +63,7 @@ function Gerador() {
   );
 
   const [qtd, setQtd] = useState(10);
+  const [tamanho, setTamanho] = useState(cfg.tamanho);
   const [somaMin, setSomaMin] = useState(defaults.somaMin);
   const [somaMax, setSomaMax] = useState(defaults.somaMax);
   const [paresMin, setParesMin] = useState(defaults.paresMin);
@@ -167,7 +168,7 @@ function Gerador() {
       repetirAnteriorMax: repetirMax,
     };
     const anterior = concursos[0]?.dezenas;
-    const jogos = gerarJogos(cfg, qtd, stats.scores, filtros, anterior);
+    const jogos = gerarJogos(cfg, qtd, stats.scores, filtros, anterior, tamanho);
     if (!jogos.length) {
       toast.error("Nenhum jogo passou nos filtros. Afrouxe algum parâmetro.");
       return;
