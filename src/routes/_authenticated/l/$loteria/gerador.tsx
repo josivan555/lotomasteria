@@ -63,6 +63,7 @@ function Gerador() {
   );
 
   const [qtd, setQtd] = useState(10);
+  const [tamanho, setTamanho] = useState(cfg.tamanho);
   const [somaMin, setSomaMin] = useState(defaults.somaMin);
   const [somaMax, setSomaMax] = useState(defaults.somaMax);
   const [paresMin, setParesMin] = useState(defaults.paresMin);
@@ -167,7 +168,7 @@ function Gerador() {
       repetirAnteriorMax: repetirMax,
     };
     const anterior = concursos[0]?.dezenas;
-    const jogos = gerarJogos(cfg, qtd, stats.scores, filtros, anterior);
+    const jogos = gerarJogos(cfg, qtd, stats.scores, filtros, anterior, tamanho);
     if (!jogos.length) {
       toast.error("Nenhum jogo passou nos filtros. Afrouxe algum parâmetro.");
       return;
@@ -197,7 +198,7 @@ function Gerador() {
     if (!resultados.length) return;
     const csv =
       "score," +
-      Array.from({ length: cfg.tamanho }, (_, i) => `d${i + 1}`).join(",") +
+      Array.from({ length: tamanho }, (_, i) => `d${i + 1}`).join(",") +
       "\n" +
       resultados.map((r) => [r.score, ...r.dezenas].join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -263,6 +264,47 @@ function Gerador() {
                   {v}
                 </Button>
               ))}
+            </div>
+          </div>
+
+          <div>
+            <InfoLabel
+              label="Dezenas por jogo"
+              description={`Quantos números cada jogo terá. Mínimo ${cfg.tamanhoMin}, máximo ${cfg.tamanhoMax}. O padrão da ${cfg.nome} é ${cfg.tamanho}.`}
+            />
+            <div className="mt-2 flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setTamanho((t) => Math.max(cfg.tamanhoMin, t - 1))}
+                disabled={tamanho <= cfg.tamanhoMin}
+                aria-label="Diminuir dezenas"
+              >
+                −
+              </Button>
+              <Input
+                type="number"
+                value={tamanho}
+                min={cfg.tamanhoMin}
+                max={cfg.tamanhoMax}
+                onChange={(e) => {
+                  const v = +e.target.value;
+                  if (Number.isFinite(v)) setTamanho(Math.max(cfg.tamanhoMin, Math.min(cfg.tamanhoMax, v)));
+                }}
+                className="max-w-20 text-center"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setTamanho((t) => Math.min(cfg.tamanhoMax, t + 1))}
+                disabled={tamanho >= cfg.tamanhoMax}
+                aria-label="Aumentar dezenas"
+              >
+                +
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                {cfg.tamanhoMin}–{cfg.tamanhoMax}
+              </span>
             </div>
           </div>
 

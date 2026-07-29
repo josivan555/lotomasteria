@@ -218,10 +218,10 @@ export function scoreJogo(cfg: LoteriaConfig, dezenas: number[], scores: Record<
   return Math.round(raw * 10) / 10;
 }
 
-function amostraPonderada(cfg: LoteriaConfig, scores: Record<number, number>): number[] {
+function amostraPonderada(cfg: LoteriaConfig, scores: Record<number, number>, tamanho: number): number[] {
   const pool = allNumbers(cfg).map((n) => ({ n, w: (scores[n] ?? 0) + 5 }));
   const picked: number[] = [];
-  while (picked.length < cfg.tamanho) {
+  while (picked.length < tamanho) {
     const total = pool.reduce((s, x) => s + x.w, 0);
     let r = Math.random() * total;
     for (let i = 0; i < pool.length; i++) {
@@ -242,6 +242,7 @@ export function gerarJogos(
   scores: Record<number, number>,
   filtros: Filtros,
   anterior?: number[],
+  tamanho: number = cfg.tamanho,
 ): { dezenas: number[]; score: number; analise: ReturnType<typeof analisarJogo> }[] {
   const out: { dezenas: number[]; score: number; analise: ReturnType<typeof analisarJogo> }[] = [];
   const seen = new Set<string>();
@@ -249,11 +250,11 @@ export function gerarJogos(
   let tentativas = 0;
   while (out.length < qtd && tentativas < maxTentativas) {
     tentativas++;
-    const dz = amostraPonderada(cfg, scores);
+    const dz = amostraPonderada(cfg, scores, tamanho);
     if (filtros.incluir?.length) for (const n of filtros.incluir) if (!dz.includes(n)) dz.push(n);
-    if (dz.length > cfg.tamanho) {
+    if (dz.length > tamanho) {
       dz.sort((a, b) => (scores[a] ?? 0) - (scores[b] ?? 0));
-      while (dz.length > cfg.tamanho) dz.shift();
+      while (dz.length > tamanho) dz.shift();
       dz.sort((a, b) => a - b);
     }
     if (!passaFiltros(cfg, dz, filtros, anterior)) continue;
