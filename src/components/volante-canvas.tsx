@@ -363,18 +363,36 @@ export function VolanteCanvas({
     label: string,
     k: keyof Calibracao,
     step = 0.05,
-  ) => (
-    <div className="space-y-1">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
-      <Input
-        type="number"
-        step={step}
-        value={cal[k] as number}
-        onChange={(e) => set(k, (Number.isFinite(+e.target.value) ? +e.target.value : 0) as never)}
-        className="h-9"
-      />
-    </div>
-  );
+    min = 0,
+    max = 30,
+  ) => {
+    const val = cal[k] as number;
+    const clamp = (v: number) => Math.min(max, Math.max(min, +v.toFixed(2)));
+    return (
+      <div className="space-y-1.5">
+        <Label className="text-xs text-muted-foreground">{label}</Label>
+        <Input
+          type="number"
+          step={step}
+          min={min}
+          max={max}
+          value={val}
+          onChange={(e) => set(k, (Number.isFinite(+e.target.value) ? +e.target.value : 0) as never)}
+          className="h-9"
+        />
+        <Slider
+          value={[Math.min(max, Math.max(min, val || 0))]}
+          min={min}
+          max={max}
+          step={step}
+          onValueChange={([v]) => set(k, clamp(v ?? min) as never)}
+          className="py-1.5"
+          aria-label={label}
+        />
+      </div>
+    );
+  };
+
 
   return (
     <section className="space-y-4 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
