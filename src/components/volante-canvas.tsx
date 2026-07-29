@@ -188,44 +188,52 @@ export function VolanteCanvas({
       if (y % 5 === 0) ctx.fillText(`${y}cm`, 2, cm(y) - 2);
     }
 
-    const marcados = new Set(jogoPreview?.dezenas ?? []);
-
-    for (let n = 1; n <= cfg.total; n++) {
-      const { col, row } = layout.pos(n);
-      const cx = cm(ox + col * cal.passoX);
-      const cy = cm(oy + row * cal.passoY);
-      const w = cm(cal.marcaW);
-      const h = cm(cal.marcaH);
-      const x = cx - w / 2;
-      const y = cy - h / 2;
-      if (marcados.has(n)) {
-        ctx.fillStyle = "#111827";
-        ctx.fillRect(x, y, w, h);
-      } else {
-        ctx.strokeStyle = "#cbd5e1";
-        ctx.setLineDash([2, 2]);
-        ctx.strokeRect(x, y, w, h);
-        ctx.setLineDash([]);
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = `${Math.max(7, h * 0.6)}px sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(String(n).padStart(2, "0"), cx, cy);
-        ctx.textAlign = "start";
-        ctx.textBaseline = "alphabetic";
-      }
+    const secoes: { oy: number; dezenas: number[] }[] = [
+      { oy, dezenas: jogoPreview?.dezenas ?? [] },
+    ];
+    if (cal.usarSecao2) {
+      secoes.push({ oy: oy + cal.secao2Y, dezenas: jogoPreview2?.dezenas ?? [] });
     }
 
-    // moldura da area do volante
-    ctx.strokeStyle = cfg.cor;
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(
-      cm(ox - cal.passoX / 2),
-      cm(oy - cal.passoY / 2),
-      cm(layout.cols * cal.passoX),
-      cm(layout.rows * cal.passoY),
-    );
-  }, [cal, cfg, layout, jogoPreview, paper, art]);
+    for (const sec of secoes) {
+      const marcados = new Set(sec.dezenas);
+      for (let n = 1; n <= cfg.total; n++) {
+        const { col, row } = layout.pos(n);
+        const cx = cm(ox + col * cal.passoX);
+        const cy = cm(sec.oy + row * cal.passoY);
+        const w = cm(cal.marcaW);
+        const h = cm(cal.marcaH);
+        const x = cx - w / 2;
+        const y = cy - h / 2;
+        if (marcados.has(n)) {
+          ctx.fillStyle = "#111827";
+          ctx.fillRect(x, y, w, h);
+        } else {
+          ctx.strokeStyle = "#cbd5e1";
+          ctx.setLineDash([2, 2]);
+          ctx.strokeRect(x, y, w, h);
+          ctx.setLineDash([]);
+          ctx.fillStyle = "#94a3b8";
+          ctx.font = `${Math.max(7, h * 0.6)}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(String(n).padStart(2, "0"), cx, cy);
+          ctx.textAlign = "start";
+          ctx.textBaseline = "alphabetic";
+        }
+      }
+
+      // moldura da area do volante
+      ctx.strokeStyle = cfg.cor;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(
+        cm(ox - cal.passoX / 2),
+        cm(sec.oy - cal.passoY / 2),
+        cm(layout.cols * cal.passoX),
+        cm(layout.rows * cal.passoY),
+      );
+    }
+  }, [cal, cfg, layout, jogoPreview, jogoPreview2, paper, art]);
 
   function set<K extends keyof Calibracao>(k: K, v: Calibracao[K]) {
     setCal((c) => ({ ...c, [k]: v }));
