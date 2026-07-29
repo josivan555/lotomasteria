@@ -108,9 +108,12 @@ function Dashboard() {
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-lg">
-              <Trophy className="h-6 w-6" />
-            </div>
+            <img
+              src={cfg.banner}
+              alt={`${cfg.nome} — arte oficial`}
+              className="h-16 w-auto drop-shadow-md"
+              loading="lazy"
+            />
             <div>
               <p className="text-xs uppercase tracking-widest text-muted-foreground">Último sorteio</p>
               <p className="text-xl font-bold">{cfg.nome}</p>

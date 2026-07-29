@@ -3,6 +3,9 @@
 import lotofacilLogo from "@/assets/lotofacil-logo.png.asset.json";
 import megasenaLogo from "@/assets/megasena-logo.png.asset.json";
 import quinaLogo from "@/assets/quina-logo.png.asset.json";
+import lotofacilBanner from "@/assets/lotofacil-banner.png.asset.json";
+import megasenaBanner from "@/assets/megasena-banner.png.asset.json";
+import quinaBanner from "@/assets/quina-banner.png.asset.json";
 
 export type LoteriaId = "lotofacil" | "megasena" | "quina";
 
@@ -31,6 +34,7 @@ export type LoteriaConfig = {
   descricaoCurta: string;
   descricaoLonga: string;
   logo: string;
+  banner: string;
   moldura?: Set<number>;
   filtrosDefault: FiltrosDefault;
 };
@@ -55,6 +59,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     descricaoLonga:
       "Sorteios de segunda a sábado. Aposte de 15 a 20 dezenas e ganhe acertando 11, 12, 13, 14 ou 15 números.",
     logo: lotofacilLogo.url,
+    banner: lotofacilBanner.url,
     moldura: LOTOFACIL_MOLDURA,
     filtrosDefault: {
       somaMin: 170,
@@ -82,6 +87,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     descricaoLonga:
       "Sorteios às quartas e sábados. Aposte de 6 a 20 dezenas e ganhe acertando 4, 5 ou 6 números.",
     logo: megasenaLogo.url,
+    banner: megasenaBanner.url,
     filtrosDefault: {
       somaMin: 130,
       somaMax: 260,
@@ -106,6 +112,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     descricaoLonga:
       "Sorteios de segunda a sábado. Aposte de 5 a 15 dezenas e ganhe acertando 2, 3, 4 ou 5 números.",
     logo: quinaLogo.url,
+    banner: quinaBanner.url,
     filtrosDefault: {
       somaMin: 130,
       somaMax: 300,
