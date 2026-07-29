@@ -67,6 +67,10 @@ export type Calibracao = {
   ajusteEsquerda: number;
   /** ajuste fino vertical da impressora (cm, pode ser negativo) */
   ajusteTopo: number;
+  /** usar a 2a secao de jogos do mesmo volante */
+  usarSecao2: boolean;
+  /** distancia vertical do inicio da 1a secao ate a 2a (cm) */
+  secao2Y: number;
   papel: "A4" | "Letter";
 };
 
@@ -75,19 +79,19 @@ const PADROES: Record<LoteriaId, Calibracao> = {
     offsetX: 3.49, offsetY: 4.53, passoX: 1.91, passoY: 0.89,
     marcaW: 0.89, marcaH: 0.6,
     cartaoX: 1.5, cartaoY: 1.0, cartaoW: 12, mostrarCartao: true,
-    ajusteEsquerda: 0, ajusteTopo: 0, papel: "A4",
+    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 5.4, papel: "A4",
   },
   megasena: {
     offsetX: 2.33, offsetY: 3.74, passoX: 0.79, passoY: 0.6,
     marcaW: 0.58, marcaH: 0.33,
     cartaoX: 1.5, cartaoY: 1.0, cartaoW: 10.5, mostrarCartao: true,
-    ajusteEsquerda: 0, ajusteTopo: 0, papel: "A4",
+    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 4.05, papel: "A4",
   },
   quina: {
     offsetX: 2.98, offsetY: 5.29, passoX: 0.77, passoY: 0.37,
     marcaW: 0.57, marcaH: 0.29,
     cartaoX: 1.5, cartaoY: 1.0, cartaoW: 9.5, mostrarCartao: true,
-    ajusteEsquerda: 0, ajusteTopo: 0, papel: "A4",
+    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 3.6, papel: "A4",
   },
 };
 
@@ -136,7 +140,9 @@ export function VolanteCanvas({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cfg.id]);
 
-  const jogoPreview = jogos.find((j) => j.id === selecionados[0]) ?? jogos[0];
+  const listaSel = jogos.filter((j) => selecionados.includes(j.id));
+  const jogoPreview = listaSel[0] ?? jogos[0];
+  const jogoPreview2 = listaSel[1];
   const paper = PAPEL_CM[cal.papel];
 
   // desenho
@@ -184,44 +190,52 @@ export function VolanteCanvas({
       if (y % 5 === 0) ctx.fillText(`${y}cm`, 2, cm(y) - 2);
     }
 
-    const marcados = new Set(jogoPreview?.dezenas ?? []);
-
-    for (let n = 1; n <= cfg.total; n++) {
-      const { col, row } = layout.pos(n);
-      const cx = cm(ox + col * cal.passoX);
-      const cy = cm(oy + row * cal.passoY);
-      const w = cm(cal.marcaW);
-      const h = cm(cal.marcaH);
-      const x = cx - w / 2;
-      const y = cy - h / 2;
-      if (marcados.has(n)) {
-        ctx.fillStyle = "#111827";
-        ctx.fillRect(x, y, w, h);
-      } else {
-        ctx.strokeStyle = "#cbd5e1";
-        ctx.setLineDash([2, 2]);
-        ctx.strokeRect(x, y, w, h);
-        ctx.setLineDash([]);
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = `${Math.max(7, h * 0.6)}px sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(String(n).padStart(2, "0"), cx, cy);
-        ctx.textAlign = "start";
-        ctx.textBaseline = "alphabetic";
-      }
+    const secoes: { oy: number; dezenas: number[] }[] = [
+      { oy, dezenas: jogoPreview?.dezenas ?? [] },
+    ];
+    if (cal.usarSecao2) {
+      secoes.push({ oy: oy + cal.secao2Y, dezenas: jogoPreview2?.dezenas ?? [] });
     }
 
-    // moldura da area do volante
-    ctx.strokeStyle = cfg.cor;
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(
-      cm(ox - cal.passoX / 2),
-      cm(oy - cal.passoY / 2),
-      cm(layout.cols * cal.passoX),
-      cm(layout.rows * cal.passoY),
-    );
-  }, [cal, cfg, layout, jogoPreview, paper, art]);
+    for (const sec of secoes) {
+      const marcados = new Set(sec.dezenas);
+      for (let n = 1; n <= cfg.total; n++) {
+        const { col, row } = layout.pos(n);
+        const cx = cm(ox + col * cal.passoX);
+        const cy = cm(sec.oy + row * cal.passoY);
+        const w = cm(cal.marcaW);
+        const h = cm(cal.marcaH);
+        const x = cx - w / 2;
+        const y = cy - h / 2;
+        if (marcados.has(n)) {
+          ctx.fillStyle = "#111827";
+          ctx.fillRect(x, y, w, h);
+        } else {
+          ctx.strokeStyle = "#cbd5e1";
+          ctx.setLineDash([2, 2]);
+          ctx.strokeRect(x, y, w, h);
+          ctx.setLineDash([]);
+          ctx.fillStyle = "#94a3b8";
+          ctx.font = `${Math.max(7, h * 0.6)}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(String(n).padStart(2, "0"), cx, cy);
+          ctx.textAlign = "start";
+          ctx.textBaseline = "alphabetic";
+        }
+      }
+
+      // moldura da area do volante
+      ctx.strokeStyle = cfg.cor;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(
+        cm(ox - cal.passoX / 2),
+        cm(sec.oy - cal.passoY / 2),
+        cm(layout.cols * cal.passoX),
+        cm(layout.rows * cal.passoY),
+      );
+    }
+  }, [cal, cfg, layout, jogoPreview, jogoPreview2, paper, art]);
 
   function set<K extends keyof Calibracao>(k: K, v: Calibracao[K]) {
     setCal((c) => ({ ...c, [k]: v }));
@@ -268,14 +282,24 @@ export function VolanteCanvas({
     const ox = cal.offsetX + cal.ajusteEsquerda;
     const oy = cal.offsetY + cal.ajusteTopo;
 
-    const paginas = lista
-      .map((j) => {
-        const marcas = j.dezenas
-          .map((n) => {
-            const { col, row } = layout.pos(n);
-            const left = ox + col * cal.passoX - cal.marcaW / 2;
-            const top = oy + row * cal.passoY - cal.marcaH / 2;
-            return `<div class="m" style="left:${left.toFixed(3)}cm;top:${top.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm"></div>`;
+    // agrupa os jogos: 2 por volante quando a 2a secao esta ativa
+    const porPagina = cal.usarSecao2 ? 2 : 1;
+    const grupos: (typeof lista)[] = [];
+    for (let i = 0; i < lista.length; i += porPagina) grupos.push(lista.slice(i, i + porPagina));
+
+    const paginas = grupos
+      .map((grupo) => {
+        const marcas = grupo
+          .map((j, idx) => {
+            const oySec = oy + (idx === 1 ? cal.secao2Y : 0);
+            return j.dezenas
+              .map((n) => {
+                const { col, row } = layout.pos(n);
+                const left = ox + col * cal.passoX - cal.marcaW / 2;
+                const top = oySec + row * cal.passoY - cal.marcaH / 2;
+                return `<div class="m" style="left:${left.toFixed(3)}cm;top:${top.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm"></div>`;
+              })
+              .join("");
           })
           .join("");
         return `<div class="pg">${marcas}</div>`;
@@ -409,6 +433,25 @@ export function VolanteCanvas({
           </div>
 
           <div className="rounded-lg border border-dashed border-border/60 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold">2ª seção do volante</p>
+              <Button
+                size="sm"
+                variant={cal.usarSecao2 ? "default" : "outline"}
+                className="h-7"
+                onClick={() => set("usarSecao2", !cal.usarSecao2)}
+              >
+                {cal.usarSecao2 ? "Ativa" : "Desativada"}
+              </Button>
+            </div>
+            {cal.usarSecao2 && num("Distância da 1ª p/ 2ª seção (cm)", "secao2Y", 0.05)}
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Com a 2ª seção ativa, cada volante recebe 2 jogos (o 1º na seção de cima e o 2º na de
+              baixo).
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-dashed border-border/60 p-3">
             <p className="mb-2 text-xs font-semibold">Ajuste da impressora</p>
             <div className="grid grid-cols-2 gap-3">
               {num("Deslocar horizontal (cm)", "ajusteEsquerda", 0.1)}
@@ -422,7 +465,7 @@ export function VolanteCanvas({
 
           <div>
             <Label className="text-xs text-muted-foreground">
-              Jogos a imprimir (1 volante por página)
+              Jogos a imprimir ({cal.usarSecao2 ? "2 jogos" : "1 jogo"} por volante)
             </Label>
             <div className="mt-2 max-h-56 space-y-1 overflow-auto rounded-lg border border-border/60 p-2">
               {jogos.length === 0 && (
