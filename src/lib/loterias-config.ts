@@ -27,6 +27,8 @@ export type LoteriaConfig = {
   slug: string;
   total: number;
   tamanho: number;
+  tamanhoMin: number;
+  tamanhoMax: number;
   cor: string;
   corFundo: string;
   ballVariant: "default" | "green" | "blue" | "purple";
