@@ -281,7 +281,7 @@ function Gerador() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Gerador Inteligente · {cfg.nome}</h2>
+        <h2 className="text-xl font-bold md:text-2xl">Gerador Inteligente · {cfg.nome}</h2>
         <p className="text-sm text-muted-foreground">
           Jogos de {cfg.tamanho} dezenas ponderados pelo Score IA, filtrados e ranqueados.{" "}
           <Link to="/resultados" className="text-primary hover:underline">
@@ -292,7 +292,8 @@ function Gerador() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-        <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-5 backdrop-blur">
+        <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
+
           <div>
             <div className="flex items-center justify-between gap-2">
               <InfoLabel
