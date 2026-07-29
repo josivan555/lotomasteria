@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter, Link, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarConcursos, salvarJogo } from "@/lib/loterias.functions";
+import { listarConcursos, salvarJogo, ultimoResultadoCaixa } from "@/lib/loterias.functions";
 import {
   computeNumberStats,
   gerarJogos,
@@ -66,6 +66,16 @@ function Gerador() {
     queryKey: ["concursos", loteria],
     queryFn: () => listar({ data: { loteria } }),
   });
+
+  const ultimoFn = useServerFn(ultimoResultadoCaixa);
+  const { data: ultimoOficial } = useQuery({
+    queryKey: ["ultimo-resultado", loteria],
+    queryFn: () => ultimoFn({ data: { loteria } }),
+    staleTime: 60_000,
+  });
+  const concursoAlvo =
+    ultimoOficial?.proximoConcurso ??
+    (ultimoOficial?.numero ? ultimoOficial.numero + 1 : undefined);
 
   const stats = useMemo(
     () => (concursos.length ? computeNumberStats(cfg, concursos) : null),
@@ -196,6 +206,7 @@ function Gerador() {
           loteria,
           dezenas: r.dezenas,
           score: r.score,
+          concurso: concursoAlvo,
           nome: `${cfg.nome} · Score ${r.score}`,
         },
       }),
@@ -216,6 +227,7 @@ function Gerador() {
             loteria,
             dezenas: r.dezenas,
             score: r.score,
+            concurso: concursoAlvo,
             nome: `${cfg.nome} · Score ${r.score}`,
           },
         });
