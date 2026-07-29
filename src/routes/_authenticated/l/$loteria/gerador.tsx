@@ -174,8 +174,10 @@ function Gerador() {
       toast.error("Nenhum jogo passou nos filtros. Afrouxe algum parâmetro.");
       return;
     }
-    setResultados(jogos.map((j) => ({ dezenas: j.dezenas, score: j.score })));
-    toast.success(`${jogos.length} jogos gerados.`);
+    const lista = jogos.map((j) => ({ dezenas: j.dezenas, score: j.score }));
+    setResultados(lista);
+    toast.success(`${jogos.length} jogos gerados. Salvando em Meus Jogos...`);
+    salvarTodosMut.mutate(lista);
   }
 
   const salvarMut = useMutation({
@@ -429,16 +431,12 @@ function Gerador() {
               <Button variant="outline" size="sm" onClick={exportarCSV}>
                 <Download className="mr-2 h-4 w-4" /> Exportar CSV
               </Button>
-              <Button
-                size="sm"
-                disabled={salvarTodosMut.isPending}
-                onClick={() => salvarTodosMut.mutate(resultados)}
-              >
-                <Bookmark className="mr-2 h-4 w-4" />
+              <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Bookmark className="h-3.5 w-3.5" />
                 {salvarTodosMut.isPending
-                  ? "Salvando..."
-                  : `Salvar todos (${resultados.length})`}
-              </Button>
+                  ? "Salvando em Meus Jogos..."
+                  : "Salvos automaticamente em Meus Jogos"}
+              </span>
             </div>
 
           )}
