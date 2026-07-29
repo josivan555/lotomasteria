@@ -1,14 +1,18 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { listarJogosSalvos, ultimoResultadoCaixa } from "@/lib/loterias.functions";
+import {
+  listarJogosSalvos,
+  ultimoResultadoCaixa,
+  resultadoDoConcurso,
+} from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trophy, Download } from "lucide-react";
+import { Trophy, Download, Clock } from "lucide-react";
 import { exportarResultadosPDF } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/resultados")({
@@ -18,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/l/$loteria/resultados")({
       {
         name: "description",
         content:
-          "Confira seus jogos salvos contra o resultado do concurso mais recente ou digite as dezenas sorteadas.",
+          "Cada jogo é conferido com o resultado do concurso para o qual ele foi gerado, assim que o sorteio acontece.",
       },
     ],
   }),
@@ -40,13 +44,14 @@ function Resultados() {
 
   const listar = useServerFn(listarJogosSalvos);
   const ultimo = useServerFn(ultimoResultadoCaixa);
+  const porConcurso = useServerFn(resultadoDoConcurso);
 
   const { data: jogos = [] } = useQuery({
     queryKey: ["jogos-salvos", loteria],
     queryFn: () => listar({ data: { loteria } }),
   });
 
-  const { data: resultado } = useQuery({
+  const { data: oficial } = useQuery({
     queryKey: ["ultimo-resultado", loteria],
     queryFn: () => ultimo({ data: { loteria } }),
     staleTime: 60_000,
@@ -55,43 +60,68 @@ function Resultados() {
   const [manual, setManual] = useState("");
   const [pdfFrom, setPdfFrom] = useState("");
   const [pdfTo, setPdfTo] = useState("");
-  const drawn = useMemo(() => {
-    const parsed = parseNumbers(manual);
-    if (parsed.length) return parsed.filter((n) => n <= cfg.total);
-    return resultado?.dezenas ?? [];
-  }, [manual, resultado, cfg.total]);
 
-  const drawnSet = useMemo(() => new Set(drawn), [drawn]);
+  const manualNums = useMemo(
+    () => parseNumbers(manual).filter((n) => n <= cfg.total),
+    [manual, cfg.total],
+  );
 
-  const items = useMemo(() => {
-    const base = jogos.map((j, i) => ({
-      id: j.id,
-      idx: i,
-      nome: j.nome,
-      nums: j.dezenas,
-      hits: j.dezenas.filter((n) => drawnSet.has(n)).length,
-    }));
-    return drawn.length
-      ? base.slice().sort((a, b) => b.hits - a.hits || a.idx - b.idx)
-      : base;
-  }, [jogos, drawnSet, drawn.length]);
+  // Concursos-alvo distintos dos jogos salvos (jogos antigos sem alvo usam o último oficial)
+  const alvos = useMemo(() => {
+    const set = new Set<number>();
+    for (const j of jogos) {
+      const alvo = j.concurso_alvo ?? oficial?.numero ?? null;
+      if (alvo) set.add(alvo);
+    }
+    return [...set].sort((a, b) => b - a);
+  }, [jogos, oficial?.numero]);
 
-  const itemsParaPdf = useMemo(() => {
-    if (!pdfFrom && !pdfTo) return items;
-    const from = pdfFrom ? new Date(pdfFrom + "T00:00:00").getTime() : -Infinity;
-    const to = pdfTo ? new Date(pdfTo + "T23:59:59.999").getTime() : Infinity;
-    const allowed = new Set(
-      jogos
-        .filter((j) => {
-          const t = new Date(j.created_at).getTime();
-          return t >= from && t <= to;
-        })
-        .map((j) => j.id),
-    );
-    return items.filter((it) => allowed.has(it.id));
-  }, [items, jogos, pdfFrom, pdfTo]);
+  const resultadosQueries = useQueries({
+    queries: alvos.map((numero) => ({
+      queryKey: ["resultado-concurso", loteria, numero],
+      queryFn: () => porConcurso({ data: { loteria, numero } }),
+      staleTime: 5 * 60_000,
+      enabled: !!oficial && numero <= oficial.numero,
+    })),
+  });
 
-  const maxHits = items.reduce((m, it) => Math.max(m, it.hits), 0);
+  const resultadoPorNumero = useMemo(() => {
+    const map = new Map<number, { numero: number; data_apuracao: string; dezenas: number[] }>();
+    alvos.forEach((numero, i) => {
+      const r = resultadosQueries[i]?.data;
+      if (r) map.set(numero, r);
+    });
+    return map;
+  }, [alvos, resultadosQueries]);
+
+  const grupos = useMemo(() => {
+    const dentroDoFiltro = (createdAt: string) => {
+      if (!pdfFrom && !pdfTo) return true;
+      const t = new Date(createdAt).getTime();
+      const from = pdfFrom ? new Date(pdfFrom + "T00:00:00").getTime() : -Infinity;
+      const to = pdfTo ? new Date(pdfTo + "T23:59:59.999").getTime() : Infinity;
+      return t >= from && t <= to;
+    };
+
+    return alvos.map((numero) => {
+      const doGrupo = jogos.filter(
+        (j) => (j.concurso_alvo ?? oficial?.numero ?? null) === numero && dentroDoFiltro(j.created_at),
+      );
+      const res = resultadoPorNumero.get(numero) ?? null;
+      const sorteadas = manualNums.length ? manualNums : (res?.dezenas ?? []);
+      const drawnSet = new Set(sorteadas);
+      const aguardando = sorteadas.length === 0;
+      const itens = doGrupo
+        .map((j, i) => ({
+          id: j.id,
+          idx: i,
+          nums: j.dezenas,
+          hits: j.dezenas.filter((n) => drawnSet.has(n)).length,
+        }))
+        .sort((a, b) => (aguardando ? a.idx - b.idx : b.hits - a.hits || a.idx - b.idx));
+      return { numero, res, sorteadas, drawnSet, aguardando, itens };
+    }).filter((g) => g.itens.length > 0);
+  }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualNums, pdfFrom, pdfTo]);
 
   const tierDefs =
     loteria === "lotofacil"
@@ -124,13 +154,32 @@ function Resultados() {
     return `${t} pontos`;
   };
 
+  const conferidos = grupos.filter((g) => !g.aguardando);
+  const podeExportar = conferidos.length > 0;
+
+  function baixarPDF() {
+    const g = conferidos[0];
+    if (!g) return;
+    exportarResultadosPDF({
+      loteriaNome: cfg.nome,
+      cor: cfg.cor,
+      concurso: g.res
+        ? { numero: g.res.numero, data: g.res.data_apuracao, dezenas: g.res.dezenas }
+        : null,
+      sorteadas: g.sorteadas,
+      itens: g.itens.map((it) => ({ nums: it.nums, hits: it.hits })),
+      tierLabel,
+    });
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold">Conferência · {cfg.nome}</h2>
           <p className="text-sm text-muted-foreground">
-            Digite as dezenas sorteadas ou confira automaticamente com o último concurso oficial.
+            Cada jogo é conferido com o resultado do concurso em que foi gerado. Jogos de concursos
+            ainda não sorteados ficam aguardando.
           </p>
         </div>
         {jogos.length > 0 && (
@@ -160,23 +209,7 @@ function Resultados() {
                 Limpar
               </Button>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={itemsParaPdf.length === 0}
-              onClick={() =>
-                exportarResultadosPDF({
-                  loteriaNome: cfg.nome,
-                  cor: cfg.cor,
-                  concurso: resultado
-                    ? { numero: resultado.numero, data: resultado.data_apuracao, dezenas: resultado.dezenas }
-                    : null,
-                  sorteadas: drawn,
-                  itens: itemsParaPdf.map((it) => ({ nums: it.nums, hits: it.hits })),
-                  tierLabel,
-                })
-              }
-            >
+            <Button variant="outline" size="sm" disabled={!podeExportar} onClick={baixarPDF}>
               <Download className="mr-2 h-4 w-4" />
               Baixar PDF
             </Button>
@@ -184,15 +217,15 @@ function Resultados() {
         )}
       </div>
 
-
       <div className="rounded-2xl border border-border/60 bg-card/60 p-5 backdrop-blur">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-semibold">
-            Resultado do <span style={{ color: cfg.cor }}>concurso</span>
+            Conferir com <span style={{ color: cfg.cor }}>dezenas manuais</span>
           </h3>
-          {resultado && (
+          {oficial && (
             <span className="rounded-md border border-border/60 bg-secondary px-2 py-1 font-mono text-xs text-muted-foreground">
-              Concurso {resultado.numero} · {new Date(resultado.data_apuracao).toLocaleDateString("pt-BR")}
+              Último oficial: concurso {oficial.numero} ·{" "}
+              {new Date(oficial.data_apuracao).toLocaleDateString("pt-BR")}
             </span>
           )}
         </div>
@@ -208,44 +241,10 @@ function Resultados() {
           </Button>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Deixe em branco para usar o último resultado oficial da Caixa. Números em qualquer ordem, separados por espaço ou vírgula.
+          Deixe em branco para conferir automaticamente cada jogo com o resultado do concurso a que
+          ele pertence.
         </p>
-        {drawn.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-muted-foreground">Sorteadas:</span>
-            <div className="flex flex-wrap gap-1">
-              {drawn
-                .slice()
-                .sort((a, b) => a - b)
-                .map((n) => (
-                  <DezenaBall key={n} n={n} variant={ballVariant} className="h-8! w-8! text-xs!" />
-                ))}
-            </div>
-          </div>
-        )}
       </div>
-
-      {jogos.length > 0 && drawn.length > 0 && (
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
-          {tierDefs.map((t) => {
-            const count = items.filter((it) => it.hits === t).length;
-            return (
-              <div
-                key={t}
-                className="rounded-xl border border-border/60 bg-card/60 p-3 text-center backdrop-blur"
-              >
-                <div
-                  className={`text-2xl font-bold ${count > 0 ? "" : "text-muted-foreground/40"}`}
-                  style={count > 0 ? { color: cfg.cor } : undefined}
-                >
-                  {count}
-                </div>
-                <div className="mt-0.5 text-[11px] text-muted-foreground">{tierName(t)}</div>
-              </div>
-            );
-          })}
-        </div>
-      )}
 
       {jogos.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border/60 p-10 text-center text-sm text-muted-foreground">
@@ -255,52 +254,103 @@ function Resultados() {
           </Link>
         </div>
       ) : (
-        <ol className="space-y-2">
-          {items.map((it, i) => (
-            <li
-              key={it.id}
-              className="flex flex-wrap items-center gap-3 rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur"
-            >
-              <span className="w-16 shrink-0 text-xs font-semibold text-muted-foreground">
-                Jogo {pad(i + 1)}
-              </span>
-              <div className="flex flex-1 flex-wrap gap-1">
-                {it.nums.map((n) => {
-                  const hit = drawnSet.has(n);
-                  return (
-                    <DezenaBall
-                      key={n}
-                      n={n}
-                      variant={hit ? ballVariant : "muted"}
-                      className="h-7! w-7! text-[11px]!"
-                    />
-                  );
-                })}
-              </div>
-              <div className="ml-auto flex w-16 shrink-0 flex-col items-center">
-                <span
-                  className="font-mono text-lg font-bold"
-                  style={
-                    drawn.length && it.hits === maxHits && it.hits > 0
-                      ? { color: cfg.cor }
-                      : { color: "hsl(var(--muted-foreground))" }
-                  }
-                >
-                  {drawn.length ? it.hits : "–"}
-                </span>
-                <span
-                  className="text-[10px] font-semibold uppercase tracking-wide"
-                  style={{ color: cfg.cor }}
-                >
-                  {drawn.length ? tierLabel(it.hits) : ""}
+        grupos.map((g) => {
+          const maxHits = g.itens.reduce((m, it) => Math.max(m, it.hits), 0);
+          return (
+            <section key={g.numero} className="space-y-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="text-lg font-semibold">Concurso {g.numero}</h3>
+                {g.aguardando ? (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-secondary px-2 py-1 text-xs text-muted-foreground">
+                    <Clock className="h-3.5 w-3.5" /> Aguardando sorteio
+                  </span>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-semibold text-muted-foreground">Sorteadas:</span>
+                    {g.sorteadas
+                      .slice()
+                      .sort((a, b) => a - b)
+                      .map((n) => (
+                        <DezenaBall key={n} n={n} variant={ballVariant} className="h-7! w-7! text-[11px]!" />
+                      ))}
+                  </div>
+                )}
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {g.itens.length} jogo{g.itens.length > 1 ? "s" : ""}
                 </span>
               </div>
-            </li>
-          ))}
-        </ol>
+
+              {!g.aguardando && (
+                <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
+                  {tierDefs.map((t) => {
+                    const count = g.itens.filter((it) => it.hits === t).length;
+                    return (
+                      <div
+                        key={t}
+                        className="rounded-xl border border-border/60 bg-card/60 p-3 text-center backdrop-blur"
+                      >
+                        <div
+                          className={`text-2xl font-bold ${count > 0 ? "" : "text-muted-foreground/40"}`}
+                          style={count > 0 ? { color: cfg.cor } : undefined}
+                        >
+                          {count}
+                        </div>
+                        <div className="mt-0.5 text-[11px] text-muted-foreground">{tierName(t)}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <ol className="space-y-2">
+                {g.itens.map((it, i) => (
+                  <li
+                    key={it.id}
+                    className="flex flex-wrap items-center gap-3 rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur"
+                  >
+                    <span className="w-16 shrink-0 text-xs font-semibold text-muted-foreground">
+                      Jogo {pad(i + 1)}
+                    </span>
+                    <div className="flex flex-1 flex-wrap gap-1">
+                      {it.nums.map((n) => {
+                        const hit = !g.aguardando && g.drawnSet.has(n);
+                        return (
+                          <DezenaBall
+                            key={n}
+                            n={n}
+                            variant={hit ? ballVariant : "muted"}
+                            className="h-7! w-7! text-[11px]!"
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="ml-auto flex w-16 shrink-0 flex-col items-center">
+                      <span
+                        className="font-mono text-lg font-bold"
+                        style={
+                          !g.aguardando && it.hits === maxHits && it.hits > 0
+                            ? { color: cfg.cor }
+                            : { color: "hsl(var(--muted-foreground))" }
+                        }
+                      >
+                        {g.aguardando ? "–" : it.hits}
+                      </span>
+                      <span
+                        className="text-[10px] font-semibold uppercase tracking-wide"
+                        style={{ color: cfg.cor }}
+                      >
+                        {g.aguardando ? "" : tierLabel(it.hits)}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          );
+        })
       )}
 
-      {resultado && (
+      {oficial && (
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Trophy className="h-3.5 w-3.5" />
           Dados oficiais da Caixa Econômica Federal.
