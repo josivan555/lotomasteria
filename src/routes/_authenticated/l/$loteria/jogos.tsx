@@ -133,6 +133,19 @@ function Jogos() {
                 Gerar volante
               </Link>
             </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={jogos.length === 0 || delAll.isPending}
+              onClick={() => {
+                if (confirm(`Tem certeza que deseja remover todos os ${jogos.length} jogos salvos da ${cfg.nome}?\n\nEssa ação não pode ser desfeita.`)) {
+                  delAll.mutate();
+                }
+              }}
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              Limpar todos
+            </Button>
           </div>
         )}
       </div>
