@@ -39,9 +39,15 @@ function InfoLabel({ label, description }: { label: string; description: string 
             <Info className="h-4 w-4" />
           </button>
         </PopoverTrigger>
-        <PopoverContent side="right" align="start" sideOffset={12} className="w-72">
+        <PopoverContent
+          side="bottom"
+          align="start"
+          sideOffset={8}
+          className="w-[min(18rem,calc(100vw-2rem))] md:w-72"
+        >
           <p className="text-sm font-semibold">{label}</p>
           <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+
         </PopoverContent>
       </Popover>
     </div>
@@ -275,7 +281,7 @@ function Gerador() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Gerador Inteligente · {cfg.nome}</h2>
+        <h2 className="text-xl font-bold md:text-2xl">Gerador Inteligente · {cfg.nome}</h2>
         <p className="text-sm text-muted-foreground">
           Jogos de {cfg.tamanho} dezenas ponderados pelo Score IA, filtrados e ranqueados.{" "}
           <Link to="/resultados" className="text-primary hover:underline">
@@ -286,7 +292,8 @@ function Gerador() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-        <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-5 backdrop-blur">
+        <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
+
           <div>
             <div className="flex items-center justify-between gap-2">
               <InfoLabel
@@ -448,7 +455,7 @@ function Gerador() {
 
         <div className="space-y-3">
           {resultados.length > 0 && (
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <Button variant="outline" size="sm" onClick={exportarCSV}>
                 <Download className="mr-2 h-4 w-4" /> Exportar CSV
               </Button>
@@ -474,14 +481,20 @@ function Gerador() {
                     key={i}
                     className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 text-sm text-muted-foreground tabular-nums">#{i + 1}</span>
+                    <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                      <span className="w-6 shrink-0 text-sm text-muted-foreground tabular-nums sm:w-8">#{i + 1}</span>
                       <div className="flex flex-wrap gap-1">
                         {r.dezenas.map((n) => (
-                          <DezenaBall key={n} n={n} variant={ballVariant} className="h-8! w-8! text-xs!" />
+                          <DezenaBall
+                            key={n}
+                            n={n}
+                            variant={ballVariant}
+                            className="h-7! w-7! text-[11px]! sm:h-8! sm:w-8! sm:text-xs!"
+                          />
                         ))}
                       </div>
                     </div>
+
                     <div className="flex items-center gap-3">
                       <div className="text-right">
                         <div className={`text-lg font-bold ${c.color}`}>{r.score.toFixed(1)}</div>

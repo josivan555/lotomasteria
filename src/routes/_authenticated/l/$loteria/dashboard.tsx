@@ -87,17 +87,22 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="text-sm text-muted-foreground">
             {concursos.length} concursos analisados · último salvo #{latest.numero}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => syncMut.mutate()} disabled={syncMut.isPending} variant="outline">
+        <div className="flex w-full gap-2 sm:w-auto">
+          <Button
+            className="flex-1 sm:flex-none"
+            onClick={() => syncMut.mutate()}
+            disabled={syncMut.isPending}
+            variant="outline"
+          >
             <RefreshCw className={`mr-2 h-4 w-4 ${syncMut.isPending ? "animate-spin" : ""}`} />
             Atualizar
           </Button>
-          <Button asChild>
+          <Button asChild className="flex-1 sm:flex-none">
             <Link to="/l/$loteria/gerador" params={{ loteria }}>
               Gerar jogos
             </Link>
@@ -106,32 +111,32 @@ function Dashboard() {
       </div>
 
       <Card>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-start md:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
             <img
               src={cfg.banner}
               alt={`${cfg.nome} — arte oficial`}
-              className="h-16 w-auto drop-shadow-md"
+              className="h-12 w-auto shrink-0 drop-shadow-md md:h-16"
               loading="lazy"
             />
-            <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">Último sorteio</p>
-              <p className="text-xl font-bold">{cfg.nome}</p>
-              <p className="text-sm text-muted-foreground">
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground md:text-xs">Último sorteio</p>
+              <p className="text-lg font-bold md:text-xl">{cfg.nome}</p>
+              <p className="text-xs text-muted-foreground md:text-sm">
                 Concurso {shown.numero} ·{" "}
                 {new Date(shown.data_apuracao + "T00:00:00").toLocaleDateString("pt-BR")}
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 md:gap-2">
             {shown.dezenas.map((n) => (
-              <DezenaBall key={n} n={n} variant="gold" />
+              <DezenaBall key={n} n={n} variant="gold" className="h-8! w-8! text-xs! md:h-10! md:w-10! md:text-sm!" />
             ))}
           </div>
 
-          <div className="text-right">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">
+          <div className="md:text-right">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground md:text-xs">
               Prêmio {cfg.faixaPrincipal} acertos
             </p>
             <p className="text-lg font-bold text-primary">
@@ -163,6 +168,7 @@ function Dashboard() {
           </div>
         </div>
       </Card>
+
 
       <div className="grid gap-4 md:grid-cols-2">
         <ListCard icon={<TrendingUp className="h-4 w-4 text-primary" />} title="Score IA — Top 8">
@@ -208,7 +214,8 @@ function Dashboard() {
       </div>
 
       <ListCard title="Frequência histórica (todas as dezenas)">
-        <div className="grid grid-cols-5 gap-3 md:grid-cols-10">
+        <div className="grid grid-cols-5 gap-2 md:grid-cols-10 md:gap-3">
+
           {nums.map((n) => (
             <div key={n} className="flex flex-col items-center gap-1">
               <DezenaBall n={n} variant={ballVariant} />

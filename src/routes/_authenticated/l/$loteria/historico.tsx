@@ -48,11 +48,11 @@ function Historico() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-bold">Histórico · {cfg.nome}</h2>
+        <div className="min-w-0">
+          <h2 className="text-xl font-bold md:text-2xl">Histórico · {cfg.nome}</h2>
           <p className="text-sm text-muted-foreground">{concursos.length} concursos importados</p>
         </div>
-        <Button onClick={() => syncMut.mutate()} disabled={syncMut.isPending}>
+        <Button className="w-full sm:w-auto" onClick={() => syncMut.mutate()} disabled={syncMut.isPending}>
           <RefreshCw className={`mr-2 h-4 w-4 ${syncMut.isPending ? "animate-spin" : ""}`} />
           Sincronizar próximos 100
         </Button>
@@ -62,48 +62,50 @@ function Historico() {
         placeholder="Buscar por número do concurso..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="max-w-xs"
+        className="w-full max-w-xs"
       />
+
 
       {isLoading ? (
         <p className="text-muted-foreground">Carregando...</p>
       ) : (
         <div className="rounded-xl border border-border/60 bg-card/60 backdrop-blur">
-          <div className="max-h-[70vh] overflow-y-auto">
+          <div className="max-h-[70vh] overflow-auto">
             <table className="w-full">
               <thead className="sticky top-0 bg-card">
-                <tr className="border-b border-border/60 text-left text-xs uppercase text-muted-foreground">
-                  <th className="px-4 py-3">Concurso</th>
-                  <th className="px-4 py-3">Data</th>
-                  <th className="px-4 py-3">Dezenas</th>
-                  <th className="px-4 py-3 text-right">Soma</th>
+                <tr className="border-b border-border/60 text-left text-[10px] uppercase text-muted-foreground md:text-xs">
+                  <th className="px-2 py-3 md:px-4">Conc.</th>
+                  <th className="hidden px-4 py-3 sm:table-cell">Data</th>
+                  <th className="px-2 py-3 md:px-4">Dezenas</th>
+                  <th className="px-2 py-3 text-right md:px-4">Soma</th>
                 </tr>
               </thead>
               <tbody>
                 {filtrados.slice(0, 200).map((c) => (
                   <tr key={c.numero} className="border-b border-border/30">
-                    <td className="px-4 py-3 font-semibold">{c.numero}</td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground">
+                    <td className="px-2 py-3 text-sm font-semibold md:px-4">{c.numero}</td>
+                    <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">
                       {new Date(c.data_apuracao + "T00:00:00").toLocaleDateString("pt-BR")}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-2 py-3 md:px-4">
                       <div className="flex flex-wrap gap-1">
                         {c.dezenas.map((n) => (
                           <DezenaBall
                             key={n}
                             n={n}
                             variant={ballVariant}
-                            className="h-7! w-7! text-xs!"
+                            className="h-6! w-6! text-[10px]! md:h-7! md:w-7! md:text-xs!"
                           />
                         ))}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right text-sm">{c.soma}</td>
+                    <td className="px-2 py-3 text-right text-sm md:px-4">{c.soma}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
         </div>
       )}
     </div>

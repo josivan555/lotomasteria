@@ -175,33 +175,33 @@ function Resultados() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-bold">Conferência · {cfg.nome}</h2>
+        <div className="min-w-0">
+          <h2 className="text-xl font-bold md:text-2xl">Conferência · {cfg.nome}</h2>
           <p className="text-sm text-muted-foreground">
             Cada jogo é conferido com o resultado do concurso em que foi gerado. Jogos de concursos
             ainda não sorteados ficam aguardando.
           </p>
         </div>
         {jogos.length > 0 && (
-          <div className="flex flex-wrap items-end gap-2">
-            <div className="flex flex-col gap-1">
+          <div className="flex w-full flex-wrap items-end gap-2 md:w-auto">
+            <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-none">
               <Label htmlFor="res-from" className="text-xs text-muted-foreground">De</Label>
               <Input
                 id="res-from"
                 type="date"
                 value={pdfFrom}
                 onChange={(e) => setPdfFrom(e.target.value)}
-                className="h-9 w-[150px]"
+                className="h-9 w-full sm:w-[150px]"
               />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-none">
               <Label htmlFor="res-to" className="text-xs text-muted-foreground">Até</Label>
               <Input
                 id="res-to"
                 type="date"
                 value={pdfTo}
                 onChange={(e) => setPdfTo(e.target.value)}
-                className="h-9 w-[150px]"
+                className="h-9 w-full sm:w-[150px]"
               />
             </div>
             {(pdfFrom || pdfTo) && (
@@ -209,7 +209,7 @@ function Resultados() {
                 Limpar
               </Button>
             )}
-            <Button variant="outline" size="sm" disabled={!podeExportar} onClick={baixarPDF}>
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none" disabled={!podeExportar} onClick={baixarPDF}>
               <Download className="mr-2 h-4 w-4" />
               Baixar PDF
             </Button>
@@ -217,24 +217,25 @@ function Resultados() {
         )}
       </div>
 
-      <div className="rounded-2xl border border-border/60 bg-card/60 p-5 backdrop-blur">
+
+      <div className="rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-semibold">
             Conferir com <span style={{ color: cfg.cor }}>dezenas manuais</span>
           </h3>
           {oficial && (
-            <span className="rounded-md border border-border/60 bg-secondary px-2 py-1 font-mono text-xs text-muted-foreground">
+            <span className="rounded-md border border-border/60 bg-secondary px-2 py-1 font-mono text-[11px] text-muted-foreground md:text-xs">
               Último oficial: concurso {oficial.numero} ·{" "}
               {new Date(oficial.data_apuracao).toLocaleDateString("pt-BR")}
             </span>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <Input
             value={manual}
             onChange={(e) => setManual(e.target.value)}
             placeholder={`Digite as ${cfg.tamanho} dezenas sorteadas (ex: ${Array.from({ length: cfg.tamanho }, (_, i) => pad(i + 1)).join(" ")})`}
-            className="flex-1 min-w-[240px] font-mono"
+            className="w-full font-mono sm:w-auto sm:min-w-[240px] sm:flex-1"
           />
           <Button variant="secondary" onClick={() => setManual("")}>
             Limpar
@@ -245,6 +246,7 @@ function Resultados() {
           ele pertence.
         </p>
       </div>
+
 
       {jogos.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border/60 p-10 text-center text-sm text-muted-foreground">

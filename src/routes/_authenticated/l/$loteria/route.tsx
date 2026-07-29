@@ -43,23 +43,23 @@ function LoteriaLayout() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:p-4">
+        <div className="flex w-full min-w-0 items-center gap-3 md:w-auto">
           <img
             src={cfg.logo}
             alt={`Logo ${cfg.nome}`}
-            className="h-11 w-auto rounded-md shadow-sm"
+            className="h-9 w-auto shrink-0 rounded-md shadow-sm md:h-11"
           />
-          <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground md:text-xs">
               Modalidade
             </p>
-            <h1 className="text-xl font-bold leading-tight">{cfg.nome}</h1>
+            <h1 className="truncate text-lg font-bold leading-tight md:text-xl">{cfg.nome}</h1>
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="ml-1 gap-1.5">
+              <Button variant="outline" size="sm" className="ml-auto shrink-0 gap-1.5 md:ml-1">
                 Trocar
                 <ChevronsUpDown className="h-3.5 w-3.5" />
               </Button>
@@ -84,7 +84,7 @@ function LoteriaLayout() {
           </DropdownMenu>
         </div>
 
-        <nav className="flex flex-wrap gap-1">
+        <nav className="-mx-1 flex w-full gap-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:mx-0 md:w-auto md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           <NavPill to="/l/$loteria/dashboard" loteria={loteria} icon={<BarChart3 className="h-4 w-4" />}>
             Dashboard
           </NavPill>
@@ -106,6 +106,7 @@ function LoteriaLayout() {
         </nav>
       </div>
 
+
       <Outlet />
     </div>
   );
@@ -126,7 +127,7 @@ function NavPill({
     <Link
       to={to}
       params={{ loteria }}
-      className="inline-flex items-center gap-1.5 rounded-full border border-border/60 px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+      className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border/60 px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-secondary hover:text-foreground"
       activeProps={{
         className: "border-primary bg-primary/15 text-primary hover:bg-primary/20 hover:text-primary",
       }}

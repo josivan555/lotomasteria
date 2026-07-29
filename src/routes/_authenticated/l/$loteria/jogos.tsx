@@ -67,33 +67,33 @@ function Jogos() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-bold">Meus Jogos · {cfg.nome}</h2>
+        <div className="min-w-0">
+          <h2 className="text-xl font-bold md:text-2xl">Meus Jogos · {cfg.nome}</h2>
           <p className="text-sm text-muted-foreground">
             {jogosFiltrados.length} de {jogos.length} jogos
             {(dateFrom || dateTo) ? " (filtrados)" : " salvos"}
           </p>
         </div>
         {jogos.length > 0 && (
-          <div className="flex flex-wrap items-end gap-2">
-            <div className="flex flex-col gap-1">
+          <div className="flex w-full flex-wrap items-end gap-2 md:w-auto">
+            <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-none">
               <Label htmlFor="jogos-from" className="text-xs text-muted-foreground">De</Label>
               <Input
                 id="jogos-from"
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="h-9 w-[150px]"
+                className="h-9 w-full sm:w-[150px]"
               />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-none">
               <Label htmlFor="jogos-to" className="text-xs text-muted-foreground">Até</Label>
               <Input
                 id="jogos-to"
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="h-9 w-[150px]"
+                className="h-9 w-full sm:w-[150px]"
               />
             </div>
             {(dateFrom || dateTo) && (
@@ -111,6 +111,7 @@ function Jogos() {
             <Button
               variant="outline"
               size="sm"
+              className="flex-1 sm:flex-none"
               disabled={jogosFiltrados.length === 0}
               onClick={() =>
                 exportarJogosPDF({
@@ -127,7 +128,7 @@ function Jogos() {
               <Download className="mr-2 h-4 w-4" />
               Baixar PDF
             </Button>
-            <Button size="sm" asChild>
+            <Button size="sm" asChild className="flex-1 sm:flex-none">
               <Link to="/l/$loteria/volante" params={{ loteria }}>
                 <Printer className="mr-2 h-4 w-4" />
                 Gerar volante
@@ -136,6 +137,7 @@ function Jogos() {
             <Button
               variant="destructive"
               size="sm"
+              className="flex-1 sm:flex-none"
               disabled={jogos.length === 0 || delAll.isPending}
               onClick={() => {
                 if (confirm(`Tem certeza que deseja remover todos os ${jogos.length} jogos salvos da ${cfg.nome}?\n\nEssa ação não pode ser desfeita.`)) {
@@ -149,6 +151,7 @@ function Jogos() {
           </div>
         )}
       </div>
+
 
 
       {isLoading ? (
@@ -166,7 +169,7 @@ function Jogos() {
                 key={j.id}
                 className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
                   <span className="text-xs text-muted-foreground">
                     {new Date(j.created_at).toLocaleDateString("pt-BR")}
                   </span>
@@ -176,11 +179,12 @@ function Jogos() {
                         key={n}
                         n={n}
                         variant={ballVariant}
-                        className="h-8! w-8! text-xs!"
+                        className="h-7! w-7! text-[11px]! sm:h-8! sm:w-8! sm:text-xs!"
                       />
                     ))}
                   </div>
                 </div>
+
                 <div className="flex items-center gap-3">
                   {c && j.score != null && (
                     <div className="text-right">
