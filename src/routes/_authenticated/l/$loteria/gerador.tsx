@@ -174,8 +174,10 @@ function Gerador() {
       toast.error("Nenhum jogo passou nos filtros. Afrouxe algum parâmetro.");
       return;
     }
-    setResultados(jogos.map((j) => ({ dezenas: j.dezenas, score: j.score })));
-    toast.success(`${jogos.length} jogos gerados.`);
+    const lista = jogos.map((j) => ({ dezenas: j.dezenas, score: j.score }));
+    setResultados(lista);
+    toast.success(`${jogos.length} jogos gerados. Salvando em Meus Jogos...`);
+    salvarTodosMut.mutate(lista);
   }
 
   const salvarMut = useMutation({
