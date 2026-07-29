@@ -25,6 +25,7 @@ function Jogos() {
 
   const listar = useServerFn(listarJogosSalvos);
   const excluir = useServerFn(excluirJogo);
+  const excluirTodos = useServerFn(excluirTodosJogos);
   const router = useRouter();
 
   const { data: jogos = [], isLoading } = useQuery({
@@ -36,6 +37,15 @@ function Jogos() {
     mutationFn: (id: string) => excluir({ data: { id } }),
     onSuccess: () => {
       toast.success("Jogo excluído");
+      router.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const delAll = useMutation({
+    mutationFn: () => excluirTodos({ data: { loteria } }),
+    onSuccess: () => {
+      toast.success("Todos os jogos desta loteria foram removidos");
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
