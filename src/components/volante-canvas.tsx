@@ -495,7 +495,7 @@ export function VolanteCanvas({
 
           <div>
             <Label className="text-xs text-muted-foreground">
-              Jogos a imprimir ({cal.usarSecao2 ? "2 jogos" : "1 jogo"} por volante)
+              Jogos a imprimir ({1 + (cal.usarSecao2 ? 1 : 0) + (cal.usarSecao3 ? 1 : 0)} por volante)
             </Label>
             <div className="mt-2 max-h-56 space-y-1 overflow-auto rounded-lg border border-border/60 p-2">
               {jogos.length === 0 && (
