@@ -282,14 +282,24 @@ export function VolanteCanvas({
     const ox = cal.offsetX + cal.ajusteEsquerda;
     const oy = cal.offsetY + cal.ajusteTopo;
 
-    const paginas = lista
-      .map((j) => {
-        const marcas = j.dezenas
-          .map((n) => {
-            const { col, row } = layout.pos(n);
-            const left = ox + col * cal.passoX - cal.marcaW / 2;
-            const top = oy + row * cal.passoY - cal.marcaH / 2;
-            return `<div class="m" style="left:${left.toFixed(3)}cm;top:${top.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm"></div>`;
+    // agrupa os jogos: 2 por volante quando a 2a secao esta ativa
+    const porPagina = cal.usarSecao2 ? 2 : 1;
+    const grupos: (typeof lista)[] = [];
+    for (let i = 0; i < lista.length; i += porPagina) grupos.push(lista.slice(i, i + porPagina));
+
+    const paginas = grupos
+      .map((grupo) => {
+        const marcas = grupo
+          .map((j, idx) => {
+            const oySec = oy + (idx === 1 ? cal.secao2Y : 0);
+            return j.dezenas
+              .map((n) => {
+                const { col, row } = layout.pos(n);
+                const left = ox + col * cal.passoX - cal.marcaW / 2;
+                const top = oySec + row * cal.passoY - cal.marcaH / 2;
+                return `<div class="m" style="left:${left.toFixed(3)}cm;top:${top.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm"></div>`;
+              })
+              .join("");
           })
           .join("");
         return `<div class="pg">${marcas}</div>`;
