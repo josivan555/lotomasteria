@@ -1,5 +1,9 @@
 // Client-safe catalog of supported lotteries. Any component or util can read this.
 
+import lotofacilLogo from "@/assets/lotofacil-logo.png.asset.json";
+import megasenaLogo from "@/assets/megasena-logo.png.asset.json";
+import quinaLogo from "@/assets/quina-logo.png.asset.json";
+
 export type LoteriaId = "lotofacil" | "megasena" | "quina";
 
 export type FiltrosDefault = {
