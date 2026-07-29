@@ -169,7 +169,7 @@ function Jogos() {
                 key={j.id}
                 className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
                   <span className="text-xs text-muted-foreground">
                     {new Date(j.created_at).toLocaleDateString("pt-BR")}
                   </span>
@@ -179,11 +179,12 @@ function Jogos() {
                         key={n}
                         n={n}
                         variant={ballVariant}
-                        className="h-8! w-8! text-xs!"
+                        className="h-7! w-7! text-[11px]! sm:h-8! sm:w-8! sm:text-xs!"
                       />
                     ))}
                   </div>
                 </div>
+
                 <div className="flex items-center gap-3">
                   {c && j.score != null && (
                     <div className="text-right">
