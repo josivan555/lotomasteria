@@ -204,6 +204,10 @@ export function VolanteCanvas({
     if (cal.usarSecao2) {
       secoes.push({ oy: oy + cal.secao2Y, dezenas: jogoPreview2?.dezenas ?? [] });
     }
+    if (cal.usarSecao3) {
+      secoes.push({ oy: oy + cal.secao3Y, dezenas: jogoPreview3?.dezenas ?? [] });
+    }
+
 
     for (const sec of secoes) {
       const marcados = new Set(sec.dezenas);
