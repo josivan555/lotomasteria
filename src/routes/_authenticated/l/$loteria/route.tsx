@@ -25,17 +25,11 @@ function LoteriaLayout() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur">
         <div className="flex items-center gap-3">
-          <span
-            className={`ball ${
-              cfg.ballVariant === "blue"
-                ? "ball-blue"
-                : cfg.ballVariant === "purple"
-                  ? "ball-purple"
-                  : ""
-            } h-11! w-11! text-sm!`}
-          >
-            {cfg.tamanho}
-          </span>
+          <img
+            src={cfg.logo}
+            alt={`Logo ${cfg.nome}`}
+            className="h-11 w-auto rounded-md shadow-sm"
+          />
           <div>
             <p className="text-xs uppercase tracking-widest text-muted-foreground">
               Modalidade
