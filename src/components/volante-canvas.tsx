@@ -467,24 +467,25 @@ export function VolanteCanvas({
                 {cal.mostrarCartao ? "Visível" : "Oculto"}
               </Button>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {num("X (cm)", "cartaoX", 0.1)}
-              {num("Y (cm)", "cartaoY", 0.1)}
-              {num("Largura", "cartaoW", 0.1)}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {num("X (cm)", "cartaoX", 0.1, 0, paper.w)}
+              {num("Y (cm)", "cartaoY", 0.1, 0, paper.h)}
+              {num("Largura", "cartaoW", 0.1, 3, paper.w)}
             </div>
             <p className="mt-2 text-[11px] text-muted-foreground">
               O cartão é apenas guia na tela — não é impresso.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {num("Margem esquerda (cm)", "offsetX")}
-            {num("Margem superior (cm)", "offsetY")}
-            {num("Passo horizontal (cm)", "passoX")}
-            {num("Passo vertical (cm)", "passoY")}
-            {num("Largura da marca (cm)", "marcaW")}
-            {num("Altura da marca (cm)", "marcaH")}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {num("Margem esquerda (cm)", "offsetX", 0.05, 0, paper.w)}
+            {num("Margem superior (cm)", "offsetY", 0.05, 0, paper.h)}
+            {num("Passo horizontal (cm)", "passoX", 0.01, 0.1, 3)}
+            {num("Passo vertical (cm)", "passoY", 0.01, 0.1, 3)}
+            {num("Largura da marca (cm)", "marcaW", 0.01, 0.05, 2)}
+            {num("Altura da marca (cm)", "marcaH", 0.01, 0.05, 2)}
           </div>
+
 
           <div className="rounded-lg border border-dashed border-border/60 p-3">
             <div className="mb-2 flex items-center justify-between">
