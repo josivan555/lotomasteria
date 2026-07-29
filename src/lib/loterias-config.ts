@@ -22,7 +22,7 @@ export type LoteriaConfig = {
   tamanho: number;
   cor: string;
   corFundo: string;
-  ballVariant: "green" | "blue" | "purple";
+  ballVariant: "default" | "green" | "blue" | "purple";
   faixaPrincipal: number;
   descricaoCurta: string;
   descricaoLonga: string;
