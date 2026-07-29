@@ -51,6 +51,7 @@ function Gerador() {
   const listar = useServerFn(listarConcursos);
   const salvar = useServerFn(salvarJogo);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data: concursos = [] } = useQuery({
     queryKey: ["concursos", loteria],
