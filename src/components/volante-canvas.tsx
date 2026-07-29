@@ -163,6 +163,10 @@ export function VolanteCanvas({
   const jogoPreview2 = listaSel[1];
   const jogoPreview3 = listaSel[2];
   const paper = PAPEL_CM[cal.papel];
+  const jogosPorVolante = 1 + (cal.usarSecao2 ? 1 : 0) + (cal.usarSecao3 ? 1 : 0);
+  const volantesNecessarios = Math.ceil(selecionados.length / jogosPorVolante);
+  const sobra = selecionados.length % jogosPorVolante;
+
 
   // desenho
   useEffect(() => {
@@ -444,8 +448,10 @@ export function VolanteCanvas({
             <Save className="mr-2 h-4 w-4" /> Salvar calibração
           </Button>
           <Button size="sm" className="flex-1 md:flex-none" onClick={imprimir}>
-            <Printer className="mr-2 h-4 w-4" /> Imprimir ({selecionados.length})
+            <Printer className="mr-2 h-4 w-4" /> Imprimir ({selecionados.length} jogos ·{" "}
+            {volantesNecessarios} volante{volantesNecessarios === 1 ? "" : "s"})
           </Button>
+
         </div>
       </div>
 
@@ -570,8 +576,24 @@ export function VolanteCanvas({
 
           <div>
             <Label className="text-xs text-muted-foreground">
-              Jogos a imprimir ({1 + (cal.usarSecao2 ? 1 : 0) + (cal.usarSecao3 ? 1 : 0)} por volante)
+              Jogos a imprimir ({jogosPorVolante} por volante)
             </Label>
+            <div className="mt-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-xs">
+              <span className="font-semibold text-foreground">
+                {selecionados.length} jogo{selecionados.length === 1 ? "" : "s"} selecionado
+                {selecionados.length === 1 ? "" : "s"}
+              </span>
+              <span className="text-muted-foreground">
+                {" "}
+                · vai usar{" "}
+                <span className="font-semibold text-foreground">
+                  {volantesNecessarios} volante{volantesNecessarios === 1 ? "" : "s"}
+                </span>{" "}
+                ({jogosPorVolante} jogos por volante)
+                {sobra > 0 && ` · último volante com ${sobra} jogo${sobra === 1 ? "" : "s"}`}
+              </span>
+            </div>
+
             <div className="mt-2 max-h-56 space-y-1 overflow-auto rounded-lg border border-border/60 p-2">
               {jogos.length === 0 && (
                 <p className="p-2 text-xs text-muted-foreground">Nenhum jogo salvo.</p>
