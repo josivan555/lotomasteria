@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link, useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { ensureBrowserSession } from "@/lib/session-guard";
 import { LogOut, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
@@ -8,6 +9,7 @@ import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
+    await ensureBrowserSession();
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth", search: { mode: "login" } });
     return { user: data.user };
