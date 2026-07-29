@@ -48,11 +48,11 @@ function Historico() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-bold">Histórico · {cfg.nome}</h2>
+        <div className="min-w-0">
+          <h2 className="text-xl font-bold md:text-2xl">Histórico · {cfg.nome}</h2>
           <p className="text-sm text-muted-foreground">{concursos.length} concursos importados</p>
         </div>
-        <Button onClick={() => syncMut.mutate()} disabled={syncMut.isPending}>
+        <Button className="w-full sm:w-auto" onClick={() => syncMut.mutate()} disabled={syncMut.isPending}>
           <RefreshCw className={`mr-2 h-4 w-4 ${syncMut.isPending ? "animate-spin" : ""}`} />
           Sincronizar próximos 100
         </Button>
@@ -62,8 +62,9 @@ function Historico() {
         placeholder="Buscar por número do concurso..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="max-w-xs"
+        className="w-full max-w-xs"
       />
+
 
       {isLoading ? (
         <p className="text-muted-foreground">Carregando...</p>

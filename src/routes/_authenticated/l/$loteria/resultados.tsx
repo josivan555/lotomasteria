@@ -218,24 +218,24 @@ function Resultados() {
       </div>
 
 
-      <div className="rounded-2xl border border-border/60 bg-card/60 p-5 backdrop-blur">
+      <div className="rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-semibold">
             Conferir com <span style={{ color: cfg.cor }}>dezenas manuais</span>
           </h3>
           {oficial && (
-            <span className="rounded-md border border-border/60 bg-secondary px-2 py-1 font-mono text-xs text-muted-foreground">
+            <span className="rounded-md border border-border/60 bg-secondary px-2 py-1 font-mono text-[11px] text-muted-foreground md:text-xs">
               Último oficial: concurso {oficial.numero} ·{" "}
               {new Date(oficial.data_apuracao).toLocaleDateString("pt-BR")}
             </span>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <Input
             value={manual}
             onChange={(e) => setManual(e.target.value)}
             placeholder={`Digite as ${cfg.tamanho} dezenas sorteadas (ex: ${Array.from({ length: cfg.tamanho }, (_, i) => pad(i + 1)).join(" ")})`}
-            className="flex-1 min-w-[240px] font-mono"
+            className="w-full font-mono sm:w-auto sm:min-w-[240px] sm:flex-1"
           />
           <Button variant="secondary" onClick={() => setManual("")}>
             Limpar
@@ -246,6 +246,7 @@ function Resultados() {
           ele pertence.
         </p>
       </div>
+
 
       {jogos.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border/60 p-10 text-center text-sm text-muted-foreground">
