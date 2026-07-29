@@ -517,7 +517,7 @@ export function VolanteCanvas({
                 {cal.usarSecao3 ? "Ativa" : "Desativada"}
               </Button>
             </div>
-            {cal.usarSecao3 && num("Distância da 1ª p/ 3ª seção (cm)", "secao3Y", 0.05)}
+            {cal.usarSecao3 && num("Distância da 1ª p/ 3ª seção (cm)", "secao3Y", 0.05, 0, paper.h)}
             <p className="mt-2 text-[11px] text-muted-foreground">
               O volante da Quina tem 3 seções: com ela ativa, cada volante recebe 3 jogos.
             </p>
