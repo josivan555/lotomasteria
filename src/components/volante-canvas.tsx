@@ -525,10 +525,11 @@ export function VolanteCanvas({
 
           <div className="rounded-lg border border-dashed border-border/60 p-3">
             <p className="mb-2 text-xs font-semibold">Ajuste da impressora</p>
-            <div className="grid grid-cols-2 gap-3">
-              {num("Deslocar horizontal (cm)", "ajusteEsquerda", 0.1)}
-              {num("Deslocar vertical (cm)", "ajusteTopo", 0.1)}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {num("Deslocar horizontal (cm)", "ajusteEsquerda", 0.05, -5, 5)}
+              {num("Deslocar vertical (cm)", "ajusteTopo", 0.05, -5, 5)}
             </div>
+
             <p className="mt-2 text-[11px] text-muted-foreground">
               Valores negativos movem para a esquerda/cima. Imprima um teste em papel comum,
               sobreponha ao volante e corrija.
