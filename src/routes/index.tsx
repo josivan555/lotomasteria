@@ -100,6 +100,7 @@ function Landing() {
             title="Gerador com filtros"
             desc="Soma, pares/ímpares, moldura, consecutivas, incluir/excluir — gere 10 a 500 jogos ranqueados."
           />
+          </div>
         </section>
       </main>
 
