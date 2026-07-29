@@ -156,7 +156,7 @@ function Gerador() {
           <div>
             <Label>Quantidade</Label>
             <div className="mt-2 flex flex-wrap gap-2">
-              {[10, 50, 100, 500].map((v) => (
+              {[1, 2, 5, 10, 50, 100, 500].map((v) => (
                 <Button
                   key={v}
                   size="sm"
