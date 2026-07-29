@@ -459,8 +459,25 @@ export function VolanteCanvas({
             </div>
             {cal.usarSecao2 && num("Distância da 1ª p/ 2ª seção (cm)", "secao2Y", 0.05)}
             <p className="mt-2 text-[11px] text-muted-foreground">
-              Com a 2ª seção ativa, cada volante recebe 2 jogos (o 1º na seção de cima e o 2º na de
-              baixo).
+              Com a 2ª seção ativa, o 2º jogo é marcado na seção do meio do volante.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-dashed border-border/60 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold">3ª seção do volante</p>
+              <Button
+                size="sm"
+                variant={cal.usarSecao3 ? "default" : "outline"}
+                className="h-7"
+                onClick={() => set("usarSecao3", !cal.usarSecao3)}
+              >
+                {cal.usarSecao3 ? "Ativa" : "Desativada"}
+              </Button>
+            </div>
+            {cal.usarSecao3 && num("Distância da 1ª p/ 3ª seção (cm)", "secao3Y", 0.05)}
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              O volante da Quina tem 3 seções: com ela ativa, cada volante recebe 3 jogos.
             </p>
           </div>
 
