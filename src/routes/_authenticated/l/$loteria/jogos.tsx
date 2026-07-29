@@ -12,6 +12,7 @@ import { Trash2, Download } from "lucide-react";
 import { classificarScore } from "@/lib/loteria-utils";
 import { toast } from "sonner";
 import { exportarJogosPDF } from "@/lib/pdf-export";
+import { VolanteCanvas } from "@/components/volante-canvas";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/jogos")({
   component: Jogos,
@@ -121,6 +122,15 @@ function Jogos() {
         )}
       </div>
 
+
+      <VolanteCanvas
+        cfg={cfg}
+        jogos={jogosFiltrados.map((j) => ({
+          id: j.id,
+          dezenas: j.dezenas,
+          created_at: j.created_at,
+        }))}
+      />
 
       {isLoading ? (
         <p className="text-muted-foreground">Carregando...</p>
