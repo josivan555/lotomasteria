@@ -154,17 +154,17 @@
 @utility ball-blue {
   background: linear-gradient(
     145deg,
-    oklch(0.78 0.15 230),
-    oklch(0.5 0.16 235)
+    oklch(0.55 0.18 265),
+    oklch(0.32 0.17 265)
   );
-  color: oklch(0.98 0.01 230);
+  color: oklch(0.98 0.01 265);
 }
 
 @utility ball-purple {
   background: linear-gradient(
     145deg,
-    oklch(0.75 0.18 305),
-    oklch(0.48 0.2 300)
+    oklch(0.58 0.22 325),
+    oklch(0.38 0.2 320)
   );
-  color: oklch(0.98 0.01 305);
+  color: oklch(0.98 0.01 325);
 }

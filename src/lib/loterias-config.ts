@@ -22,7 +22,7 @@ export type LoteriaConfig = {
   tamanho: number;
   cor: string;
   corFundo: string;
-  ballVariant: "green" | "blue" | "purple";
+  ballVariant: "default" | "green" | "blue" | "purple";
   faixaPrincipal: number;
   descricaoCurta: string;
   descricaoLonga: string;
@@ -42,9 +42,9 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     slug: "lotofacil",
     total: 25,
     tamanho: 15,
-    cor: "#22c55e",
-    corFundo: "from-emerald-500/20 to-emerald-500/5",
-    ballVariant: "green",
+    cor: "#7a1f8f",
+    corFundo: "from-fuchsia-600/25 to-purple-700/10",
+    ballVariant: "purple",
     faixaPrincipal: 15,
     descricaoCurta: "15 dezenas entre 01 e 25.",
     descricaoLonga:
@@ -68,9 +68,9 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     slug: "megasena",
     total: 60,
     tamanho: 6,
-    cor: "#0ea5e9",
-    corFundo: "from-sky-500/20 to-sky-500/5",
-    ballVariant: "blue",
+    cor: "#067d3f",
+    corFundo: "from-emerald-600/25 to-green-700/10",
+    ballVariant: "green",
     faixaPrincipal: 6,
     descricaoCurta: "6 dezenas entre 01 e 60.",
     descricaoLonga:
@@ -91,9 +91,9 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     slug: "quina",
     total: 80,
     tamanho: 5,
-    cor: "#a855f7",
-    corFundo: "from-violet-500/20 to-violet-500/5",
-    ballVariant: "purple",
+    cor: "#0b3a8c",
+    corFundo: "from-blue-700/25 to-indigo-800/10",
+    ballVariant: "blue",
     faixaPrincipal: 5,
     descricaoCurta: "5 dezenas entre 01 e 80.",
     descricaoLonga:
