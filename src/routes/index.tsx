@@ -80,7 +80,11 @@ function Landing() {
           </div>
         </section>
 
-        <section className="grid gap-4 pb-24 md:grid-cols-3">
+        <section className="pb-24">
+          <h2 className="mb-6 text-center text-2xl font-bold tracking-tight md:text-3xl">
+            Recursos do LotoMaster IA
+          </h2>
+          <div className="grid gap-4 md:grid-cols-3">
           <Feature
             icon={<BarChart3 className="h-5 w-5" />}
             title="Estatísticas completas"
