@@ -7,6 +7,7 @@ import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Trophy, Download } from "lucide-react";
 import { exportarResultadosPDF } from "@/lib/pdf-export";
 
