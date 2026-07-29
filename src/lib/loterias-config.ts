@@ -3,6 +3,9 @@
 import lotofacilLogo from "@/assets/lotofacil-logo.png.asset.json";
 import megasenaLogo from "@/assets/megasena-logo.png.asset.json";
 import quinaLogo from "@/assets/quina-logo.png.asset.json";
+import lotofacilBanner from "@/assets/lotofacil-banner.png.asset.json";
+import megasenaBanner from "@/assets/megasena-banner.png.asset.json";
+import quinaBanner from "@/assets/quina-banner.png.asset.json";
 
 export type LoteriaId = "lotofacil" | "megasena" | "quina";
 
@@ -31,6 +34,7 @@ export type LoteriaConfig = {
   descricaoCurta: string;
   descricaoLonga: string;
   logo: string;
+  banner: string;
   moldura?: Set<number>;
   filtrosDefault: FiltrosDefault;
 };
