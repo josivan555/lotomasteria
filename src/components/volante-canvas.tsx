@@ -71,6 +71,10 @@ export type Calibracao = {
   usarSecao2: boolean;
   /** distancia vertical do inicio da 1a secao ate a 2a (cm) */
   secao2Y: number;
+  /** usar a 3a secao de jogos do mesmo volante */
+  usarSecao3: boolean;
+  /** distancia vertical do inicio da 1a secao ate a 3a (cm) */
+  secao3Y: number;
   papel: "A4" | "Letter";
 };
 
