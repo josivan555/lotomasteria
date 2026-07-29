@@ -105,6 +105,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     descricaoCurta: "5 dezenas entre 01 e 80.",
     descricaoLonga:
       "Sorteios de segunda a sábado. Aposte de 5 a 15 dezenas e ganhe acertando 2, 3, 4 ou 5 números.",
+    logo: quinaLogo.url,
     filtrosDefault: {
       somaMin: 130,
       somaMax: 300,
