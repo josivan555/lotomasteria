@@ -6,7 +6,7 @@ export function DezenaBall({
   className,
 }: {
   n: number;
-  variant?: "default" | "gold" | "muted";
+  variant?: "default" | "gold" | "muted" | "green" | "blue" | "purple";
   className?: string;
 }) {
   return (
@@ -15,6 +15,8 @@ export function DezenaBall({
         "ball text-sm",
         variant === "gold" && "ball-gold",
         variant === "muted" && "ball-muted",
+        variant === "blue" && "ball-blue",
+        variant === "purple" && "ball-purple",
         className,
       )}
     >
