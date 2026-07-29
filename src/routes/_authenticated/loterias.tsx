@@ -50,11 +50,11 @@ function LoteriasHub() {
               <div
                 className={`absolute inset-0 -z-10 bg-gradient-to-br ${cfg.corFundo} opacity-60 transition group-hover:opacity-100`}
               />
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-3">
                 <img
                   src={cfg.logo}
                   alt={`Logo ${cfg.nome}`}
-                  className="h-12 w-auto rounded-md shadow-sm"
+                  className="h-12 w-auto self-start rounded-md shadow-sm"
                   loading="lazy"
                 />
                 <div>
@@ -62,6 +62,7 @@ function LoteriasHub() {
                   <p className="text-xs text-muted-foreground">{cfg.descricaoCurta}</p>
                 </div>
               </div>
+
               <p className="mt-4 text-sm text-muted-foreground">{cfg.descricaoLonga}</p>
               <div className="mt-4 flex items-center justify-between text-xs">
                 <span className="rounded-full bg-secondary px-2 py-0.5 text-muted-foreground">
