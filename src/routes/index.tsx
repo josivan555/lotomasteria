@@ -70,15 +70,16 @@ function Landing() {
           <h1 className="mt-6 text-5xl font-black tracking-tight md:text-6xl">
             Domine a{" "}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Lotofácil
+              Lotofácil, Mega-Sena e Quina
             </span>
             <br />
             com IA estatística
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            O LotoMaster IA analisa todo o histórico oficial da Lotofácil, calcula um{" "}
+            O LotoMaster IA analisa todo o histórico oficial das três loterias, calcula um{" "}
             <strong className="text-foreground">Score IA</strong> para cada dezena e gera jogos
-            equilibrados com dezenas de filtros estatísticos.
+            equilibrados com dezenas de filtros estatísticos — dashboards e geradores dedicados
+            para cada modalidade.
           </p>
           <div className="mt-8 flex justify-center gap-3">
             <Button asChild size="lg">

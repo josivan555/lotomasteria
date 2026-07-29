@@ -14,10 +14,13 @@ import { Route as ResultadosRouteImport } from './routes/resultados'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedJogosRouteImport } from './routes/_authenticated/jogos'
-import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
-import { Route as AuthenticatedGeradorRouteImport } from './routes/_authenticated/gerador'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedLoteriasRouteImport } from './routes/_authenticated/loterias'
+import { Route as AuthenticatedLLoteriaRouteRouteImport } from './routes/_authenticated/l/$loteria/route'
+import { Route as AuthenticatedLLoteriaIndexRouteImport } from './routes/_authenticated/l/$loteria/index'
+import { Route as AuthenticatedLLoteriaJogosRouteImport } from './routes/_authenticated/l/$loteria/jogos'
+import { Route as AuthenticatedLLoteriaHistoricoRouteImport } from './routes/_authenticated/l/$loteria/historico'
+import { Route as AuthenticatedLLoteriaGeradorRouteImport } from './routes/_authenticated/l/$loteria/gerador'
+import { Route as AuthenticatedLLoteriaDashboardRouteImport } from './routes/_authenticated/l/$loteria/dashboard'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -43,46 +46,72 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedJogosRoute = AuthenticatedJogosRouteImport.update({
-  id: '/jogos',
-  path: '/jogos',
+const AuthenticatedLoteriasRoute = AuthenticatedLoteriasRouteImport.update({
+  id: '/loterias',
+  path: '/loterias',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
-  id: '/historico',
-  path: '/historico',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedGeradorRoute = AuthenticatedGeradorRouteImport.update({
-  id: '/gerador',
-  path: '/gerador',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
+const AuthenticatedLLoteriaRouteRoute =
+  AuthenticatedLLoteriaRouteRouteImport.update({
+    id: '/l/$loteria',
+    path: '/l/$loteria',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaIndexRoute =
+  AuthenticatedLLoteriaIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaJogosRoute =
+  AuthenticatedLLoteriaJogosRouteImport.update({
+    id: '/jogos',
+    path: '/jogos',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaHistoricoRoute =
+  AuthenticatedLLoteriaHistoricoRouteImport.update({
+    id: '/historico',
+    path: '/historico',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaGeradorRoute =
+  AuthenticatedLLoteriaGeradorRouteImport.update({
+    id: '/gerador',
+    path: '/gerador',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaDashboardRoute =
+  AuthenticatedLLoteriaDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/resultados': typeof ResultadosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/gerador': typeof AuthenticatedGeradorRoute
-  '/historico': typeof AuthenticatedHistoricoRoute
-  '/jogos': typeof AuthenticatedJogosRoute
+  '/loterias': typeof AuthenticatedLoteriasRoute
+  '/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
+  '/l/$loteria/dashboard': typeof AuthenticatedLLoteriaDashboardRoute
+  '/l/$loteria/gerador': typeof AuthenticatedLLoteriaGeradorRoute
+  '/l/$loteria/historico': typeof AuthenticatedLLoteriaHistoricoRoute
+  '/l/$loteria/jogos': typeof AuthenticatedLLoteriaJogosRoute
+  '/l/$loteria/': typeof AuthenticatedLLoteriaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/resultados': typeof ResultadosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/gerador': typeof AuthenticatedGeradorRoute
-  '/historico': typeof AuthenticatedHistoricoRoute
-  '/jogos': typeof AuthenticatedJogosRoute
+  '/loterias': typeof AuthenticatedLoteriasRoute
+  '/l/$loteria/dashboard': typeof AuthenticatedLLoteriaDashboardRoute
+  '/l/$loteria/gerador': typeof AuthenticatedLLoteriaGeradorRoute
+  '/l/$loteria/historico': typeof AuthenticatedLLoteriaHistoricoRoute
+  '/l/$loteria/jogos': typeof AuthenticatedLLoteriaJogosRoute
+  '/l/$loteria': typeof AuthenticatedLLoteriaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -91,10 +120,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/resultados': typeof ResultadosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/gerador': typeof AuthenticatedGeradorRoute
-  '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
-  '/_authenticated/jogos': typeof AuthenticatedJogosRoute
+  '/_authenticated/loterias': typeof AuthenticatedLoteriasRoute
+  '/_authenticated/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
+  '/_authenticated/l/$loteria/dashboard': typeof AuthenticatedLLoteriaDashboardRoute
+  '/_authenticated/l/$loteria/gerador': typeof AuthenticatedLLoteriaGeradorRoute
+  '/_authenticated/l/$loteria/historico': typeof AuthenticatedLLoteriaHistoricoRoute
+  '/_authenticated/l/$loteria/jogos': typeof AuthenticatedLLoteriaJogosRoute
+  '/_authenticated/l/$loteria/': typeof AuthenticatedLLoteriaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -103,20 +135,25 @@ export interface FileRouteTypes {
     | '/auth'
     | '/resultados'
     | '/sitemap.xml'
-    | '/dashboard'
-    | '/gerador'
-    | '/historico'
-    | '/jogos'
+    | '/loterias'
+    | '/l/$loteria'
+    | '/l/$loteria/dashboard'
+    | '/l/$loteria/gerador'
+    | '/l/$loteria/historico'
+    | '/l/$loteria/jogos'
+    | '/l/$loteria/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/resultados'
     | '/sitemap.xml'
-    | '/dashboard'
-    | '/gerador'
-    | '/historico'
-    | '/jogos'
+    | '/loterias'
+    | '/l/$loteria/dashboard'
+    | '/l/$loteria/gerador'
+    | '/l/$loteria/historico'
+    | '/l/$loteria/jogos'
+    | '/l/$loteria'
   id:
     | '__root__'
     | '/'
@@ -124,10 +161,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/resultados'
     | '/sitemap.xml'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/gerador'
-    | '/_authenticated/historico'
-    | '/_authenticated/jogos'
+    | '/_authenticated/loterias'
+    | '/_authenticated/l/$loteria'
+    | '/_authenticated/l/$loteria/dashboard'
+    | '/_authenticated/l/$loteria/gerador'
+    | '/_authenticated/l/$loteria/historico'
+    | '/_authenticated/l/$loteria/jogos'
+    | '/_authenticated/l/$loteria/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -175,49 +215,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/jogos': {
-      id: '/_authenticated/jogos'
+    '/_authenticated/loterias': {
+      id: '/_authenticated/loterias'
+      path: '/loterias'
+      fullPath: '/loterias'
+      preLoaderRoute: typeof AuthenticatedLoteriasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/l/$loteria': {
+      id: '/_authenticated/l/$loteria'
+      path: '/l/$loteria'
+      fullPath: '/l/$loteria'
+      preLoaderRoute: typeof AuthenticatedLLoteriaRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/l/$loteria/': {
+      id: '/_authenticated/l/$loteria/'
+      path: '/'
+      fullPath: '/l/$loteria/'
+      preLoaderRoute: typeof AuthenticatedLLoteriaIndexRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
+    }
+    '/_authenticated/l/$loteria/jogos': {
+      id: '/_authenticated/l/$loteria/jogos'
       path: '/jogos'
-      fullPath: '/jogos'
-      preLoaderRoute: typeof AuthenticatedJogosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      fullPath: '/l/$loteria/jogos'
+      preLoaderRoute: typeof AuthenticatedLLoteriaJogosRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
     }
-    '/_authenticated/historico': {
-      id: '/_authenticated/historico'
+    '/_authenticated/l/$loteria/historico': {
+      id: '/_authenticated/l/$loteria/historico'
       path: '/historico'
-      fullPath: '/historico'
-      preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      fullPath: '/l/$loteria/historico'
+      preLoaderRoute: typeof AuthenticatedLLoteriaHistoricoRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
     }
-    '/_authenticated/gerador': {
-      id: '/_authenticated/gerador'
+    '/_authenticated/l/$loteria/gerador': {
+      id: '/_authenticated/l/$loteria/gerador'
       path: '/gerador'
-      fullPath: '/gerador'
-      preLoaderRoute: typeof AuthenticatedGeradorRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      fullPath: '/l/$loteria/gerador'
+      preLoaderRoute: typeof AuthenticatedLLoteriaGeradorRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
+    '/_authenticated/l/$loteria/dashboard': {
+      id: '/_authenticated/l/$loteria/dashboard'
       path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      fullPath: '/l/$loteria/dashboard'
+      preLoaderRoute: typeof AuthenticatedLLoteriaDashboardRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
     }
   }
 }
 
+interface AuthenticatedLLoteriaRouteRouteChildren {
+  AuthenticatedLLoteriaDashboardRoute: typeof AuthenticatedLLoteriaDashboardRoute
+  AuthenticatedLLoteriaGeradorRoute: typeof AuthenticatedLLoteriaGeradorRoute
+  AuthenticatedLLoteriaHistoricoRoute: typeof AuthenticatedLLoteriaHistoricoRoute
+  AuthenticatedLLoteriaJogosRoute: typeof AuthenticatedLLoteriaJogosRoute
+  AuthenticatedLLoteriaIndexRoute: typeof AuthenticatedLLoteriaIndexRoute
+}
+
+const AuthenticatedLLoteriaRouteRouteChildren: AuthenticatedLLoteriaRouteRouteChildren =
+  {
+    AuthenticatedLLoteriaDashboardRoute: AuthenticatedLLoteriaDashboardRoute,
+    AuthenticatedLLoteriaGeradorRoute: AuthenticatedLLoteriaGeradorRoute,
+    AuthenticatedLLoteriaHistoricoRoute: AuthenticatedLLoteriaHistoricoRoute,
+    AuthenticatedLLoteriaJogosRoute: AuthenticatedLLoteriaJogosRoute,
+    AuthenticatedLLoteriaIndexRoute: AuthenticatedLLoteriaIndexRoute,
+  }
+
+const AuthenticatedLLoteriaRouteRouteWithChildren =
+  AuthenticatedLLoteriaRouteRoute._addFileChildren(
+    AuthenticatedLLoteriaRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedGeradorRoute: typeof AuthenticatedGeradorRoute
-  AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
-  AuthenticatedJogosRoute: typeof AuthenticatedJogosRoute
+  AuthenticatedLoteriasRoute: typeof AuthenticatedLoteriasRoute
+  AuthenticatedLLoteriaRouteRoute: typeof AuthenticatedLLoteriaRouteRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedGeradorRoute: AuthenticatedGeradorRoute,
-  AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
-  AuthenticatedJogosRoute: AuthenticatedJogosRoute,
+  AuthenticatedLoteriasRoute: AuthenticatedLoteriasRoute,
+  AuthenticatedLLoteriaRouteRoute: AuthenticatedLLoteriaRouteRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

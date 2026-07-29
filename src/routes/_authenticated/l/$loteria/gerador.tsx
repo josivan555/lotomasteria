@@ -1,14 +1,15 @@
-import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
+import { createFileRoute, useRouter, Link, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarConcursos, salvarJogo } from "@/lib/lotofacil.functions";
+import { listarConcursos, salvarJogo } from "@/lib/loterias.functions";
 import {
   computeNumberStats,
   gerarJogos,
   classificarScore,
-  ALL_NUMBERS,
+  allNumbers,
   type Filtros,
-} from "@/lib/lotofacil-utils";
+} from "@/lib/loteria-utils";
+import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,48 +18,46 @@ import { Bookmark, Dice5, Download } from "lucide-react";
 import { toast } from "sonner";
 import { useMemo, useState } from "react";
 
-export const Route = createFileRoute("/_authenticated/gerador")({
-  head: () => ({
-    meta: [
-      { title: "Gerador de jogos · LotoMaster IA" },
-      { name: "description", content: "Gere jogos otimizados da Lotofácil com filtros de soma, pares/ímpares, moldura, consecutivas e ranqueamento por Score IA." },
-      { property: "og:title", content: "Gerador de jogos · LotoMaster IA" },
-      { property: "og:description", content: "Gere jogos otimizados da Lotofácil com filtros avançados e ranqueamento por Score IA." },
-    ],
-    links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/gerador" }],
-  }),
+export const Route = createFileRoute("/_authenticated/l/$loteria/gerador")({
   component: Gerador,
 });
 
 type Result = { dezenas: number[]; score: number };
 
 function Gerador() {
+  const { loteria } = useParams({ from: "/_authenticated/l/$loteria/gerador" });
+  if (!isLoteriaId(loteria)) return null;
+  const cfg = LOTERIAS[loteria];
+  const ballVariant = cfg.ballVariant === "green" ? "default" : cfg.ballVariant;
+  const nums = allNumbers(cfg);
+  const defaults = cfg.filtrosDefault;
+
   const listar = useServerFn(listarConcursos);
   const salvar = useServerFn(salvarJogo);
   const router = useRouter();
 
   const { data: concursos = [] } = useQuery({
-    queryKey: ["concursos"],
-    queryFn: () => listar(),
+    queryKey: ["concursos", loteria],
+    queryFn: () => listar({ data: { loteria } }),
   });
 
   const stats = useMemo(
-    () => (concursos.length ? computeNumberStats(concursos) : null),
-    [concursos],
+    () => (concursos.length ? computeNumberStats(cfg, concursos) : null),
+    [concursos, cfg],
   );
 
   const [qtd, setQtd] = useState(10);
-  const [somaMin, setSomaMin] = useState(170);
-  const [somaMax, setSomaMax] = useState(210);
-  const [paresMin, setParesMin] = useState(6);
-  const [paresMax, setParesMax] = useState(9);
-  const [maxConsecutivas, setMaxConsecutivas] = useState(5);
-  const [molduraMin, setMolduraMin] = useState(7);
-  const [molduraMax, setMolduraMax] = useState(12);
+  const [somaMin, setSomaMin] = useState(defaults.somaMin);
+  const [somaMax, setSomaMax] = useState(defaults.somaMax);
+  const [paresMin, setParesMin] = useState(defaults.paresMin);
+  const [paresMax, setParesMax] = useState(defaults.paresMax);
+  const [maxConsecutivas, setMaxConsecutivas] = useState(defaults.maxConsecutivas);
+  const [molduraMin, setMolduraMin] = useState(defaults.molduraMin ?? 0);
+  const [molduraMax, setMolduraMax] = useState(defaults.molduraMax ?? cfg.tamanho);
   const [incluir, setIncluir] = useState<number[]>([]);
   const [excluir, setExcluir] = useState<number[]>([]);
-  const [repetirMin, setRepetirMin] = useState(6);
-  const [repetirMax, setRepetirMax] = useState(11);
+  const [repetirMin, setRepetirMin] = useState(defaults.repetirAnteriorMin);
+  const [repetirMax, setRepetirMax] = useState(defaults.repetirAnteriorMax);
 
   const [resultados, setResultados] = useState<Result[]>([]);
 
@@ -77,15 +76,15 @@ function Gerador() {
       paresMin,
       paresMax,
       maxConsecutivas,
-      molduraMin,
-      molduraMax,
+      molduraMin: cfg.moldura ? molduraMin : undefined,
+      molduraMax: cfg.moldura ? molduraMax : undefined,
       incluir,
       excluir,
       repetirAnteriorMin: repetirMin,
       repetirAnteriorMax: repetirMax,
     };
     const anterior = concursos[0]?.dezenas;
-    const jogos = gerarJogos(qtd, stats.scores, filtros, anterior);
+    const jogos = gerarJogos(cfg, qtd, stats.scores, filtros, anterior);
     if (!jogos.length) {
       toast.error("Nenhum jogo passou nos filtros. Afrouxe algum parâmetro.");
       return;
@@ -96,7 +95,14 @@ function Gerador() {
 
   const salvarMut = useMutation({
     mutationFn: (r: Result) =>
-      salvar({ data: { dezenas: r.dezenas, score: r.score, nome: `Score ${r.score}` } }),
+      salvar({
+        data: {
+          loteria,
+          dezenas: r.dezenas,
+          score: r.score,
+          nome: `${cfg.nome} · Score ${r.score}`,
+        },
+      }),
     onSuccess: () => {
       toast.success("Jogo salvo!");
       router.invalidate();
@@ -108,14 +114,14 @@ function Gerador() {
     if (!resultados.length) return;
     const csv =
       "score," +
-      Array.from({ length: 15 }, (_, i) => `d${i + 1}`).join(",") +
+      Array.from({ length: cfg.tamanho }, (_, i) => `d${i + 1}`).join(",") +
       "\n" +
       resultados.map((r) => [r.score, ...r.dezenas].join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "lotomaster-jogos.csv";
+    a.download = `lotomaster-${cfg.slug}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -123,7 +129,11 @@ function Gerador() {
   if (!concursos.length) {
     return (
       <div className="rounded-xl border border-border/60 bg-card/60 p-6 text-center text-muted-foreground">
-        Sincronize o histórico no Dashboard antes de gerar jogos.
+        Sincronize o histórico no{" "}
+        <Link to="/l/$loteria/dashboard" params={{ loteria }} className="text-primary hover:underline">
+          Dashboard
+        </Link>{" "}
+        antes de gerar jogos.
       </div>
     );
   }
@@ -131,40 +141,64 @@ function Gerador() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Gerador Inteligente</h1>
+        <h2 className="text-2xl font-bold">Gerador Inteligente · {cfg.nome}</h2>
         <p className="text-sm text-muted-foreground">
-          Jogos ponderados pelo Score IA, filtrados e ranqueados. Confira os{" "}
+          Jogos de {cfg.tamanho} dezenas ponderados pelo Score IA, filtrados e ranqueados.{" "}
           <Link to="/resultados" className="text-primary hover:underline">
-            últimos resultados da Lotofácil
-          </Link>{" "}
-          antes de gerar.
+            Ver últimos resultados
+          </Link>
+          .
         </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-5 backdrop-blur">
-          <FieldRow>
-            <div>
-              <Label>Quantidade</Label>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {[10, 50, 100, 500].map((v) => (
-                  <Button
-                    key={v}
-                    size="sm"
-                    variant={qtd === v ? "default" : "outline"}
-                    onClick={() => setQtd(v)}
-                  >
-                    {v}
-                  </Button>
-                ))}
-              </div>
+          <div>
+            <Label>Quantidade</Label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {[10, 50, 100, 500].map((v) => (
+                <Button
+                  key={v}
+                  size="sm"
+                  variant={qtd === v ? "default" : "outline"}
+                  onClick={() => setQtd(v)}
+                >
+                  {v}
+                </Button>
+              ))}
             </div>
-          </FieldRow>
+          </div>
 
           <RangeRow label="Soma" min={somaMin} max={somaMax} setMin={setSomaMin} setMax={setSomaMax} />
-          <RangeRow label="Pares" min={paresMin} max={paresMax} setMin={setParesMin} setMax={setParesMax} minLimit={0} maxLimit={15} />
-          <RangeRow label="Moldura" min={molduraMin} max={molduraMax} setMin={setMolduraMin} setMax={setMolduraMax} minLimit={0} maxLimit={15} />
-          <RangeRow label="Repetir do anterior" min={repetirMin} max={repetirMax} setMin={setRepetirMin} setMax={setRepetirMax} minLimit={0} maxLimit={15} />
+          <RangeRow
+            label="Pares"
+            min={paresMin}
+            max={paresMax}
+            setMin={setParesMin}
+            setMax={setParesMax}
+            minLimit={0}
+            maxLimit={cfg.tamanho}
+          />
+          {cfg.moldura && (
+            <RangeRow
+              label="Moldura"
+              min={molduraMin}
+              max={molduraMax}
+              setMin={setMolduraMin}
+              setMax={setMolduraMax}
+              minLimit={0}
+              maxLimit={cfg.tamanho}
+            />
+          )}
+          <RangeRow
+            label="Repetir do anterior"
+            min={repetirMin}
+            max={repetirMax}
+            setMin={setRepetirMin}
+            setMax={setRepetirMax}
+            minLimit={0}
+            maxLimit={cfg.tamanho}
+          />
           <div>
             <Label>Máx. consecutivas</Label>
             <Input
@@ -179,12 +213,23 @@ function Gerador() {
 
           <div>
             <Label className="mb-2 block">Incluir sempre</Label>
-            <NumbersPicker selected={incluir} onToggle={(n) => toggle(incluir, setIncluir, n)} disabled={excluir} />
+            <NumbersPicker
+              numbers={nums}
+              selected={incluir}
+              onToggle={(n) => toggle(incluir, setIncluir, n)}
+              disabled={excluir}
+            />
           </div>
 
           <div>
             <Label className="mb-2 block">Excluir sempre</Label>
-            <NumbersPicker selected={excluir} onToggle={(n) => toggle(excluir, setExcluir, n)} disabled={incluir} variant="danger" />
+            <NumbersPicker
+              numbers={nums}
+              selected={excluir}
+              onToggle={(n) => toggle(excluir, setExcluir, n)}
+              disabled={incluir}
+              variant="danger"
+            />
           </div>
 
           <Button className="w-full" size="lg" onClick={gerar}>
@@ -217,7 +262,7 @@ function Gerador() {
                       <span className="w-8 text-sm text-muted-foreground tabular-nums">#{i + 1}</span>
                       <div className="flex flex-wrap gap-1">
                         {r.dezenas.map((n) => (
-                          <DezenaBall key={n} n={n} className="h-8! w-8! text-xs!" />
+                          <DezenaBall key={n} n={n} variant={ballVariant} className="h-8! w-8! text-xs!" />
                         ))}
                       </div>
                     </div>
@@ -226,7 +271,12 @@ function Gerador() {
                         <div className={`text-lg font-bold ${c.color}`}>{r.score.toFixed(1)}</div>
                         <div className="text-xs text-muted-foreground">{c.label}</div>
                       </div>
-                      <Button size="sm" variant="ghost" aria-label="Salvar jogo" onClick={() => salvarMut.mutate(r)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        aria-label="Salvar jogo"
+                        onClick={() => salvarMut.mutate(r)}
+                      >
                         <Bookmark className="h-4 w-4" />
                       </Button>
                     </div>
@@ -239,10 +289,6 @@ function Gerador() {
       </div>
     </div>
   );
-}
-
-function FieldRow({ children }: { children: React.ReactNode }) {
-  return <div>{children}</div>;
 }
 
 function RangeRow({
@@ -287,11 +333,13 @@ function RangeRow({
 }
 
 function NumbersPicker({
+  numbers,
   selected,
   onToggle,
   disabled = [],
   variant = "primary",
 }: {
+  numbers: number[];
   selected: number[];
   onToggle: (n: number) => void;
   disabled?: number[];
@@ -299,7 +347,7 @@ function NumbersPicker({
 }) {
   return (
     <div className="grid grid-cols-9 gap-1">
-      {ALL_NUMBERS.map((n) => {
+      {numbers.map((n) => {
         const isSel = selected.includes(n);
         const isDis = disabled.includes(n);
         return (
