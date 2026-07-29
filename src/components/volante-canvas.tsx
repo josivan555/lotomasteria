@@ -37,7 +37,7 @@ export function volanteLayout(cfg: LoteriaConfig): VolanteLayout {
 /** arte oficial do volante de cada loteria (apenas guia visual, nao e impressa) */
 export const VOLANTE_ART: Record<LoteriaId, { url: string; ratio: number }> = {
   lotofacil: { url: volanteLoto.url, ratio: 1857 / 847 },
-  megasena: { url: volanteMega.url, ratio: 875 / 1798 },
+  megasena: { url: volanteMega.url, ratio: 1798 / 875 },
   quina: { url: volanteQuina.url, ratio: 992 / 450 },
 };
 
