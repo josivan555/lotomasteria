@@ -42,9 +42,9 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     slug: "lotofacil",
     total: 25,
     tamanho: 15,
-    cor: "#22c55e",
-    corFundo: "from-emerald-500/20 to-emerald-500/5",
-    ballVariant: "green",
+    cor: "#7a1f8f",
+    corFundo: "from-fuchsia-600/25 to-purple-700/10",
+    ballVariant: "purple",
     faixaPrincipal: 15,
     descricaoCurta: "15 dezenas entre 01 e 25.",
     descricaoLonga:
