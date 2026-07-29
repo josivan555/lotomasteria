@@ -54,6 +54,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     descricaoCurta: "15 dezenas entre 01 e 25.",
     descricaoLonga:
       "Sorteios de segunda a sábado. Aposte de 15 a 20 dezenas e ganhe acertando 11, 12, 13, 14 ou 15 números.",
+    logo: lotofacilLogo.url,
     moldura: LOTOFACIL_MOLDURA,
     filtrosDefault: {
       somaMin: 170,
