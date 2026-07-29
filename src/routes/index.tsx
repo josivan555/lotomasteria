@@ -4,20 +4,31 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "LotoMaster IA — Análise inteligente para Lotofácil" },
+    links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/" }],
+    scripts: [
       {
-        name: "description",
-        content:
-          "Análise estatística inteligente do histórico completo da Lotofácil: frequência, atraso, tendência, score IA e geração de jogos com filtros avançados.",
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "LotoMaster IA",
+          applicationCategory: "StatisticalApplication",
+          operatingSystem: "All",
+          url: "https://lotomasteria.lovable.app/",
+          description:
+            "Análise estatística inteligente da Lotofácil com Score IA, filtros avançados e geração de jogos.",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
+        }),
       },
-      { property: "og:title", content: "LotoMaster IA — Análise inteligente para Lotofácil" },
       {
-        property: "og:description",
-        content: "Análise estatística inteligente do histórico completo da Lotofácil: frequência, atraso, tendência, score IA e geração de jogos com filtros avançados.",
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "LotoMaster IA",
+          url: "https://lotomasteria.lovable.app/",
+        }),
       },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Landing,
