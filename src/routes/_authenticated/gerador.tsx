@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarConcursos, salvarJogo } from "@/lib/lotofacil.functions";
@@ -133,7 +133,11 @@ function Gerador() {
       <div>
         <h1 className="text-2xl font-bold">Gerador Inteligente</h1>
         <p className="text-sm text-muted-foreground">
-          Jogos ponderados pelo Score IA, filtrados e ranqueados.
+          Jogos ponderados pelo Score IA, filtrados e ranqueados. Confira os{" "}
+          <Link to="/resultados" className="text-primary hover:underline">
+            últimos resultados da Lotofácil
+          </Link>{" "}
+          antes de gerar.
         </p>
       </div>
 
