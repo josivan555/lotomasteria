@@ -448,8 +448,10 @@ export function VolanteCanvas({
             <Save className="mr-2 h-4 w-4" /> Salvar calibração
           </Button>
           <Button size="sm" className="flex-1 md:flex-none" onClick={imprimir}>
-            <Printer className="mr-2 h-4 w-4" /> Imprimir ({selecionados.length})
+            <Printer className="mr-2 h-4 w-4" /> Imprimir ({selecionados.length} jogos ·{" "}
+            {volantesNecessarios} volante{volantesNecessarios === 1 ? "" : "s"})
           </Button>
+
         </div>
       </div>
 
