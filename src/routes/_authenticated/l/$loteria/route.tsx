@@ -4,9 +4,20 @@ import {
   Link,
   notFound,
   useParams,
+  useNavigate,
+  useRouterState,
 } from "@tanstack/react-router";
-import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer } from "lucide-react";
-import { isLoteriaId, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
+import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, ChevronsUpDown } from "lucide-react";
+import { isLoteriaId, LOTERIAS, LOTERIA_IDS, type LoteriaId } from "@/lib/loterias-config";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria")({
   beforeLoad: ({ params }) => {
@@ -18,8 +29,17 @@ export const Route = createFileRoute("/_authenticated/l/$loteria")({
 
 function LoteriaLayout() {
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria" });
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   if (!isLoteriaId(loteria)) return null;
   const cfg = LOTERIAS[loteria];
+
+  function trocarLoteria(destino: LoteriaId) {
+    if (destino === loteria) return;
+    // Mantém a mesma sub-aba (dashboard, gerador, historico, ...) ao trocar de loteria.
+    const sub = pathname.split(`/l/${loteria}`)[1] ?? "";
+    navigate({ to: `/l/${destino}${sub || "/dashboard"}` });
+  }
 
   return (
     <div className="space-y-6">
@@ -36,7 +56,34 @@ function LoteriaLayout() {
             </p>
             <h1 className="text-xl font-bold leading-tight">{cfg.nome}</h1>
           </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="ml-1 gap-1.5">
+                Trocar
+                <ChevronsUpDown className="h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>Escolher modalidade</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {LOTERIA_IDS.map((id) => {
+                const l = LOTERIAS[id];
+                return (
+                  <DropdownMenuItem
+                    key={id}
+                    onSelect={() => trocarLoteria(id)}
+                    className={id === loteria ? "bg-primary/10 text-primary" : ""}
+                  >
+                    <img src={l.logo} alt="" className="mr-2 h-5 w-5 rounded object-contain" />
+                    {l.nome}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+
         <nav className="flex flex-wrap gap-1">
           <NavPill to="/l/$loteria/dashboard" loteria={loteria} icon={<BarChart3 className="h-4 w-4" />}>
             Dashboard
