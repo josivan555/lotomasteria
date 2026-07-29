@@ -376,23 +376,23 @@ export function VolanteCanvas({
   );
 
   return (
-    <section className="space-y-4 rounded-xl border border-border/60 bg-card/60 p-5 backdrop-blur">
+    <section className="space-y-4 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="text-lg font-bold">Volante para impressão · {cfg.nome}</h3>
+        <div className="min-w-0">
+          <h3 className="text-base font-bold md:text-lg">Volante para impressão · {cfg.nome}</h3>
           <p className="text-sm text-muted-foreground">
             Ajuste a posição dos quadradinhos até coincidirem com o volante oficial, salve a
             calibração e imprima direto no volante.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex w-full flex-wrap gap-2 md:w-auto">
           <Button variant="ghost" size="sm" onClick={resetar}>
             <RotateCcw className="mr-2 h-4 w-4" /> Padrão
           </Button>
-          <Button variant="outline" size="sm" onClick={salvar}>
+          <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={salvar}>
             <Save className="mr-2 h-4 w-4" /> Salvar calibração
           </Button>
-          <Button size="sm" onClick={imprimir}>
+          <Button size="sm" className="flex-1 md:flex-none" onClick={imprimir}>
             <Printer className="mr-2 h-4 w-4" /> Imprimir ({selecionados.length})
           </Button>
         </div>
@@ -406,13 +406,18 @@ export function VolanteCanvas({
           <canvas
             ref={canvasRef}
             width={620}
-            className="w-full cursor-move rounded-lg border border-border bg-white"
+            className="w-full cursor-move touch-none rounded-lg border border-border bg-white"
             onMouseDown={onDown}
             onMouseMove={onMove}
             onMouseUp={onUp}
             onMouseLeave={onUp}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onUp}
+            onTouchCancel={onUp}
           />
         </div>
+
 
         <div className="space-y-4">
           <div>
