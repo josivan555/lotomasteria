@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Printer, RotateCcw, Move, Save } from "lucide-react";
+import volanteLoto from "@/assets/volante-loto.asset.json";
+import volanteMega from "@/assets/volante-mega_sena.asset.json";
+import volanteQuina from "@/assets/volante-quina.asset.json";
 import { toast } from "sonner";
 
 /* ---------------- layout do volante por loteria ---------------- */
@@ -25,11 +28,18 @@ export function volanteLayout(cfg: LoteriaConfig): VolanteLayout {
     };
   }
   if (cfg.id === "megasena") {
-    return { cols: 6, rows: 10, pos: (n) => ({ col: (n - 1) % 6, row: Math.floor((n - 1) / 6) }) };
+    return { cols: 10, rows: 6, pos: (n) => ({ col: (n - 1) % 10, row: Math.floor((n - 1) / 10) }) };
   }
   // quina: 80 numeros em 10 colunas x 8 linhas
   return { cols: 10, rows: 8, pos: (n) => ({ col: (n - 1) % 10, row: Math.floor((n - 1) / 10) }) };
 }
+
+/** arte oficial do volante de cada loteria (apenas guia visual, nao e impressa) */
+export const VOLANTE_ART: Record<LoteriaId, { url: string; ratio: number }> = {
+  lotofacil: { url: volanteLoto.url, ratio: 1626 / 967 },
+  megasena: { url: volanteMega.url, ratio: 645 / 453 },
+  quina: { url: volanteQuina.url, ratio: 992 / 450 },
+};
 
 /* ---------------- calibracao ---------------- */
 
@@ -46,6 +56,13 @@ export type Calibracao = {
   marcaW: number;
   /** altura da marca (cm) */
   marcaH: number;
+  /** posicao do cartao guia na folha (cm) */
+  cartaoX: number;
+  cartaoY: number;
+  /** largura do cartao guia (cm) */
+  cartaoW: number;
+  /** exibir a arte do volante como guia */
+  mostrarCartao: boolean;
   /** ajuste fino horizontal da impressora (cm, pode ser negativo) */
   ajusteEsquerda: number;
   /** ajuste fino vertical da impressora (cm, pode ser negativo) */
@@ -55,16 +72,22 @@ export type Calibracao = {
 
 const PADROES: Record<LoteriaId, Calibracao> = {
   lotofacil: {
-    offsetX: 2.0, offsetY: 4.6, passoX: 1.62, passoY: 0.74,
-    marcaW: 0.95, marcaH: 0.45, ajusteEsquerda: 0, ajusteTopo: 0, papel: "A4",
+    offsetX: 3.49, offsetY: 4.53, passoX: 1.91, passoY: 0.89,
+    marcaW: 0.89, marcaH: 0.6,
+    cartaoX: 1.5, cartaoY: 1.0, cartaoW: 12, mostrarCartao: true,
+    ajusteEsquerda: 0, ajusteTopo: 0, papel: "A4",
   },
   megasena: {
-    offsetX: 2.1, offsetY: 4.4, passoX: 1.35, passoY: 0.72,
-    marcaW: 0.8, marcaH: 0.45, ajusteEsquerda: 0, ajusteTopo: 0, papel: "A4",
+    offsetX: 2.33, offsetY: 3.74, passoX: 0.79, passoY: 0.6,
+    marcaW: 0.58, marcaH: 0.33,
+    cartaoX: 1.5, cartaoY: 1.0, cartaoW: 10.5, mostrarCartao: true,
+    ajusteEsquerda: 0, ajusteTopo: 0, papel: "A4",
   },
   quina: {
-    offsetX: 1.6, offsetY: 4.4, passoX: 0.95, passoY: 0.72,
-    marcaW: 0.7, marcaH: 0.45, ajusteEsquerda: 0, ajusteTopo: 0, papel: "A4",
+    offsetX: 2.98, offsetY: 5.29, passoX: 0.77, passoY: 0.37,
+    marcaW: 0.57, marcaH: 0.29,
+    cartaoX: 1.5, cartaoY: 1.0, cartaoW: 9.5, mostrarCartao: true,
+    ajusteEsquerda: 0, ajusteTopo: 0, papel: "A4",
   },
 };
 
@@ -97,6 +120,15 @@ export function VolanteCanvas({
   const [selecionados, setSelecionados] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+  const [art, setArt] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    const info = VOLANTE_ART[cfg.id];
+    const im = new Image();
+    im.src = info.url;
+    im.onload = () => setArt(im);
+    setArt(null);
+  }, [cfg.id]);
 
   useEffect(() => {
     setCal(carregar(cfg.id));
@@ -123,6 +155,15 @@ export function VolanteCanvas({
     const cm = (v: number) => v * scale;
     const ox = cal.offsetX + cal.ajusteEsquerda;
     const oy = cal.offsetY + cal.ajusteTopo;
+
+    // arte do volante como guia
+    if (cal.mostrarCartao && art) {
+      const w = cm(cal.cartaoW);
+      const h = w * VOLANTE_ART[cfg.id].ratio;
+      ctx.globalAlpha = 0.85;
+      ctx.drawImage(art, cm(cal.cartaoX), cm(cal.cartaoY), w, h);
+      ctx.globalAlpha = 1;
+    }
 
     // regua
     ctx.strokeStyle = "#e5e7eb";
@@ -180,7 +221,7 @@ export function VolanteCanvas({
       cm(layout.cols * cal.passoX),
       cm(layout.rows * cal.passoY),
     );
-  }, [cal, cfg, layout, jogoPreview, paper]);
+  }, [cal, cfg, layout, jogoPreview, paper, art]);
 
   function set<K extends keyof Calibracao>(k: K, v: Calibracao[K]) {
     setCal((c) => ({ ...c, [k]: v }));
@@ -334,6 +375,28 @@ export function VolanteCanvas({
                 </Button>
               ))}
             </div>
+          </div>
+
+          <div className="rounded-lg border border-dashed border-border/60 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold">Cartão guia</p>
+              <Button
+                size="sm"
+                variant={cal.mostrarCartao ? "default" : "outline"}
+                className="h-7"
+                onClick={() => set("mostrarCartao", !cal.mostrarCartao)}
+              >
+                {cal.mostrarCartao ? "Visível" : "Oculto"}
+              </Button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {num("X (cm)", "cartaoX", 0.1)}
+              {num("Y (cm)", "cartaoY", 0.1)}
+              {num("Largura", "cartaoW", 0.1)}
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              O cartão é apenas guia na tela — não é impresso.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
