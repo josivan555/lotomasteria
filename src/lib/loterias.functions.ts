@@ -194,8 +194,10 @@ export const salvarJogo = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const cfg = LOTERIAS[data.loteria];
-    if (data.dezenas.length !== cfg.tamanho) {
-      throw new Error(`Jogo da ${cfg.nome} precisa de ${cfg.tamanho} dezenas.`);
+    const minLen = cfg.tamanhoMin ?? cfg.tamanho;
+    const maxLen = cfg.tamanhoMax ?? cfg.tamanho;
+    if (data.dezenas.length < minLen || data.dezenas.length > maxLen) {
+      throw new Error(`Jogo da ${cfg.nome} precisa de ${minLen} a ${maxLen} dezenas.`);
     }
     for (const d of data.dezenas) {
       if (d < 1 || d > cfg.total) {
