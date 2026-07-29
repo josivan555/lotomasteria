@@ -18,7 +18,15 @@ import { toast } from "sonner";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/gerador")({
-  head: () => ({ meta: [{ title: "Gerador · LotoMaster IA" }] }),
+  head: () => ({
+    meta: [
+      { title: "Gerador de jogos · LotoMaster IA" },
+      { name: "description", content: "Gere jogos otimizados da Lotofácil com filtros de soma, pares/ímpares, moldura, consecutivas e ranqueamento por Score IA." },
+      { property: "og:title", content: "Gerador de jogos · LotoMaster IA" },
+      { property: "og:description", content: "Gere jogos otimizados da Lotofácil com filtros avançados e ranqueamento por Score IA." },
+    ],
+    links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/gerador" }],
+  }),
   component: Gerador,
 });
 
@@ -214,7 +222,7 @@ function Gerador() {
                         <div className={`text-lg font-bold ${c.color}`}>{r.score.toFixed(1)}</div>
                         <div className="text-xs text-muted-foreground">{c.label}</div>
                       </div>
-                      <Button size="sm" variant="ghost" onClick={() => salvarMut.mutate(r)}>
+                      <Button size="sm" variant="ghost" aria-label="Salvar jogo" onClick={() => salvarMut.mutate(r)}>
                         <Bookmark className="h-4 w-4" />
                       </Button>
                     </div>

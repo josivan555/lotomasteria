@@ -10,7 +10,15 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/historico")({
-  head: () => ({ meta: [{ title: "Histórico · LotoMaster IA" }] }),
+  head: () => ({
+    meta: [
+      { title: "Histórico de concursos · LotoMaster IA" },
+      { name: "description", content: "Consulte o histórico completo dos concursos da Lotofácil com busca, dezenas sorteadas e sincronização com a base oficial da Caixa." },
+      { property: "og:title", content: "Histórico de concursos · LotoMaster IA" },
+      { property: "og:description", content: "Histórico completo dos concursos da Lotofácil com busca e sincronização com a base oficial." },
+    ],
+    links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/historico" }],
+  }),
   component: Historico,
 });
 
