@@ -35,9 +35,11 @@ function AuthPage() {
   useEffect(() => setIsSignup(mode === "signup"), [mode]);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/loterias", replace: true });
-    });
+    ensureBrowserSession().then(() =>
+      supabase.auth.getUser().then(({ data }) => {
+        if (data.user) navigate({ to: "/loterias", replace: true });
+      }),
+    );
   }, [navigate]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
