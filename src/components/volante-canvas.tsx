@@ -3,6 +3,7 @@ import type { LoteriaConfig, LoteriaId } from "@/lib/loterias-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Printer, RotateCcw, Move, Save } from "lucide-react";
 import volanteLoto from "@/assets/volante-loto.asset.json";
 import volanteMega from "@/assets/volante-mega_sena.asset.json";
