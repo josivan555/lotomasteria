@@ -42,7 +42,10 @@ function Landing() {
           <span className="ball ball-gold h-8! w-8! text-sm!">L</span>
           LotoMaster <span className="text-primary">IA</span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <Button asChild variant="ghost">
+            <Link to="/resultados">Resultados</Link>
+          </Button>
           <Button asChild variant="ghost">
             <Link to="/auth" search={{ mode: "login" }}>Entrar</Link>
           </Button>
@@ -57,6 +60,13 @@ function Landing() {
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary">
             <Sparkles className="h-3 w-3" /> Análise estatística inteligente
           </div>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Veja também os{" "}
+            <Link to="/resultados" className="text-primary hover:underline">
+              últimos resultados oficiais da Lotofácil
+            </Link>
+            .
+          </p>
           <h1 className="mt-6 text-5xl font-black tracking-tight md:text-6xl">
             Domine a{" "}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
