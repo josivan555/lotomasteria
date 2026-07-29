@@ -98,11 +98,10 @@ function ResultadosPage() {
             </Link>
           </Button>
         </div>
-
-        </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 pb-24">
+      <main className="mx-auto max-w-6xl px-4 pb-24 md:px-6">
+
         <section className="py-10">
           <h1 className="text-4xl font-black tracking-tight md:text-5xl">
             Resultados oficiais das <span className="text-primary">loterias</span>
