@@ -214,7 +214,8 @@ function Dashboard() {
       </div>
 
       <ListCard title="Frequência histórica (todas as dezenas)">
-        <div className="grid grid-cols-5 gap-3 md:grid-cols-10">
+        <div className="grid grid-cols-5 gap-2 md:grid-cols-10 md:gap-3">
+
           {nums.map((n) => (
             <div key={n} className="flex flex-col items-center gap-1">
               <DezenaBall n={n} variant={ballVariant} />
