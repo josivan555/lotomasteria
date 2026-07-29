@@ -294,8 +294,9 @@ export function VolanteCanvas({
     const ox = cal.offsetX + cal.ajusteEsquerda;
     const oy = cal.offsetY + cal.ajusteTopo;
 
-    // agrupa os jogos: 2 por volante quando a 2a secao esta ativa
-    const porPagina = cal.usarSecao2 ? 2 : 1;
+    // agrupa os jogos conforme as secoes ativas do volante
+    const offsetsSecao = [0, ...(cal.usarSecao2 ? [cal.secao2Y] : []), ...(cal.usarSecao3 ? [cal.secao3Y] : [])];
+    const porPagina = offsetsSecao.length;
     const grupos: (typeof lista)[] = [];
     for (let i = 0; i < lista.length; i += porPagina) grupos.push(lista.slice(i, i + porPagina));
 
@@ -303,7 +304,7 @@ export function VolanteCanvas({
       .map((grupo) => {
         const marcas = grupo
           .map((j, idx) => {
-            const oySec = oy + (idx === 1 ? cal.secao2Y : 0);
+            const oySec = oy + (offsetsSecao[idx] ?? 0);
             return j.dezenas
               .map((n) => {
                 const { col, row } = layout.pos(n);
