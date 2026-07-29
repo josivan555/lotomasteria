@@ -7,7 +7,8 @@ import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trophy } from "lucide-react";
+import { Trophy, Download } from "lucide-react";
+import { exportarResultadosPDF } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/resultados")({
   head: () => ({
@@ -107,11 +108,34 @@ function Resultados() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Conferência · {cfg.nome}</h2>
-        <p className="text-sm text-muted-foreground">
-          Digite as dezenas sorteadas ou confira automaticamente com o último concurso oficial.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-bold">Conferência · {cfg.nome}</h2>
+          <p className="text-sm text-muted-foreground">
+            Digite as dezenas sorteadas ou confira automaticamente com o último concurso oficial.
+          </p>
+        </div>
+        {jogos.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              exportarResultadosPDF({
+                loteriaNome: cfg.nome,
+                cor: cfg.cor,
+                concurso: resultado
+                  ? { numero: resultado.numero, data: resultado.data_apuracao, dezenas: resultado.dezenas }
+                  : null,
+                sorteadas: drawn,
+                itens: items.map((it) => ({ nums: it.nums, hits: it.hits })),
+                tierLabel,
+              })
+            }
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Baixar PDF
+          </Button>
+        )}
       </div>
 
       <div className="rounded-2xl border border-border/60 bg-card/60 p-5 backdrop-blur">

@@ -5,9 +5,10 @@ import { listarJogosSalvos, excluirJogo } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Download } from "lucide-react";
 import { classificarScore } from "@/lib/loteria-utils";
 import { toast } from "sonner";
+import { exportarJogosPDF } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/jogos")({
   component: Jogos,
@@ -39,9 +40,31 @@ function Jogos() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Meus Jogos · {cfg.nome}</h2>
-        <p className="text-sm text-muted-foreground">{jogos.length} jogos salvos</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-bold">Meus Jogos · {cfg.nome}</h2>
+          <p className="text-sm text-muted-foreground">{jogos.length} jogos salvos</p>
+        </div>
+        {jogos.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              exportarJogosPDF({
+                loteriaNome: cfg.nome,
+                cor: cfg.cor,
+                jogos: jogos.map((j) => ({
+                  dezenas: j.dezenas,
+                  score: j.score,
+                  created_at: j.created_at,
+                })),
+              })
+            }
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Baixar PDF
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
