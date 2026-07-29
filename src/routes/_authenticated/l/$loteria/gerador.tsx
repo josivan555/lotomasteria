@@ -267,6 +267,47 @@ function Gerador() {
             </div>
           </div>
 
+          <div>
+            <InfoLabel
+              label="Dezenas por jogo"
+              description={`Quantos números cada jogo terá. Mínimo ${cfg.tamanhoMin}, máximo ${cfg.tamanhoMax}. O padrão da ${cfg.nome} é ${cfg.tamanho}.`}
+            />
+            <div className="mt-2 flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setTamanho((t) => Math.max(cfg.tamanhoMin, t - 1))}
+                disabled={tamanho <= cfg.tamanhoMin}
+                aria-label="Diminuir dezenas"
+              >
+                −
+              </Button>
+              <Input
+                type="number"
+                value={tamanho}
+                min={cfg.tamanhoMin}
+                max={cfg.tamanhoMax}
+                onChange={(e) => {
+                  const v = +e.target.value;
+                  if (Number.isFinite(v)) setTamanho(Math.max(cfg.tamanhoMin, Math.min(cfg.tamanhoMax, v)));
+                }}
+                className="max-w-20 text-center"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setTamanho((t) => Math.min(cfg.tamanhoMax, t + 1))}
+                disabled={tamanho >= cfg.tamanhoMax}
+                aria-label="Aumentar dezenas"
+              >
+                +
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                {cfg.tamanhoMin}–{cfg.tamanhoMax}
+              </span>
+            </div>
+          </div>
+
 
           <RangeRow
             label="Soma"
