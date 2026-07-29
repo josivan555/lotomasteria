@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           data_apuracao: string
           dezenas: number[]
+          loteria: string
           numero: number
           soma: number
         }
@@ -26,6 +27,7 @@ export type Database = {
           created_at?: string
           data_apuracao: string
           dezenas: number[]
+          loteria?: string
           numero: number
           soma: number
         }
@@ -33,16 +35,26 @@ export type Database = {
           created_at?: string
           data_apuracao?: string
           dezenas?: number[]
+          loteria?: string
           numero?: number
           soma?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "concursos_loteria_fkey"
+            columns: ["loteria"]
+            isOneToOne: false
+            referencedRelation: "loterias"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       jogos_salvos: {
         Row: {
           created_at: string
           dezenas: number[]
           id: string
+          loteria: string
           metadata: Json | null
           nome: string | null
           score: number | null
@@ -52,6 +64,7 @@ export type Database = {
           created_at?: string
           dezenas: number[]
           id?: string
+          loteria?: string
           metadata?: Json | null
           nome?: string | null
           score?: number | null
@@ -61,10 +74,49 @@ export type Database = {
           created_at?: string
           dezenas?: number[]
           id?: string
+          loteria?: string
           metadata?: Json | null
           nome?: string | null
           score?: number | null
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jogos_salvos_loteria_fkey"
+            columns: ["loteria"]
+            isOneToOne: false
+            referencedRelation: "loterias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loterias: {
+        Row: {
+          cor_tema: string
+          created_at: string
+          id: string
+          nome: string
+          ordem: number
+          tamanho_jogo: number
+          total_numeros: number
+        }
+        Insert: {
+          cor_tema: string
+          created_at?: string
+          id: string
+          nome: string
+          ordem?: number
+          tamanho_jogo: number
+          total_numeros: number
+        }
+        Update: {
+          cor_tema?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          ordem?: number
+          tamanho_jogo?: number
+          total_numeros?: number
         }
         Relationships: []
       }
