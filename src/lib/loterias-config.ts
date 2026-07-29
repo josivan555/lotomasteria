@@ -81,6 +81,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     descricaoCurta: "6 dezenas entre 01 e 60.",
     descricaoLonga:
       "Sorteios às quartas e sábados. Aposte de 6 a 20 dezenas e ganhe acertando 4, 5 ou 6 números.",
+    logo: megasenaLogo.url,
     filtrosDefault: {
       somaMin: 130,
       somaMax: 260,
