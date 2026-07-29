@@ -37,6 +37,43 @@ export const listarConcursos = createServerFn({ method: "GET" }).handler(async (
   }));
 });
 
+// Busca o ultimo resultado oficial direto da Caixa, incluindo premio.
+export const ultimoResultadoCaixa = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    const res = await fetch(
+      "https://servicebus2.caixa.gov.br/portaldeloterias/api/lotofacil",
+      { headers: { accept: "application/json" } },
+    );
+    if (!res.ok) return null;
+    const j = (await res.json()) as {
+      numero: number;
+      dataApuracao: string;
+      listaDezenas: string[];
+      valorEstimadoProximoConcurso?: number;
+      dataProximoConcurso?: string;
+      numeroConcursoProximo?: number;
+      listaRateioPremio?: { descricaoFaixa: string; numeroDeGanhadores: number; valorPremio: number }[];
+    };
+    const dz = (j.listaDezenas ?? []).map(Number).sort((a, b) => a - b);
+    const faixa15 = (j.listaRateioPremio ?? []).find((f) =>
+      /15/.test(f.descricaoFaixa),
+    ) ?? j.listaRateioPremio?.[0];
+    return {
+      numero: j.numero,
+      data_apuracao: parseData(j.dataApuracao),
+      dezenas: dz,
+      soma: dz.reduce((a, b) => a + b, 0),
+      premio15: faixa15?.valorPremio ?? 0,
+      ganhadores15: faixa15?.numeroDeGanhadores ?? 0,
+      proximoConcurso: j.numeroConcursoProximo ?? null,
+      proximoData: j.dataProximoConcurso ? parseData(j.dataProximoConcurso) : null,
+      estimativaProximo: j.valorEstimadoProximoConcurso ?? 0,
+    };
+  } catch {
+    return null;
+  }
+});
+
 // Sincroniza concursos direto da API oficial da Caixa.
 // Busca do ultimo salvo ate o mais recente, com limite por chamada.
 type CaixaResp = {
