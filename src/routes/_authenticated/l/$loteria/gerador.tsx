@@ -221,7 +221,18 @@ function Gerador() {
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-5 backdrop-blur">
           <div>
-            <Label>Quantidade</Label>
+            <div className="flex items-center justify-between gap-2">
+              <Label>Quantidade</Label>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={autoConfigurarIA}
+                className="h-7 gap-1 border-primary/50 text-primary hover:bg-primary/10"
+                title="Ajusta os filtros automaticamente com base no histórico e na quantidade escolhida"
+              >
+                <Sparkles className="h-3.5 w-3.5" /> IA configurar
+              </Button>
+            </div>
             <div className="mt-2 flex flex-wrap gap-2">
               {[1, 2, 5, 10, 50, 100, 500].map((v) => (
                 <Button
@@ -235,6 +246,7 @@ function Gerador() {
               ))}
             </div>
           </div>
+
 
           <RangeRow label="Soma" min={somaMin} max={somaMax} setMin={setSomaMin} setMax={setSomaMax} />
           <RangeRow
