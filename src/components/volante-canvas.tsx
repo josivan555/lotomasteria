@@ -468,10 +468,25 @@ export function VolanteCanvas({
           <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={salvar}>
             <Save className="mr-2 h-4 w-4" /> Salvar calibração
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 md:flex-none"
+            onClick={() => {
+              if (!selecionados.length) {
+                toast.error("Selecione ao menos um jogo para ver a prévia.");
+                return;
+              }
+              setPreviaAberta(true);
+            }}
+          >
+            <Eye className="mr-2 h-4 w-4" /> Prévia da impressão
+          </Button>
           <Button size="sm" className="flex-1 md:flex-none" onClick={imprimir}>
             <Printer className="mr-2 h-4 w-4" /> Imprimir ({selecionados.length} jogos ·{" "}
             {volantesNecessarios} volante{volantesNecessarios === 1 ? "" : "s"})
           </Button>
+
 
         </div>
       </div>
