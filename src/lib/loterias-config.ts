@@ -1,5 +1,9 @@
 // Client-safe catalog of supported lotteries. Any component or util can read this.
 
+import lotofacilLogo from "@/assets/lotofacil-logo.png.asset.json";
+import megasenaLogo from "@/assets/megasena-logo.png.asset.json";
+import quinaLogo from "@/assets/quina-logo.png.asset.json";
+
 export type LoteriaId = "lotofacil" | "megasena" | "quina";
 
 export type FiltrosDefault = {
@@ -26,6 +30,7 @@ export type LoteriaConfig = {
   faixaPrincipal: number;
   descricaoCurta: string;
   descricaoLonga: string;
+  logo: string;
   moldura?: Set<number>;
   filtrosDefault: FiltrosDefault;
 };
@@ -49,6 +54,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     descricaoCurta: "15 dezenas entre 01 e 25.",
     descricaoLonga:
       "Sorteios de segunda a sábado. Aposte de 15 a 20 dezenas e ganhe acertando 11, 12, 13, 14 ou 15 números.",
+    logo: lotofacilLogo.url,
     moldura: LOTOFACIL_MOLDURA,
     filtrosDefault: {
       somaMin: 170,
@@ -75,6 +81,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     descricaoCurta: "6 dezenas entre 01 e 60.",
     descricaoLonga:
       "Sorteios às quartas e sábados. Aposte de 6 a 20 dezenas e ganhe acertando 4, 5 ou 6 números.",
+    logo: megasenaLogo.url,
     filtrosDefault: {
       somaMin: 130,
       somaMax: 260,
@@ -98,6 +105,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     descricaoCurta: "5 dezenas entre 01 e 80.",
     descricaoLonga:
       "Sorteios de segunda a sábado. Aposte de 5 a 15 dezenas e ganhe acertando 2, 3, 4 ou 5 números.",
+    logo: quinaLogo.url,
     filtrosDefault: {
       somaMin: 130,
       somaMax: 300,

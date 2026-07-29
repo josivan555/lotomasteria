@@ -50,18 +50,13 @@ function LoteriasHub() {
               <div
                 className={`absolute inset-0 -z-10 bg-gradient-to-br ${cfg.corFundo} opacity-60 transition group-hover:opacity-100`}
               />
-              <div className="flex items-center gap-2">
-                <span
-                  className={`ball ${
-                    cfg.ballVariant === "blue"
-                      ? "ball-blue"
-                      : cfg.ballVariant === "purple"
-                        ? "ball-purple"
-                        : ""
-                  } h-10! w-10! text-sm!`}
-                >
-                  {cfg.tamanho}
-                </span>
+              <div className="flex items-center gap-3">
+                <img
+                  src={cfg.logo}
+                  alt={`Logo ${cfg.nome}`}
+                  className="h-12 w-auto rounded-md shadow-sm"
+                  loading="lazy"
+                />
                 <div>
                   <h2 className="text-lg font-bold">{cfg.nome}</h2>
                   <p className="text-xs text-muted-foreground">{cfg.descricaoCurta}</p>
