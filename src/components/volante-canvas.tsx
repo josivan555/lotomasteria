@@ -440,7 +440,7 @@ export function VolanteCanvas({
         </div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+      <div className={`grid gap-5 ${expandido ? "lg:grid-cols-[1fr_360px]" : "lg:grid-cols-[1fr_320px]"}`}>
         <div className="space-y-2">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Move className="h-3.5 w-3.5" /> Arraste a grade sobre a folha para posicionar
