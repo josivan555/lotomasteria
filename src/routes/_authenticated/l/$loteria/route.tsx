@@ -73,7 +73,7 @@ function NavPill({
   icon,
   children,
 }: {
-  to: "/l/$loteria/dashboard" | "/l/$loteria/gerador" | "/l/$loteria/historico" | "/l/$loteria/jogos";
+  to: "/l/$loteria/dashboard" | "/l/$loteria/gerador" | "/l/$loteria/historico" | "/l/$loteria/jogos" | "/l/$loteria/resultados";
   loteria: LoteriaId;
   icon: React.ReactNode;
   children: React.ReactNode;
