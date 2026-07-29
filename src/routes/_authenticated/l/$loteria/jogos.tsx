@@ -5,9 +5,10 @@ import { listarJogosSalvos, excluirJogo } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Download } from "lucide-react";
 import { classificarScore } from "@/lib/loteria-utils";
 import { toast } from "sonner";
+import { exportarJogosPDF } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/jogos")({
   component: Jogos,
