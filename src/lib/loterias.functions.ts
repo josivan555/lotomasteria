@@ -267,3 +267,14 @@ export const excluirJogo = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const excluirTodosJogos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ loteria: loteriaEnum.optional() }).parse(raw ?? {}))
+  .handler(async ({ data, context }) => {
+    let q = context.supabase.from("jogos_salvos").delete().eq("user_id", context.userId);
+    if (data.loteria) q = q.eq("loteria", data.loteria);
+    const { error } = await q;
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+

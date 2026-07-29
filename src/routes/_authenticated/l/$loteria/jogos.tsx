@@ -2,13 +2,13 @@ import { createFileRoute, useRouter, useParams, Link } from "@tanstack/react-rou
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { listarJogosSalvos, excluirJogo } from "@/lib/loterias.functions";
+import { listarJogosSalvos, excluirJogo, excluirTodosJogos } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Download, Printer } from "lucide-react";
+import { Trash2, Download, Printer, Trash } from "lucide-react";
 import { classificarScore } from "@/lib/loteria-utils";
 import { toast } from "sonner";
 import { exportarJogosPDF } from "@/lib/pdf-export";
@@ -25,6 +25,7 @@ function Jogos() {
 
   const listar = useServerFn(listarJogosSalvos);
   const excluir = useServerFn(excluirJogo);
+  const excluirTodos = useServerFn(excluirTodosJogos);
   const router = useRouter();
 
   const { data: jogos = [], isLoading } = useQuery({
@@ -36,6 +37,15 @@ function Jogos() {
     mutationFn: (id: string) => excluir({ data: { id } }),
     onSuccess: () => {
       toast.success("Jogo excluído");
+      router.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const delAll = useMutation({
+    mutationFn: () => excluirTodos({ data: { loteria } }),
+    onSuccess: () => {
+      toast.success("Todos os jogos desta loteria foram removidos");
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
@@ -122,6 +132,19 @@ function Jogos() {
                 <Printer className="mr-2 h-4 w-4" />
                 Gerar volante
               </Link>
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={jogos.length === 0 || delAll.isPending}
+              onClick={() => {
+                if (confirm(`Tem certeza que deseja remover todos os ${jogos.length} jogos salvos da ${cfg.nome}?\n\nEssa ação não pode ser desfeita.`)) {
+                  delAll.mutate();
+                }
+              }}
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              Limpar todos
             </Button>
           </div>
         )}
