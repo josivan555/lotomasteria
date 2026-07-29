@@ -1,10 +1,13 @@
 import { createFileRoute, useRouter, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useMemo, useState } from "react";
 import { listarJogosSalvos, excluirJogo } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Trash2, Download } from "lucide-react";
 import { classificarScore } from "@/lib/loteria-utils";
 import { toast } from "sonner";
@@ -38,34 +41,86 @@ function Jogos() {
     onError: (e) => toast.error(e.message),
   });
 
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+
+  const jogosFiltrados = useMemo(() => {
+    if (!dateFrom && !dateTo) return jogos;
+    const from = dateFrom ? new Date(dateFrom + "T00:00:00").getTime() : -Infinity;
+    const to = dateTo ? new Date(dateTo + "T23:59:59.999").getTime() : Infinity;
+    return jogos.filter((j) => {
+      const t = new Date(j.created_at).getTime();
+      return t >= from && t <= to;
+    });
+  }, [jogos, dateFrom, dateTo]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold">Meus Jogos · {cfg.nome}</h2>
-          <p className="text-sm text-muted-foreground">{jogos.length} jogos salvos</p>
+          <p className="text-sm text-muted-foreground">
+            {jogosFiltrados.length} de {jogos.length} jogos
+            {(dateFrom || dateTo) ? " (filtrados)" : " salvos"}
+          </p>
         </div>
         {jogos.length > 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              exportarJogosPDF({
-                loteriaNome: cfg.nome,
-                cor: cfg.cor,
-                jogos: jogos.map((j) => ({
-                  dezenas: j.dezenas,
-                  score: j.score,
-                  created_at: j.created_at,
-                })),
-              })
-            }
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Baixar PDF
-          </Button>
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="jogos-from" className="text-xs text-muted-foreground">De</Label>
+              <Input
+                id="jogos-from"
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="h-9 w-[150px]"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="jogos-to" className="text-xs text-muted-foreground">Até</Label>
+              <Input
+                id="jogos-to"
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="h-9 w-[150px]"
+              />
+            </div>
+            {(dateFrom || dateTo) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setDateFrom("");
+                  setDateTo("");
+                }}
+              >
+                Limpar
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={jogosFiltrados.length === 0}
+              onClick={() =>
+                exportarJogosPDF({
+                  loteriaNome: cfg.nome,
+                  cor: cfg.cor,
+                  jogos: jogosFiltrados.map((j) => ({
+                    dezenas: j.dezenas,
+                    score: j.score,
+                    created_at: j.created_at,
+                  })),
+                })
+              }
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Baixar PDF
+            </Button>
+          </div>
         )}
       </div>
+
 
       {isLoading ? (
         <p className="text-muted-foreground">Carregando...</p>

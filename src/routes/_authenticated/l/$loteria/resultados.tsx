@@ -7,6 +7,7 @@ import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Trophy, Download } from "lucide-react";
 import { exportarResultadosPDF } from "@/lib/pdf-export";
 
@@ -52,6 +53,8 @@ function Resultados() {
   });
 
   const [manual, setManual] = useState("");
+  const [pdfFrom, setPdfFrom] = useState("");
+  const [pdfTo, setPdfTo] = useState("");
   const drawn = useMemo(() => {
     const parsed = parseNumbers(manual);
     if (parsed.length) return parsed.filter((n) => n <= cfg.total);
@@ -72,6 +75,21 @@ function Resultados() {
       ? base.slice().sort((a, b) => b.hits - a.hits || a.idx - b.idx)
       : base;
   }, [jogos, drawnSet, drawn.length]);
+
+  const itemsParaPdf = useMemo(() => {
+    if (!pdfFrom && !pdfTo) return items;
+    const from = pdfFrom ? new Date(pdfFrom + "T00:00:00").getTime() : -Infinity;
+    const to = pdfTo ? new Date(pdfTo + "T23:59:59.999").getTime() : Infinity;
+    const allowed = new Set(
+      jogos
+        .filter((j) => {
+          const t = new Date(j.created_at).getTime();
+          return t >= from && t <= to;
+        })
+        .map((j) => j.id),
+    );
+    return items.filter((it) => allowed.has(it.id));
+  }, [items, jogos, pdfFrom, pdfTo]);
 
   const maxHits = items.reduce((m, it) => Math.max(m, it.hits), 0);
 
@@ -116,27 +134,56 @@ function Resultados() {
           </p>
         </div>
         {jogos.length > 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              exportarResultadosPDF({
-                loteriaNome: cfg.nome,
-                cor: cfg.cor,
-                concurso: resultado
-                  ? { numero: resultado.numero, data: resultado.data_apuracao, dezenas: resultado.dezenas }
-                  : null,
-                sorteadas: drawn,
-                itens: items.map((it) => ({ nums: it.nums, hits: it.hits })),
-                tierLabel,
-              })
-            }
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Baixar PDF
-          </Button>
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="res-from" className="text-xs text-muted-foreground">De</Label>
+              <Input
+                id="res-from"
+                type="date"
+                value={pdfFrom}
+                onChange={(e) => setPdfFrom(e.target.value)}
+                className="h-9 w-[150px]"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="res-to" className="text-xs text-muted-foreground">Até</Label>
+              <Input
+                id="res-to"
+                type="date"
+                value={pdfTo}
+                onChange={(e) => setPdfTo(e.target.value)}
+                className="h-9 w-[150px]"
+              />
+            </div>
+            {(pdfFrom || pdfTo) && (
+              <Button variant="ghost" size="sm" onClick={() => { setPdfFrom(""); setPdfTo(""); }}>
+                Limpar
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={itemsParaPdf.length === 0}
+              onClick={() =>
+                exportarResultadosPDF({
+                  loteriaNome: cfg.nome,
+                  cor: cfg.cor,
+                  concurso: resultado
+                    ? { numero: resultado.numero, data: resultado.data_apuracao, dezenas: resultado.dezenas }
+                    : null,
+                  sorteadas: drawn,
+                  itens: itemsParaPdf.map((it) => ({ nums: it.nums, hits: it.hits })),
+                  tierLabel,
+                })
+              }
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Baixar PDF
+            </Button>
+          </div>
         )}
       </div>
+
 
       <div className="rounded-2xl border border-border/60 bg-card/60 p-5 backdrop-blur">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
