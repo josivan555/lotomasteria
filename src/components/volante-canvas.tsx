@@ -176,6 +176,18 @@ export function VolanteCanvas({
   const volantesNecessarios = Math.ceil(selecionados.length / jogosPorVolante);
   const sobra = selecionados.length % jogosPorVolante;
 
+  const [previaAberta, setPreviaAberta] = useState(false);
+  // ordem de impressao: mesma ordem da lista de jogos, fatiada por volante/pagina
+  const paginasPrevia = useMemo(() => {
+    const out: { dezenas: number[]; created_at: string }[][] = [];
+    for (let i = 0; i < listaSel.length; i += jogosPorVolante) {
+      out.push(listaSel.slice(i, i + jogosPorVolante));
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selecionados, jogos, jogosPorVolante]);
+
+
 
   // desenho
   useEffect(() => {
