@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Printer, RotateCcw, Move, Save } from "lucide-react";
+import { Printer, RotateCcw, Move, Save, Maximize2, Minimize2 } from "lucide-react";
 import volanteLoto from "@/assets/volante-loto.asset.json";
 import volanteMega from "@/assets/volante-mega_sena.asset.json";
 import volanteQuina from "@/assets/volante-quina.asset.json";
@@ -130,9 +130,19 @@ export function VolanteCanvas({
   const layout = useMemo(() => volanteLayout(cfg), [cfg]);
   const [cal, setCal] = useState<Calibracao>(PADROES[cfg.id]);
   const [selecionados, setSelecionados] = useState<string[]>([]);
+  const [expandido, setExpandido] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const [art, setArt] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    if (!expandido) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpandido(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [expandido]);
 
   useEffect(() => {
     const info = VOLANTE_ART[cfg.id];
@@ -395,7 +405,13 @@ export function VolanteCanvas({
 
 
   return (
-    <section className="space-y-4 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
+    <section
+      className={
+        expandido
+          ? "fixed inset-0 z-50 space-y-4 overflow-auto bg-background p-4 md:p-6"
+          : "space-y-4 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5"
+      }
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="text-base font-bold md:text-lg">Volante para impressão · {cfg.nome}</h3>
@@ -408,6 +424,22 @@ export function VolanteCanvas({
           <Button variant="ghost" size="sm" onClick={resetar}>
             <RotateCcw className="mr-2 h-4 w-4" /> Padrão
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 md:flex-none"
+            onClick={() => setExpandido((v) => !v)}
+          >
+            {expandido ? (
+              <>
+                <Minimize2 className="mr-2 h-4 w-4" /> Sair da tela cheia
+              </>
+            ) : (
+              <>
+                <Maximize2 className="mr-2 h-4 w-4" /> Tela cheia
+              </>
+            )}
+          </Button>
           <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={salvar}>
             <Save className="mr-2 h-4 w-4" /> Salvar calibração
           </Button>
@@ -417,7 +449,7 @@ export function VolanteCanvas({
         </div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+      <div className={`grid gap-5 ${expandido ? "lg:grid-cols-[1fr_360px]" : "lg:grid-cols-[1fr_320px]"}`}>
         <div className="space-y-2">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Move className="h-3.5 w-3.5" /> Arraste a grade sobre a folha para posicionar
