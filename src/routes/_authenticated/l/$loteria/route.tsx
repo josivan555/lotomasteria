@@ -56,6 +56,9 @@ function LoteriaLayout() {
           <NavPill to="/l/$loteria/jogos" loteria={loteria} icon={<Bookmark className="h-4 w-4" />}>
             Meus jogos
           </NavPill>
+          <NavPill to="/l/$loteria/resultados" loteria={loteria} icon={<ClipboardCheck className="h-4 w-4" />}>
+            Resultados
+          </NavPill>
         </nav>
       </div>
 
