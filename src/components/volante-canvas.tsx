@@ -676,6 +676,71 @@ export function VolanteCanvas({
           </div>
         </div>
       </div>
+
+      <Dialog open={previaAberta} onOpenChange={setPreviaAberta}>
+        <DialogContent className="max-h-[85vh] max-w-2xl overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Prévia da impressão · {cfg.nome}</DialogTitle>
+            <DialogDescription>
+              {paginasPrevia.length} volante{paginasPrevia.length === 1 ? "" : "s"} (páginas) ·{" "}
+              {selecionados.length} jogo{selecionados.length === 1 ? "" : "s"} ·{" "}
+              {jogosPorVolante} por volante. Ordem de saída na impressora, de cima para baixo.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-[55vh] space-y-3 overflow-auto pr-1">
+            {paginasPrevia.map((grupo, pi) => (
+              <div key={pi} className="rounded-lg border border-border/60 p-3">
+                <div className="mb-2 flex items-center justify-between text-xs">
+                  <span className="font-semibold">
+                    Volante {pi + 1} de {paginasPrevia.length}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {grupo.length} de {jogosPorVolante} seções preenchidas
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {Array.from({ length: jogosPorVolante }).map((_, si) => {
+                    const j = grupo[si];
+                    return (
+                      <div key={si} className="flex items-start gap-2 text-xs">
+                        <span className="w-16 shrink-0 text-muted-foreground">{si + 1}ª seção</span>
+                        {j ? (
+                          <span className="font-mono font-semibold">
+                            {j.dezenas
+                              .slice()
+                              .sort((a, b) => a - b)
+                              .map((n) => String(n).padStart(2, "0"))
+                              .join(" ")}
+                          </span>
+                        ) : (
+                          <span className="italic text-muted-foreground">vazia (não marcada)</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setPreviaAberta(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                setPreviaAberta(false);
+                imprimir();
+              }}
+            >
+              <Printer className="mr-2 h-4 w-4" /> Confirmar e imprimir {paginasPrevia.length}{" "}
+              volante{paginasPrevia.length === 1 ? "" : "s"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
+
   );
 }
