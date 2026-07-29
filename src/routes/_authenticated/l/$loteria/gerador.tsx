@@ -189,10 +189,36 @@ function Gerador() {
       }),
     onSuccess: () => {
       toast.success("Jogo salvo!");
+      queryClient.invalidateQueries({ queryKey: ["jogos-salvos"] });
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
   });
+
+  const salvarTodosMut = useMutation({
+    mutationFn: async (lista: Result[]) => {
+      let ok = 0;
+      for (const r of lista) {
+        await salvar({
+          data: {
+            loteria,
+            dezenas: r.dezenas,
+            score: r.score,
+            nome: `${cfg.nome} · Score ${r.score}`,
+          },
+        });
+        ok++;
+      }
+      return ok;
+    },
+    onSuccess: (n) => {
+      toast.success(`${n} jogos salvos em Meus Jogos!`);
+      queryClient.invalidateQueries({ queryKey: ["jogos-salvos"] });
+      router.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
 
   function exportarCSV() {
     if (!resultados.length) return;
