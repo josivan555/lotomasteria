@@ -150,6 +150,7 @@ export function VolanteCanvas({
   const listaSel = jogos.filter((j) => selecionados.includes(j.id));
   const jogoPreview = listaSel[0] ?? jogos[0];
   const jogoPreview2 = listaSel[1];
+  const jogoPreview3 = listaSel[2];
   const paper = PAPEL_CM[cal.papel];
 
   // desenho
