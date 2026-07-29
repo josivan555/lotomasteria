@@ -499,7 +499,7 @@ export function VolanteCanvas({
                 {cal.usarSecao2 ? "Ativa" : "Desativada"}
               </Button>
             </div>
-            {cal.usarSecao2 && num("Distância da 1ª p/ 2ª seção (cm)", "secao2Y", 0.05)}
+            {cal.usarSecao2 && num("Distância da 1ª p/ 2ª seção (cm)", "secao2Y", 0.05, 0, paper.h)}
             <p className="mt-2 text-[11px] text-muted-foreground">
               Com a 2ª seção ativa, o 2º jogo é marcado na seção do meio do volante.
             </p>
