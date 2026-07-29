@@ -28,17 +28,25 @@ function InfoLabel({ label, description }: { label: string; description: string 
   return (
     <div className="flex items-center gap-1.5">
       <Label>{label}</Label>
-      <button
-        type="button"
-        onClick={() => toast(label, { description })}
-        className="inline-flex text-muted-foreground transition hover:text-foreground"
-        aria-label={`Informações sobre ${label}`}
-      >
-        <Info className="h-4 w-4" />
-      </button>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="inline-flex text-muted-foreground transition hover:text-foreground"
+            aria-label={`Informações sobre ${label}`}
+          >
+            <Info className="h-4 w-4" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="right" align="start" sideOffset={12} className="w-72">
+          <p className="text-sm font-semibold">{label}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
+
 
 function Gerador() {
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria/gerador" });
