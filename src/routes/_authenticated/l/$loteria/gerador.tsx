@@ -198,7 +198,7 @@ function Gerador() {
     if (!resultados.length) return;
     const csv =
       "score," +
-      Array.from({ length: cfg.tamanho }, (_, i) => `d${i + 1}`).join(",") +
+      Array.from({ length: tamanho }, (_, i) => `d${i + 1}`).join(",") +
       "\n" +
       resultados.map((r) => [r.score, ...r.dezenas].join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
