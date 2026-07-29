@@ -71,6 +71,10 @@ export type Calibracao = {
   usarSecao2: boolean;
   /** distancia vertical do inicio da 1a secao ate a 2a (cm) */
   secao2Y: number;
+  /** usar a 3a secao de jogos do mesmo volante */
+  usarSecao3: boolean;
+  /** distancia vertical do inicio da 1a secao ate a 3a (cm) */
+  secao3Y: number;
   papel: "A4" | "Letter";
 };
 
@@ -79,19 +83,22 @@ const PADROES: Record<LoteriaId, Calibracao> = {
     offsetX: 3.49, offsetY: 4.53, passoX: 1.91, passoY: 0.89,
     marcaW: 0.89, marcaH: 0.6,
     cartaoX: 1.5, cartaoY: 1.0, cartaoW: 12, mostrarCartao: true,
-    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 5.4, papel: "A4",
+    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 5.4,
+    usarSecao3: false, secao3Y: 10.8, papel: "A4",
   },
   megasena: {
     offsetX: 2.33, offsetY: 3.74, passoX: 0.79, passoY: 0.6,
     marcaW: 0.58, marcaH: 0.33,
     cartaoX: 1.5, cartaoY: 1.0, cartaoW: 10.5, mostrarCartao: true,
-    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 4.05, papel: "A4",
+    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 4.05,
+    usarSecao3: false, secao3Y: 8.1, papel: "A4",
   },
   quina: {
     offsetX: 2.98, offsetY: 5.29, passoX: 0.77, passoY: 0.37,
     marcaW: 0.57, marcaH: 0.29,
     cartaoX: 1.5, cartaoY: 1.0, cartaoW: 9.5, mostrarCartao: true,
-    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 3.6, papel: "A4",
+    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 3.6,
+    usarSecao3: true, secao3Y: 7.2, papel: "A4",
   },
 };
 
@@ -143,6 +150,7 @@ export function VolanteCanvas({
   const listaSel = jogos.filter((j) => selecionados.includes(j.id));
   const jogoPreview = listaSel[0] ?? jogos[0];
   const jogoPreview2 = listaSel[1];
+  const jogoPreview3 = listaSel[2];
   const paper = PAPEL_CM[cal.papel];
 
   // desenho
@@ -196,6 +204,10 @@ export function VolanteCanvas({
     if (cal.usarSecao2) {
       secoes.push({ oy: oy + cal.secao2Y, dezenas: jogoPreview2?.dezenas ?? [] });
     }
+    if (cal.usarSecao3) {
+      secoes.push({ oy: oy + cal.secao3Y, dezenas: jogoPreview3?.dezenas ?? [] });
+    }
+
 
     for (const sec of secoes) {
       const marcados = new Set(sec.dezenas);
@@ -235,7 +247,7 @@ export function VolanteCanvas({
         cm(layout.rows * cal.passoY),
       );
     }
-  }, [cal, cfg, layout, jogoPreview, jogoPreview2, paper, art]);
+  }, [cal, cfg, layout, jogoPreview, jogoPreview2, jogoPreview3, paper, art]);
 
   function set<K extends keyof Calibracao>(k: K, v: Calibracao[K]) {
     setCal((c) => ({ ...c, [k]: v }));
@@ -282,8 +294,9 @@ export function VolanteCanvas({
     const ox = cal.offsetX + cal.ajusteEsquerda;
     const oy = cal.offsetY + cal.ajusteTopo;
 
-    // agrupa os jogos: 2 por volante quando a 2a secao esta ativa
-    const porPagina = cal.usarSecao2 ? 2 : 1;
+    // agrupa os jogos conforme as secoes ativas do volante
+    const offsetsSecao = [0, ...(cal.usarSecao2 ? [cal.secao2Y] : []), ...(cal.usarSecao3 ? [cal.secao3Y] : [])];
+    const porPagina = offsetsSecao.length;
     const grupos: (typeof lista)[] = [];
     for (let i = 0; i < lista.length; i += porPagina) grupos.push(lista.slice(i, i + porPagina));
 
@@ -291,7 +304,7 @@ export function VolanteCanvas({
       .map((grupo) => {
         const marcas = grupo
           .map((j, idx) => {
-            const oySec = oy + (idx === 1 ? cal.secao2Y : 0);
+            const oySec = oy + (offsetsSecao[idx] ?? 0);
             return j.dezenas
               .map((n) => {
                 const { col, row } = layout.pos(n);
@@ -446,8 +459,25 @@ export function VolanteCanvas({
             </div>
             {cal.usarSecao2 && num("Distância da 1ª p/ 2ª seção (cm)", "secao2Y", 0.05)}
             <p className="mt-2 text-[11px] text-muted-foreground">
-              Com a 2ª seção ativa, cada volante recebe 2 jogos (o 1º na seção de cima e o 2º na de
-              baixo).
+              Com a 2ª seção ativa, o 2º jogo é marcado na seção do meio do volante.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-dashed border-border/60 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold">3ª seção do volante</p>
+              <Button
+                size="sm"
+                variant={cal.usarSecao3 ? "default" : "outline"}
+                className="h-7"
+                onClick={() => set("usarSecao3", !cal.usarSecao3)}
+              >
+                {cal.usarSecao3 ? "Ativa" : "Desativada"}
+              </Button>
+            </div>
+            {cal.usarSecao3 && num("Distância da 1ª p/ 3ª seção (cm)", "secao3Y", 0.05)}
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              O volante da Quina tem 3 seções: com ela ativa, cada volante recebe 3 jogos.
             </p>
           </div>
 
@@ -465,7 +495,7 @@ export function VolanteCanvas({
 
           <div>
             <Label className="text-xs text-muted-foreground">
-              Jogos a imprimir ({cal.usarSecao2 ? "2 jogos" : "1 jogo"} por volante)
+              Jogos a imprimir ({1 + (cal.usarSecao2 ? 1 : 0) + (cal.usarSecao3 ? 1 : 0)} por volante)
             </Label>
             <div className="mt-2 max-h-56 space-y-1 overflow-auto rounded-lg border border-border/60 p-2">
               {jogos.length === 0 && (
