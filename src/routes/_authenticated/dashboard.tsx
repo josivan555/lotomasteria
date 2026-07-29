@@ -10,7 +10,15 @@ import { RefreshCw, TrendingUp, Flame, Snowflake, Clock } from "lucide-react";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard · LotoMaster IA" }] }),
+  head: () => ({
+    meta: [
+      { title: "Dashboard estatístico · LotoMaster IA" },
+      { name: "description", content: "Painel com o último concurso da Lotofácil, ranking do Score IA, dezenas quentes/frias e estatísticas de frequência e atraso." },
+      { property: "og:title", content: "Dashboard estatístico · LotoMaster IA" },
+      { property: "og:description", content: "Último concurso, ranking do Score IA e estatísticas de frequência, atraso e tendência da Lotofácil." },
+    ],
+    links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/dashboard" }],
+  }),
   component: Dashboard,
 });
 

@@ -9,7 +9,15 @@ import { classificarScore } from "@/lib/lotofacil-utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/jogos")({
-  head: () => ({ meta: [{ title: "Meus Jogos · LotoMaster IA" }] }),
+  head: () => ({
+    meta: [
+      { title: "Meus jogos salvos · LotoMaster IA" },
+      { name: "description", content: "Gerencie seus jogos favoritados da Lotofácil, com Score IA de cada combinação salva para acompanhamento e revisão." },
+      { property: "og:title", content: "Meus jogos · LotoMaster IA" },
+      { property: "og:description", content: "Gerencie sua carteira de jogos salvos da Lotofácil com o Score IA de cada combinação." },
+    ],
+    links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/jogos" }],
+  }),
   component: Jogos,
 });
 
@@ -71,7 +79,7 @@ function Jogos() {
                       <div className="text-xs text-muted-foreground">{c.label}</div>
                     </div>
                   )}
-                  <Button size="sm" variant="ghost" onClick={() => del.mutate(j.id)}>
+                  <Button size="sm" variant="ghost" aria-label="Excluir jogo" onClick={() => del.mutate(j.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
