@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter, useParams } from "@tanstack/react-router";
+import { createFileRoute, useRouter, useParams, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -8,11 +8,10 @@ import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Download } from "lucide-react";
+import { Trash2, Download, Printer } from "lucide-react";
 import { classificarScore } from "@/lib/loteria-utils";
 import { toast } from "sonner";
 import { exportarJogosPDF } from "@/lib/pdf-export";
-import { VolanteCanvas } from "@/components/volante-canvas";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/jogos")({
   component: Jogos,
@@ -118,19 +117,16 @@ function Jogos() {
               <Download className="mr-2 h-4 w-4" />
               Baixar PDF
             </Button>
+            <Button size="sm" asChild>
+              <Link to="/l/$loteria/volante" params={{ loteria }}>
+                <Printer className="mr-2 h-4 w-4" />
+                Gerar volante
+              </Link>
+            </Button>
           </div>
         )}
       </div>
 
-
-      <VolanteCanvas
-        cfg={cfg}
-        jogos={jogosFiltrados.map((j) => ({
-          id: j.id,
-          dezenas: j.dezenas,
-          created_at: j.created_at,
-        }))}
-      />
 
       {isLoading ? (
         <p className="text-muted-foreground">Carregando...</p>
