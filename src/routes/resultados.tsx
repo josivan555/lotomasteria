@@ -81,22 +81,24 @@ function ResultadosPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-6 md:py-6">
         <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
           <span className="ball ball-gold h-8! w-8! text-sm!">L</span>
           LotoMaster <span className="text-primary">IA</span>
         </Link>
-        <div className="flex gap-2">
-          <Button asChild variant="ghost">
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="ghost" size="sm">
             <Link to="/auth" search={{ mode: "login" }}>
               Entrar
             </Link>
           </Button>
-          <Button asChild>
+          <Button asChild size="sm">
             <Link to="/auth" search={{ mode: "signup" }}>
               Criar conta
             </Link>
           </Button>
+        </div>
+
         </div>
       </header>
 
