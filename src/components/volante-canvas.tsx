@@ -120,6 +120,15 @@ export function VolanteCanvas({
   const [selecionados, setSelecionados] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+  const [art, setArt] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    const info = VOLANTE_ART[cfg.id];
+    const im = new Image();
+    im.src = info.url;
+    im.onload = () => setArt(im);
+    setArt(null);
+  }, [cfg.id]);
 
   useEffect(() => {
     setCal(carregar(cfg.id));
@@ -146,6 +155,15 @@ export function VolanteCanvas({
     const cm = (v: number) => v * scale;
     const ox = cal.offsetX + cal.ajusteEsquerda;
     const oy = cal.offsetY + cal.ajusteTopo;
+
+    // arte do volante como guia
+    if (cal.mostrarCartao && art) {
+      const w = cm(cal.cartaoW);
+      const h = w * VOLANTE_ART[cfg.id].ratio;
+      ctx.globalAlpha = 0.85;
+      ctx.drawImage(art, cm(cal.cartaoX), cm(cal.cartaoY), w, h);
+      ctx.globalAlpha = 1;
+    }
 
     // regua
     ctx.strokeStyle = "#e5e7eb";
@@ -203,7 +221,7 @@ export function VolanteCanvas({
       cm(layout.cols * cal.passoX),
       cm(layout.rows * cal.passoY),
     );
-  }, [cal, cfg, layout, jogoPreview, paper]);
+  }, [cal, cfg, layout, jogoPreview, paper, art]);
 
   function set<K extends keyof Calibracao>(k: K, v: Calibracao[K]) {
     setCal((c) => ({ ...c, [k]: v }));
@@ -357,6 +375,28 @@ export function VolanteCanvas({
                 </Button>
               ))}
             </div>
+          </div>
+
+          <div className="rounded-lg border border-dashed border-border/60 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-semibold">Cartão guia</p>
+              <Button
+                size="sm"
+                variant={cal.mostrarCartao ? "default" : "outline"}
+                className="h-7"
+                onClick={() => set("mostrarCartao", !cal.mostrarCartao)}
+              >
+                {cal.mostrarCartao ? "Visível" : "Oculto"}
+              </Button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {num("X (cm)", "cartaoX", 0.1)}
+              {num("Y (cm)", "cartaoY", 0.1)}
+              {num("Largura", "cartaoW", 0.1)}
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              O cartão é apenas guia na tela — não é impresso.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
