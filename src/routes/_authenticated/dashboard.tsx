@@ -1,13 +1,14 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarConcursos, sincronizarConcursos } from "@/lib/lotofacil.functions";
+import { listarConcursos, sincronizarConcursos, ultimoResultadoCaixa } from "@/lib/lotofacil.functions";
 import { computeNumberStats, ALL_NUMBERS } from "@/lib/lotofacil-utils";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { RefreshCw, TrendingUp, Flame, Snowflake, Clock } from "lucide-react";
+import { RefreshCw, TrendingUp, Flame, Snowflake, Clock, Trophy } from "lucide-react";
 import { useMemo } from "react";
+import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
