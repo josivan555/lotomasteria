@@ -263,26 +263,43 @@ export function VolanteCanvas({
     toast("Calibração restaurada ao padrão");
   }
 
-  /* arrastar a grade no canvas */
-  function onDown(e: React.MouseEvent<HTMLCanvasElement>) {
-    dragRef.current = { x: e.clientX, y: e.clientY, ox: cal.offsetX, oy: cal.offsetY };
+  /* arrastar a grade no canvas (mouse ou toque) */
+  function startDrag(x: number, y: number) {
+    dragRef.current = { x, y, ox: cal.offsetX, oy: cal.offsetY };
   }
-  function onMove(e: React.MouseEvent<HTMLCanvasElement>) {
+  function moveDrag(x: number, y: number) {
     const d = dragRef.current;
     const canvas = canvasRef.current;
     if (!d || !canvas) return;
     const scale = canvas.getBoundingClientRect().width / paper.w;
-    const dx = (e.clientX - d.x) / scale;
-    const dy = (e.clientY - d.y) / scale;
+    const dx = (x - d.x) / scale;
+    const dy = (y - d.y) / scale;
     setCal((c) => ({
       ...c,
       offsetX: +(d.ox + dx).toFixed(2),
       offsetY: +(d.oy + dy).toFixed(2),
     }));
   }
+  function onDown(e: React.MouseEvent<HTMLCanvasElement>) {
+    startDrag(e.clientX, e.clientY);
+  }
+  function onMove(e: React.MouseEvent<HTMLCanvasElement>) {
+    moveDrag(e.clientX, e.clientY);
+  }
+  function onTouchStart(e: React.TouchEvent<HTMLCanvasElement>) {
+    const t = e.touches[0];
+    if (t) startDrag(t.clientX, t.clientY);
+  }
+  function onTouchMove(e: React.TouchEvent<HTMLCanvasElement>) {
+    const t = e.touches[0];
+    if (!t || !dragRef.current) return;
+    e.preventDefault();
+    moveDrag(t.clientX, t.clientY);
+  }
   function onUp() {
     dragRef.current = null;
   }
+
 
   /* impressao */
   function imprimir() {
