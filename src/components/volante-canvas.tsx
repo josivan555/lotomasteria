@@ -163,6 +163,10 @@ export function VolanteCanvas({
   const jogoPreview2 = listaSel[1];
   const jogoPreview3 = listaSel[2];
   const paper = PAPEL_CM[cal.papel];
+  const jogosPorVolante = 1 + (cal.usarSecao2 ? 1 : 0) + (cal.usarSecao3 ? 1 : 0);
+  const volantesNecessarios = Math.ceil(selecionados.length / jogosPorVolante);
+  const sobra = selecionados.length % jogosPorVolante;
+
 
   // desenho
   useEffect(() => {
