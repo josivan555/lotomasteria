@@ -140,7 +140,9 @@ export function VolanteCanvas({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cfg.id]);
 
-  const jogoPreview = jogos.find((j) => j.id === selecionados[0]) ?? jogos[0];
+  const listaSel = jogos.filter((j) => selecionados.includes(j.id));
+  const jogoPreview = listaSel[0] ?? jogos[0];
+  const jogoPreview2 = listaSel[1];
   const paper = PAPEL_CM[cal.papel];
 
   // desenho
