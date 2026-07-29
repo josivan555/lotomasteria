@@ -73,11 +73,18 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            {concursos.length} concursos analisados · última atualização concurso {latest.numero}
-          </p>
+        <div className="flex items-center gap-3">
+          <img
+            src={logoAsset.url}
+            alt="LotoMaster IA"
+            className="h-14 w-14 rounded-xl object-contain shadow-lg ring-1 ring-border/40"
+          />
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">
+              {concursos.length} concursos analisados · última atualização concurso {latest.numero}
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => syncMut.mutate()} disabled={syncMut.isPending} variant="outline">
@@ -91,24 +98,59 @@ function Dashboard() {
       </div>
 
       <Card>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Último concurso</p>
-            <p className="text-lg font-semibold">
-              {latest.numero} · {new Date(latest.data_apuracao).toLocaleDateString("pt-BR")}
-            </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-lg">
+              <Trophy className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Último sorteio</p>
+              <p className="text-xl font-bold">Lotofácil</p>
+              <p className="text-sm text-muted-foreground">
+                Concurso {(ultimoOficial ?? latest).numero} ·{" "}
+                {new Date((ultimoOficial ?? latest).data_apuracao + "T00:00:00").toLocaleDateString("pt-BR")}
+              </p>
+            </div>
           </div>
+
           <div className="flex flex-wrap gap-2">
-            {latest.dezenas.map((n) => (
+            {(ultimoOficial ?? latest).dezenas.map((n) => (
               <DezenaBall key={n} n={n} variant="gold" />
             ))}
           </div>
+
           <div className="text-right">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Soma</p>
-            <p className="text-lg font-semibold">{latest.soma}</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">Prêmio 15 acertos</p>
+            <p className="text-lg font-bold text-primary">
+              {ultimoOficial
+                ? ultimoOficial.premio15.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                    maximumFractionDigits: 2,
+                  })
+                : "—"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {ultimoOficial
+                ? `${ultimoOficial.ganhadores15} ganhador${ultimoOficial.ganhadores15 === 1 ? "" : "es"}`
+                : `Soma ${latest.soma}`}
+            </p>
+            {ultimoOficial && ultimoOficial.estimativaProximo > 0 && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Próximo:{" "}
+                <span className="font-semibold text-foreground">
+                  {ultimoOficial.estimativaProximo.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                    maximumFractionDigits: 0,
+                  })}
+                </span>
+              </p>
+            )}
           </div>
         </div>
       </Card>
+
 
       <div className="grid gap-4 md:grid-cols-2">
         <ListCard icon={<TrendingUp className="h-4 w-4 text-primary" />} title="Score IA — Top 8">
