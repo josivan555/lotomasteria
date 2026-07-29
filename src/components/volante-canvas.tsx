@@ -3,6 +3,7 @@ import type { LoteriaConfig, LoteriaId } from "@/lib/loterias-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Printer, RotateCcw, Move, Save } from "lucide-react";
 import volanteLoto from "@/assets/volante-loto.asset.json";
 import volanteMega from "@/assets/volante-mega_sena.asset.json";
@@ -362,18 +363,36 @@ export function VolanteCanvas({
     label: string,
     k: keyof Calibracao,
     step = 0.05,
-  ) => (
-    <div className="space-y-1">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
-      <Input
-        type="number"
-        step={step}
-        value={cal[k] as number}
-        onChange={(e) => set(k, (Number.isFinite(+e.target.value) ? +e.target.value : 0) as never)}
-        className="h-9"
-      />
-    </div>
-  );
+    min = 0,
+    max = 30,
+  ) => {
+    const val = cal[k] as number;
+    const clamp = (v: number) => Math.min(max, Math.max(min, +v.toFixed(2)));
+    return (
+      <div className="space-y-1.5">
+        <Label className="text-xs text-muted-foreground">{label}</Label>
+        <Input
+          type="number"
+          step={step}
+          min={min}
+          max={max}
+          value={val}
+          onChange={(e) => set(k, (Number.isFinite(+e.target.value) ? +e.target.value : 0) as never)}
+          className="h-9"
+        />
+        <Slider
+          value={[Math.min(max, Math.max(min, val || 0))]}
+          min={min}
+          max={max}
+          step={step}
+          onValueChange={([v]) => set(k, clamp(v ?? min) as never)}
+          className="py-1.5"
+          aria-label={label}
+        />
+      </div>
+    );
+  };
+
 
   return (
     <section className="space-y-4 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
@@ -448,24 +467,25 @@ export function VolanteCanvas({
                 {cal.mostrarCartao ? "Visível" : "Oculto"}
               </Button>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {num("X (cm)", "cartaoX", 0.1)}
-              {num("Y (cm)", "cartaoY", 0.1)}
-              {num("Largura", "cartaoW", 0.1)}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {num("X (cm)", "cartaoX", 0.1, 0, paper.w)}
+              {num("Y (cm)", "cartaoY", 0.1, 0, paper.h)}
+              {num("Largura", "cartaoW", 0.1, 3, paper.w)}
             </div>
             <p className="mt-2 text-[11px] text-muted-foreground">
               O cartão é apenas guia na tela — não é impresso.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {num("Margem esquerda (cm)", "offsetX")}
-            {num("Margem superior (cm)", "offsetY")}
-            {num("Passo horizontal (cm)", "passoX")}
-            {num("Passo vertical (cm)", "passoY")}
-            {num("Largura da marca (cm)", "marcaW")}
-            {num("Altura da marca (cm)", "marcaH")}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {num("Margem esquerda (cm)", "offsetX", 0.05, 0, paper.w)}
+            {num("Margem superior (cm)", "offsetY", 0.05, 0, paper.h)}
+            {num("Passo horizontal (cm)", "passoX", 0.01, 0.1, 3)}
+            {num("Passo vertical (cm)", "passoY", 0.01, 0.1, 3)}
+            {num("Largura da marca (cm)", "marcaW", 0.01, 0.05, 2)}
+            {num("Altura da marca (cm)", "marcaH", 0.01, 0.05, 2)}
           </div>
+
 
           <div className="rounded-lg border border-dashed border-border/60 p-3">
             <div className="mb-2 flex items-center justify-between">
@@ -479,7 +499,7 @@ export function VolanteCanvas({
                 {cal.usarSecao2 ? "Ativa" : "Desativada"}
               </Button>
             </div>
-            {cal.usarSecao2 && num("Distância da 1ª p/ 2ª seção (cm)", "secao2Y", 0.05)}
+            {cal.usarSecao2 && num("Distância da 1ª p/ 2ª seção (cm)", "secao2Y", 0.05, 0, paper.h)}
             <p className="mt-2 text-[11px] text-muted-foreground">
               Com a 2ª seção ativa, o 2º jogo é marcado na seção do meio do volante.
             </p>
@@ -497,7 +517,7 @@ export function VolanteCanvas({
                 {cal.usarSecao3 ? "Ativa" : "Desativada"}
               </Button>
             </div>
-            {cal.usarSecao3 && num("Distância da 1ª p/ 3ª seção (cm)", "secao3Y", 0.05)}
+            {cal.usarSecao3 && num("Distância da 1ª p/ 3ª seção (cm)", "secao3Y", 0.05, 0, paper.h)}
             <p className="mt-2 text-[11px] text-muted-foreground">
               O volante da Quina tem 3 seções: com ela ativa, cada volante recebe 3 jogos.
             </p>
@@ -505,10 +525,11 @@ export function VolanteCanvas({
 
           <div className="rounded-lg border border-dashed border-border/60 p-3">
             <p className="mb-2 text-xs font-semibold">Ajuste da impressora</p>
-            <div className="grid grid-cols-2 gap-3">
-              {num("Deslocar horizontal (cm)", "ajusteEsquerda", 0.1)}
-              {num("Deslocar vertical (cm)", "ajusteTopo", 0.1)}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {num("Deslocar horizontal (cm)", "ajusteEsquerda", 0.05, -5, 5)}
+              {num("Deslocar vertical (cm)", "ajusteTopo", 0.05, -5, 5)}
             </div>
+
             <p className="mt-2 text-[11px] text-muted-foreground">
               Valores negativos movem para a esquerda/cima. Imprima um teste em papel comum,
               sobreponha ao volante e corrija.
