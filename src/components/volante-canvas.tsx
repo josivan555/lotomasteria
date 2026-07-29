@@ -67,6 +67,10 @@ export type Calibracao = {
   ajusteEsquerda: number;
   /** ajuste fino vertical da impressora (cm, pode ser negativo) */
   ajusteTopo: number;
+  /** usar a 2a secao de jogos do mesmo volante */
+  usarSecao2: boolean;
+  /** distancia vertical do inicio da 1a secao ate a 2a (cm) */
+  secao2Y: number;
   papel: "A4" | "Letter";
 };
 
