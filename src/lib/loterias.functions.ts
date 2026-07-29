@@ -179,6 +179,21 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
     };
   });
 
+export const resultadoDoConcurso = createServerFn({ method: "GET" })
+  .inputValidator((raw: unknown) =>
+    z.object({ loteria: loteriaEnum, numero: z.number().int().positive() }).parse(raw),
+  )
+  .handler(async ({ data }) => {
+    const r = await fetchCaixa(data.loteria, data.numero);
+    if (!r || !r.listaDezenas?.length) return null;
+    const dz = r.listaDezenas.map(Number).sort((a, b) => a - b);
+    return {
+      numero: r.numero,
+      data_apuracao: parseData(r.dataApuracao),
+      dezenas: dz,
+    };
+  });
+
 export const salvarJogo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) =>
@@ -188,6 +203,7 @@ export const salvarJogo = createServerFn({ method: "POST" })
         nome: z.string().optional(),
         dezenas: z.array(z.number().int().min(1).max(80)).min(3).max(20),
         score: z.number().optional(),
+        concurso: z.number().int().positive().optional(),
         metadata: z.record(z.string(), z.unknown()).optional(),
       })
       .parse(raw),
@@ -212,6 +228,7 @@ export const salvarJogo = createServerFn({ method: "POST" })
         nome: data.nome ?? null,
         dezenas: data.dezenas,
         score: data.score ?? null,
+        concurso_alvo: data.concurso ?? null,
         metadata: (data.metadata ?? {}) as never,
       })
       .select("id")
@@ -228,7 +245,7 @@ export const listarJogosSalvos = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     let q = context.supabase
       .from("jogos_salvos")
-      .select("id, loteria, nome, dezenas, score, created_at")
+      .select("id, loteria, nome, dezenas, score, concurso_alvo, created_at")
       .order("created_at", { ascending: false })
       .limit(300);
     if (data.loteria) q = q.eq("loteria", data.loteria);
@@ -236,6 +253,7 @@ export const listarJogosSalvos = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return (rows ?? []).map((j) => ({
       ...j,
+      concurso_alvo: (j as { concurso_alvo: number | null }).concurso_alvo ?? null,
       dezenas: (j.dezenas as unknown as number[]) ?? [],
     }));
   });
@@ -248,3 +266,4 @@ export const excluirJogo = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+

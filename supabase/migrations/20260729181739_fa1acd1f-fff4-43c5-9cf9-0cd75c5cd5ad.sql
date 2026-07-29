@@ -1,0 +1,1 @@
+ALTER TABLE public.jogos_salvos ADD COLUMN IF NOT EXISTS concurso_alvo integer;

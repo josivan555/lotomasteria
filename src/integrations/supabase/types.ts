@@ -51,6 +51,7 @@ export type Database = {
       }
       jogos_salvos: {
         Row: {
+          concurso_alvo: number | null
           created_at: string
           dezenas: number[]
           id: string
@@ -61,6 +62,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          concurso_alvo?: number | null
           created_at?: string
           dezenas: number[]
           id?: string
@@ -71,6 +73,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          concurso_alvo?: number | null
           created_at?: string
           dezenas?: number[]
           id?: string
