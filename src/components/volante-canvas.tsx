@@ -130,6 +130,7 @@ export function VolanteCanvas({
   const layout = useMemo(() => volanteLayout(cfg), [cfg]);
   const [cal, setCal] = useState<Calibracao>(PADROES[cfg.id]);
   const [selecionados, setSelecionados] = useState<string[]>([]);
+  const [expandido, setExpandido] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const [art, setArt] = useState<HTMLImageElement | null>(null);
