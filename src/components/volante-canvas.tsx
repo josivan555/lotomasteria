@@ -4,11 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Printer, RotateCcw, Move, Save, Maximize2, Minimize2 } from "lucide-react";
+import { Printer, RotateCcw, Move, Save, Maximize2, Minimize2, Eye } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import volanteLoto from "@/assets/volante-loto.asset.json";
 import volanteMega from "@/assets/volante-mega_sena.asset.json";
 import volanteQuina from "@/assets/volante-quina.asset.json";
 import { toast } from "sonner";
+
 
 /* ---------------- layout do volante por loteria ---------------- */
 
@@ -166,6 +175,18 @@ export function VolanteCanvas({
   const jogosPorVolante = 1 + (cal.usarSecao2 ? 1 : 0) + (cal.usarSecao3 ? 1 : 0);
   const volantesNecessarios = Math.ceil(selecionados.length / jogosPorVolante);
   const sobra = selecionados.length % jogosPorVolante;
+
+  const [previaAberta, setPreviaAberta] = useState(false);
+  // ordem de impressao: mesma ordem da lista de jogos, fatiada por volante/pagina
+  const paginasPrevia = useMemo(() => {
+    const out: { dezenas: number[]; created_at: string }[][] = [];
+    for (let i = 0; i < listaSel.length; i += jogosPorVolante) {
+      out.push(listaSel.slice(i, i + jogosPorVolante));
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selecionados, jogos, jogosPorVolante]);
+
 
 
   // desenho
@@ -447,10 +468,25 @@ export function VolanteCanvas({
           <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={salvar}>
             <Save className="mr-2 h-4 w-4" /> Salvar calibração
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 md:flex-none"
+            onClick={() => {
+              if (!selecionados.length) {
+                toast.error("Selecione ao menos um jogo para ver a prévia.");
+                return;
+              }
+              setPreviaAberta(true);
+            }}
+          >
+            <Eye className="mr-2 h-4 w-4" /> Prévia da impressão
+          </Button>
           <Button size="sm" className="flex-1 md:flex-none" onClick={imprimir}>
             <Printer className="mr-2 h-4 w-4" /> Imprimir ({selecionados.length} jogos ·{" "}
             {volantesNecessarios} volante{volantesNecessarios === 1 ? "" : "s"})
           </Button>
+
 
         </div>
       </div>
@@ -640,6 +676,71 @@ export function VolanteCanvas({
           </div>
         </div>
       </div>
+
+      <Dialog open={previaAberta} onOpenChange={setPreviaAberta}>
+        <DialogContent className="max-h-[85vh] max-w-2xl overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Prévia da impressão · {cfg.nome}</DialogTitle>
+            <DialogDescription>
+              {paginasPrevia.length} volante{paginasPrevia.length === 1 ? "" : "s"} (páginas) ·{" "}
+              {selecionados.length} jogo{selecionados.length === 1 ? "" : "s"} ·{" "}
+              {jogosPorVolante} por volante. Ordem de saída na impressora, de cima para baixo.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-[55vh] space-y-3 overflow-auto pr-1">
+            {paginasPrevia.map((grupo, pi) => (
+              <div key={pi} className="rounded-lg border border-border/60 p-3">
+                <div className="mb-2 flex items-center justify-between text-xs">
+                  <span className="font-semibold">
+                    Volante {pi + 1} de {paginasPrevia.length}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {grupo.length} de {jogosPorVolante} seções preenchidas
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {Array.from({ length: jogosPorVolante }).map((_, si) => {
+                    const j = grupo[si];
+                    return (
+                      <div key={si} className="flex items-start gap-2 text-xs">
+                        <span className="w-16 shrink-0 text-muted-foreground">{si + 1}ª seção</span>
+                        {j ? (
+                          <span className="font-mono font-semibold">
+                            {j.dezenas
+                              .slice()
+                              .sort((a, b) => a - b)
+                              .map((n) => String(n).padStart(2, "0"))
+                              .join(" ")}
+                          </span>
+                        ) : (
+                          <span className="italic text-muted-foreground">vazia (não marcada)</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setPreviaAberta(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                setPreviaAberta(false);
+                imprimir();
+              }}
+            >
+              <Printer className="mr-2 h-4 w-4" /> Confirmar e imprimir {paginasPrevia.length}{" "}
+              volante{paginasPrevia.length === 1 ? "" : "s"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
+
   );
 }
