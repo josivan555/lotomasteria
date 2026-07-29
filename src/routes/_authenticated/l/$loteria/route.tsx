@@ -127,7 +127,7 @@ function NavPill({
     <Link
       to={to}
       params={{ loteria }}
-      className="inline-flex items-center gap-1.5 rounded-full border border-border/60 px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+      className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border/60 px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-secondary hover:text-foreground"
       activeProps={{
         className: "border-primary bg-primary/15 text-primary hover:bg-primary/20 hover:text-primary",
       }}
