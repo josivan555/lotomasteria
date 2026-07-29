@@ -76,6 +76,21 @@ function Resultados() {
       : base;
   }, [jogos, drawnSet, drawn.length]);
 
+  const itemsParaPdf = useMemo(() => {
+    if (!pdfFrom && !pdfTo) return items;
+    const from = pdfFrom ? new Date(pdfFrom + "T00:00:00").getTime() : -Infinity;
+    const to = pdfTo ? new Date(pdfTo + "T23:59:59.999").getTime() : Infinity;
+    const allowed = new Set(
+      jogos
+        .filter((j) => {
+          const t = new Date(j.created_at).getTime();
+          return t >= from && t <= to;
+        })
+        .map((j) => j.id),
+    );
+    return items.filter((it) => allowed.has(it.id));
+  }, [items, jogos, pdfFrom, pdfTo]);
+
   const maxHits = items.reduce((m, it) => Math.max(m, it.hits), 0);
 
   const tierDefs =
