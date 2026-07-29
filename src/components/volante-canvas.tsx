@@ -363,7 +363,11 @@ export function VolanteCanvas({
                 const { col, row } = layout.pos(n);
                 const left = ox + col * cal.passoX - cal.marcaW / 2;
                 const top = oySec + row * cal.passoY - cal.marcaH / 2;
-                return `<div class="m" style="left:${left.toFixed(3)}cm;top:${top.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm"></div>`;
+                // usa border (em vez de background) para garantir a impressao
+                // mesmo quando o navegador desativa impressao de cores de fundo
+                const bw = (cal.marcaH / 2).toFixed(3);
+                const bh = (cal.marcaW / 2).toFixed(3);
+                return `<div class="m" style="left:${left.toFixed(3)}cm;top:${top.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm;border-width:${bw}cm ${bh}cm"></div>`;
               })
               .join("");
           })
@@ -376,12 +380,16 @@ export function VolanteCanvas({
 <title>Volantes ${cfg.nome}</title>
 <style>
   @page { size: ${cal.papel === "A4" ? "A4" : "letter"}; margin: 0; }
-  html,body { margin:0; padding:0; background:#fff; }
+  html,body { margin:0; padding:0; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   .pg { position:relative; width:${paper.w}cm; height:${paper.h}cm; page-break-after:always; overflow:hidden; }
   .pg:last-child { page-break-after:auto; }
-  .m { position:absolute; background:#000; }
-</style></head><body>${paginas}
-<script>window.onload=function(){window.focus();window.print();}<\/script>
+  .m { position:absolute; box-sizing:border-box; background:#000; border-style:solid; border-color:#000; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .bar { position:fixed; top:8px; right:8px; z-index:99; font:14px sans-serif; }
+  @media print { .bar { display:none; } }
+</style></head><body>
+<div class="bar"><button onclick="window.print()">Imprimir</button></div>
+${paginas}
+<script>window.onload=function(){window.focus();setTimeout(function(){window.print();},300);}<\/script>
 </body></html>`;
 
     const w = window.open("", "_blank", "width=900,height=1000");
@@ -393,6 +401,7 @@ export function VolanteCanvas({
     w.document.write(html);
     w.document.close();
   }
+
 
   const num = (
     label: string,
