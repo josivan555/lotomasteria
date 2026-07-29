@@ -5,7 +5,7 @@ import {
   notFound,
   useParams,
 } from "@tanstack/react-router";
-import { BarChart3, Bookmark, ClipboardCheck, Dice5, History } from "lucide-react";
+import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer } from "lucide-react";
 import { isLoteriaId, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria")({
@@ -53,6 +53,9 @@ function LoteriaLayout() {
           <NavPill to="/l/$loteria/resultados" loteria={loteria} icon={<ClipboardCheck className="h-4 w-4" />}>
             Resultados
           </NavPill>
+          <NavPill to="/l/$loteria/volante" loteria={loteria} icon={<Printer className="h-4 w-4" />}>
+            Volante
+          </NavPill>
         </nav>
       </div>
 
@@ -67,7 +70,7 @@ function NavPill({
   icon,
   children,
 }: {
-  to: "/l/$loteria/dashboard" | "/l/$loteria/gerador" | "/l/$loteria/historico" | "/l/$loteria/jogos" | "/l/$loteria/resultados";
+  to: "/l/$loteria/dashboard" | "/l/$loteria/gerador" | "/l/$loteria/historico" | "/l/$loteria/jogos" | "/l/$loteria/resultados" | "/l/$loteria/volante";
   loteria: LoteriaId;
   icon: React.ReactNode;
   children: React.ReactNode;
