@@ -26,11 +26,18 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const listar = useServerFn(listarConcursos);
   const sync = useServerFn(sincronizarConcursos);
+  const ultimoCaixa = useServerFn(ultimoResultadoCaixa);
   const router = useRouter();
 
   const { data: concursos = [], isLoading } = useQuery({
     queryKey: ["concursos"],
     queryFn: () => listar(),
+  });
+
+  const { data: ultimoOficial } = useQuery({
+    queryKey: ["ultimo-caixa"],
+    queryFn: () => ultimoCaixa(),
+    staleTime: 1000 * 60 * 5,
   });
 
   const stats = useMemo(() => (concursos.length ? computeNumberStats(concursos) : null), [concursos]);
