@@ -247,7 +247,7 @@ export function VolanteCanvas({
         cm(layout.rows * cal.passoY),
       );
     }
-  }, [cal, cfg, layout, jogoPreview, jogoPreview2, paper, art]);
+  }, [cal, cfg, layout, jogoPreview, jogoPreview2, jogoPreview3, paper, art]);
 
   function set<K extends keyof Calibracao>(k: K, v: Calibracao[K]) {
     setCal((c) => ({ ...c, [k]: v }));
