@@ -53,6 +53,8 @@ function Resultados() {
   });
 
   const [manual, setManual] = useState("");
+  const [pdfFrom, setPdfFrom] = useState("");
+  const [pdfTo, setPdfTo] = useState("");
   const drawn = useMemo(() => {
     const parsed = parseNumbers(manual);
     if (parsed.length) return parsed.filter((n) => n <= cfg.total);
