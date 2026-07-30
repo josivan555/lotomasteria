@@ -310,7 +310,7 @@ function Gerador() {
                 <Sparkles className="h-3.5 w-3.5" /> IA configurar
               </Button>
             </div>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               {[1, 2, 5, 10, 50, 100, 500].map((v) => (
                 <Button
                   key={v}
@@ -321,6 +321,21 @@ function Gerador() {
                   {v}
                 </Button>
               ))}
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={qtd}
+                  onChange={(e) => {
+                    const v = +e.target.value;
+                    if (Number.isFinite(v)) setQtd(Math.max(1, Math.min(500, v)));
+                  }}
+                  className="max-w-24 text-center"
+                  aria-label="Quantidade personalizada de jogos"
+                />
+                <span className="text-xs text-muted-foreground">personalizado</span>
+              </div>
             </div>
           </div>
 
