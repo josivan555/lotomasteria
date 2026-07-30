@@ -245,47 +245,40 @@ function Gerador() {
 
   const salvarMut = useMutation({
     mutationFn: (r: Result) =>
-      salvar({
+      salvarLote({
         data: {
           loteria,
-          dezenas: r.dezenas,
-          score: r.score,
           concurso: concursoAlvo,
-          nome: `${cfg.nome} · Score ${r.score}`,
+          jogos: [{ dezenas: r.dezenas, score: r.score }],
         },
       }),
     onSuccess: () => {
       toast.success("Jogo salvo!");
       queryClient.invalidateQueries({ queryKey: ["jogos-salvos"] });
+      queryClient.invalidateQueries({ queryKey: ["saldo"] });
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
   });
 
   const salvarTodosMut = useMutation({
-    mutationFn: async (lista: Result[]) => {
-      let ok = 0;
-      for (const r of lista) {
-        await salvar({
-          data: {
-            loteria,
-            dezenas: r.dezenas,
-            score: r.score,
-            concurso: concursoAlvo,
-            nome: `${cfg.nome} · Score ${r.score}`,
-          },
-        });
-        ok++;
-      }
-      return ok;
-    },
-    onSuccess: (n) => {
-      toast.success(`${n} jogos salvos em Meus Jogos!`);
+    mutationFn: (lista: Result[]) =>
+      salvarLote({
+        data: {
+          loteria,
+          concurso: concursoAlvo,
+          jogos: lista.map((r) => ({ dezenas: r.dezenas, score: r.score })),
+        },
+      }),
+    onSuccess: (r) => {
+      toast.success(`${r.salvos} jogos salvos · ${r.custo} crédito(s) usado(s)`);
       queryClient.invalidateQueries({ queryKey: ["jogos-salvos"] });
+      queryClient.invalidateQueries({ queryKey: ["saldo"] });
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
   });
+
 
 
   function exportarCSV() {
