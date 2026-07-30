@@ -90,9 +90,13 @@ function Gerador() {
   const defaults = cfg.filtrosDefault;
 
   const listar = useServerFn(listarConcursos);
-  const salvar = useServerFn(salvarJogo);
+  const salvarLote = useServerFn(salvarJogosComCreditos);
+  const saldoFn = useServerFn(meuSaldo);
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const { data: saldo } = useQuery({ queryKey: ["saldo"], queryFn: () => saldoFn({}) });
+
 
   const { data: concursos = [] } = useQuery({
     queryKey: ["concursos", loteria],
