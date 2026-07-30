@@ -82,7 +82,10 @@ function LoteriaLayout() {
               })}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <SaldoBadge />
         </div>
+
 
         <nav className="-mx-1 flex w-full gap-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:mx-0 md:w-auto md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           <NavPill to="/l/$loteria/dashboard" loteria={loteria} icon={<BarChart3 className="h-4 w-4" />}>
