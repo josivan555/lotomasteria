@@ -220,11 +220,22 @@ function Gerador() {
 
 
 
+  const custoCreditos = creditosNecessarios(qtd);
+  const saldoAtual = saldo?.balance ?? 0;
+  const semSaldo = saldoAtual < custoCreditos;
+
   function gerar() {
     if (!stats) {
       toast.error("Sincronize o histórico primeiro.");
       return;
     }
+    if (semSaldo) {
+      toast.error(
+        `Você precisa de ${custoCreditos} crédito(s) e tem ${saldoAtual}. Compre mais créditos.`,
+      );
+      return;
+    }
+
     const filtros: Filtros = {
       somaMin,
       somaMax,
