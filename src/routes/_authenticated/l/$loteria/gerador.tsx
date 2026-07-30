@@ -115,6 +115,18 @@ function Gerador() {
   );
 
   const [qtd, setQtd] = useState(10);
+
+  // Carrega a quantidade salva desta loteria e mantém o valor por modalidade
+  useEffect(() => {
+    setQtd(lerQtdSalva(loteria) ?? 10);
+  }, [loteria]);
+
+  function alterarQtd(v: number) {
+    const n = Math.max(1, Math.min(500, Math.round(v)));
+    setQtd(n);
+    salvarQtd(loteria, n);
+  }
+
   const [tamanho, setTamanho] = useState(cfg.tamanho);
   const [somaMin, setSomaMin] = useState(defaults.somaMin);
   const [somaMax, setSomaMax] = useState(defaults.somaMax);
