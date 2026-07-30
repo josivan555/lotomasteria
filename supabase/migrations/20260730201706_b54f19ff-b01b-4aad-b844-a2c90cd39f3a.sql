@@ -1,0 +1,3 @@
+REVOKE ALL ON FUNCTION public.grant_initial_credits() FROM public, anon, authenticated;
+REVOKE ALL ON FUNCTION public.handle_new_user() FROM public, anon, authenticated;
+REVOKE ALL ON FUNCTION public.set_updated_at() FROM public, anon, authenticated;
