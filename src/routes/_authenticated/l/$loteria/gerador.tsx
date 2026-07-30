@@ -1,7 +1,10 @@
 import { createFileRoute, useRouter, Link, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarConcursos, salvarJogo, ultimoResultadoCaixa } from "@/lib/loterias.functions";
+import { listarConcursos, ultimoResultadoCaixa } from "@/lib/loterias.functions";
+import { salvarJogosComCreditos, meuSaldo } from "@/lib/credits.functions";
+import { creditosNecessarios } from "@/lib/credits-config";
+
 import {
   computeNumberStats,
   gerarJogos,
