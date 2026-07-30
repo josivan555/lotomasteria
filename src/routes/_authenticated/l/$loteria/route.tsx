@@ -27,7 +27,21 @@ export const Route = createFileRoute("/_authenticated/l/$loteria")({
   component: LoteriaLayout,
 });
 
+function SaldoBadge() {
+  const saldoFn = useServerFn(meuSaldo);
+  const { data } = useQuery({ queryKey: ["saldo"], queryFn: () => saldoFn({}) });
+  return (
+    <Button asChild variant="secondary" size="sm" className="shrink-0 gap-1.5">
+      <Link to="/creditos">
+        <Coins className="h-3.5 w-3.5 text-primary" />
+        {data?.balance ?? 0}
+      </Link>
+    </Button>
+  );
+}
+
 function LoteriaLayout() {
+
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria" });
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
