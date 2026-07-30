@@ -354,7 +354,7 @@ function Gerador() {
                   key={v}
                   size="sm"
                   variant={qtd === v ? "default" : "outline"}
-                  onClick={() => setQtd(v)}
+                  onClick={() => alterarQtd(v)}
                 >
                   {v}
                 </Button>
@@ -367,7 +367,7 @@ function Gerador() {
                   value={qtd}
                   onChange={(e) => {
                     const v = +e.target.value;
-                    if (Number.isFinite(v)) setQtd(Math.max(1, Math.min(500, v)));
+                    if (Number.isFinite(v)) alterarQtd(v);
                   }}
                   className="max-w-24 text-center"
                   aria-label="Quantidade personalizada de jogos"
