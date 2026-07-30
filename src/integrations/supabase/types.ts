@@ -49,6 +49,78 @@ export type Database = {
           },
         ]
       }
+      credit_orders: {
+        Row: {
+          amount_brl: number
+          created_at: string
+          credits: number
+          id: string
+          init_point: string | null
+          package_id: string
+          payment_id: string | null
+          preference_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_brl: number
+          created_at?: string
+          credits: number
+          id?: string
+          init_point?: string | null
+          package_id: string
+          payment_id?: string | null
+          preference_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_brl?: number
+          created_at?: string
+          credits?: number
+          id?: string
+          init_point?: string | null
+          package_id?: string
+          payment_id?: string | null
+          preference_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      credit_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          kind: string
+          order_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind: string
+          order_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          order_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       jogos_salvos: {
         Row: {
           concurso_alvo: number | null
@@ -141,12 +213,40 @@ export type Database = {
         }
         Relationships: []
       }
+      user_credits: {
+        Row: {
+          balance: number
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      apply_paid_order: {
+        Args: { _order_id: string; _payment_id: string }
+        Returns: boolean
+      }
+      consume_credits: {
+        Args: { _amount: number; _description: string; _user_id: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
