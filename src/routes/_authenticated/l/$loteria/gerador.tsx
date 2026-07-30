@@ -17,7 +17,33 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Bookmark, Dice5, Download, Sparkles, Info } from "lucide-react";
 import { toast } from "sonner";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+const QTD_KEY = "lotomaster:qtd-personalizada";
+
+function lerQtdSalva(loteria: string): number | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(QTD_KEY);
+    if (!raw) return null;
+    const v = (JSON.parse(raw) as Record<string, number>)[loteria];
+    return typeof v === "number" && Number.isFinite(v) ? Math.max(1, Math.min(500, v)) : null;
+  } catch {
+    return null;
+  }
+}
+
+function salvarQtd(loteria: string, qtd: number) {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = window.localStorage.getItem(QTD_KEY);
+    const map = raw ? (JSON.parse(raw) as Record<string, number>) : {};
+    map[loteria] = qtd;
+    window.localStorage.setItem(QTD_KEY, JSON.stringify(map));
+  } catch {
+    /* ignora */
+  }
+}
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/gerador")({
   component: Gerador,
@@ -89,6 +115,18 @@ function Gerador() {
   );
 
   const [qtd, setQtd] = useState(10);
+
+  // Carrega a quantidade salva desta loteria e mantém o valor por modalidade
+  useEffect(() => {
+    setQtd(lerQtdSalva(loteria) ?? 10);
+  }, [loteria]);
+
+  function alterarQtd(v: number) {
+    const n = Math.max(1, Math.min(500, Math.round(v)));
+    setQtd(n);
+    salvarQtd(loteria, n);
+  }
+
   const [tamanho, setTamanho] = useState(cfg.tamanho);
   const [somaMin, setSomaMin] = useState(defaults.somaMin);
   const [somaMax, setSomaMax] = useState(defaults.somaMax);
@@ -316,7 +354,7 @@ function Gerador() {
                   key={v}
                   size="sm"
                   variant={qtd === v ? "default" : "outline"}
-                  onClick={() => setQtd(v)}
+                  onClick={() => alterarQtd(v)}
                 >
                   {v}
                 </Button>
@@ -329,7 +367,7 @@ function Gerador() {
                   value={qtd}
                   onChange={(e) => {
                     const v = +e.target.value;
-                    if (Number.isFinite(v)) setQtd(Math.max(1, Math.min(500, v)));
+                    if (Number.isFinite(v)) alterarQtd(v);
                   }}
                   className="max-w-24 text-center"
                   aria-label="Quantidade personalizada de jogos"
