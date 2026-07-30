@@ -1,7 +1,10 @@
 import { createFileRoute, useRouter, Link, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarConcursos, salvarJogo, ultimoResultadoCaixa } from "@/lib/loterias.functions";
+import { listarConcursos, ultimoResultadoCaixa } from "@/lib/loterias.functions";
+import { salvarJogosComCreditos, meuSaldo } from "@/lib/credits.functions";
+import { creditosNecessarios } from "@/lib/credits-config";
+
 import {
   computeNumberStats,
   gerarJogos,
@@ -90,9 +93,13 @@ function Gerador() {
   const defaults = cfg.filtrosDefault;
 
   const listar = useServerFn(listarConcursos);
-  const salvar = useServerFn(salvarJogo);
+  const salvarLote = useServerFn(salvarJogosComCreditos);
+  const saldoFn = useServerFn(meuSaldo);
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const { data: saldo } = useQuery({ queryKey: ["saldo"], queryFn: () => saldoFn({}) });
+
 
   const { data: concursos = [] } = useQuery({
     queryKey: ["concursos", loteria],
@@ -213,11 +220,22 @@ function Gerador() {
 
 
 
+  const custoCreditos = creditosNecessarios(qtd);
+  const saldoAtual = saldo?.balance ?? 0;
+  const semSaldo = saldoAtual < custoCreditos;
+
   function gerar() {
     if (!stats) {
       toast.error("Sincronize o histórico primeiro.");
       return;
     }
+    if (semSaldo) {
+      toast.error(
+        `Você precisa de ${custoCreditos} crédito(s) e tem ${saldoAtual}. Compre mais créditos.`,
+      );
+      return;
+    }
+
     const filtros: Filtros = {
       somaMin,
       somaMax,
@@ -245,47 +263,40 @@ function Gerador() {
 
   const salvarMut = useMutation({
     mutationFn: (r: Result) =>
-      salvar({
+      salvarLote({
         data: {
           loteria,
-          dezenas: r.dezenas,
-          score: r.score,
           concurso: concursoAlvo,
-          nome: `${cfg.nome} · Score ${r.score}`,
+          jogos: [{ dezenas: r.dezenas, score: r.score }],
         },
       }),
     onSuccess: () => {
       toast.success("Jogo salvo!");
       queryClient.invalidateQueries({ queryKey: ["jogos-salvos"] });
+      queryClient.invalidateQueries({ queryKey: ["saldo"] });
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
   });
 
   const salvarTodosMut = useMutation({
-    mutationFn: async (lista: Result[]) => {
-      let ok = 0;
-      for (const r of lista) {
-        await salvar({
-          data: {
-            loteria,
-            dezenas: r.dezenas,
-            score: r.score,
-            concurso: concursoAlvo,
-            nome: `${cfg.nome} · Score ${r.score}`,
-          },
-        });
-        ok++;
-      }
-      return ok;
-    },
-    onSuccess: (n) => {
-      toast.success(`${n} jogos salvos em Meus Jogos!`);
+    mutationFn: (lista: Result[]) =>
+      salvarLote({
+        data: {
+          loteria,
+          concurso: concursoAlvo,
+          jogos: lista.map((r) => ({ dezenas: r.dezenas, score: r.score })),
+        },
+      }),
+    onSuccess: (r) => {
+      toast.success(`${r.salvos} jogos salvos · ${r.custo} crédito(s) usado(s)`);
       queryClient.invalidateQueries({ queryKey: ["jogos-salvos"] });
+      queryClient.invalidateQueries({ queryKey: ["saldo"] });
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
   });
+
 
 
   function exportarCSV() {
@@ -501,9 +512,22 @@ function Gerador() {
             />
           </div>
 
-          <Button className="w-full" size="lg" onClick={gerar}>
-            <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} jogos
+          <Button className="w-full" size="lg" onClick={gerar} disabled={salvarTodosMut.isPending}>
+            <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} jogos · {custoCreditos} crédito(s)
           </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Saldo: {saldoAtual} crédito(s).{" "}
+            {semSaldo ? (
+              <Link to="/creditos" className="font-medium text-primary underline">
+                Comprar créditos
+              </Link>
+            ) : (
+              <Link to="/creditos" className="underline">
+                Gerenciar créditos
+              </Link>
+            )}
+          </p>
+
         </div>
 
         <div className="space-y-3">

@@ -7,7 +7,11 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, ChevronsUpDown } from "lucide-react";
+import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, ChevronsUpDown, Coins } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { meuSaldo } from "@/lib/credits.functions";
+
 import { isLoteriaId, LOTERIAS, LOTERIA_IDS, type LoteriaId } from "@/lib/loterias-config";
 import {
   DropdownMenu,
@@ -27,7 +31,21 @@ export const Route = createFileRoute("/_authenticated/l/$loteria")({
   component: LoteriaLayout,
 });
 
+function SaldoBadge() {
+  const saldoFn = useServerFn(meuSaldo);
+  const { data } = useQuery({ queryKey: ["saldo"], queryFn: () => saldoFn({}) });
+  return (
+    <Button asChild variant="secondary" size="sm" className="shrink-0 gap-1.5">
+      <Link to="/creditos">
+        <Coins className="h-3.5 w-3.5 text-primary" />
+        {data?.balance ?? 0}
+      </Link>
+    </Button>
+  );
+}
+
 function LoteriaLayout() {
+
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria" });
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -82,7 +100,10 @@ function LoteriaLayout() {
               })}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <SaldoBadge />
         </div>
+
 
         <nav className="-mx-1 flex w-full gap-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:mx-0 md:w-auto md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           <NavPill to="/l/$loteria/dashboard" loteria={loteria} icon={<BarChart3 className="h-4 w-4" />}>

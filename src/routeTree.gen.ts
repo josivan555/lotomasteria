@@ -16,6 +16,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedLoteriasRouteImport } from './routes/_authenticated/loterias'
+import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticated/creditos'
+import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as AuthenticatedLLoteriaRouteRouteImport } from './routes/_authenticated/l/$loteria/route'
 import { Route as AuthenticatedLLoteriaIndexRouteImport } from './routes/_authenticated/l/$loteria/index'
 import { Route as AuthenticatedLLoteriaVolanteRouteImport } from './routes/_authenticated/l/$loteria/volante'
@@ -59,6 +61,17 @@ const AuthenticatedLoteriasRoute = AuthenticatedLoteriasRouteImport.update({
   path: '/loterias',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCreditosRoute = AuthenticatedCreditosRouteImport.update({
+  id: '/creditos',
+  path: '/creditos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicMercadopagoWebhookRoute =
+  ApiPublicMercadopagoWebhookRouteImport.update({
+    id: '/api/public/mercadopago-webhook',
+    path: '/api/public/mercadopago-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedLLoteriaRouteRoute =
   AuthenticatedLLoteriaRouteRouteImport.update({
     id: '/l/$loteria',
@@ -114,8 +127,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/resultados': typeof ResultadosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/creditos': typeof AuthenticatedCreditosRoute
   '/loterias': typeof AuthenticatedLoteriasRoute
   '/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/l/$loteria/dashboard': typeof AuthenticatedLLoteriaDashboardRoute
   '/l/$loteria/gerador': typeof AuthenticatedLLoteriaGeradorRoute
   '/l/$loteria/historico': typeof AuthenticatedLLoteriaHistoricoRoute
@@ -130,7 +145,9 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/resultados': typeof ResultadosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/creditos': typeof AuthenticatedCreditosRoute
   '/loterias': typeof AuthenticatedLoteriasRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/l/$loteria/dashboard': typeof AuthenticatedLLoteriaDashboardRoute
   '/l/$loteria/gerador': typeof AuthenticatedLLoteriaGeradorRoute
   '/l/$loteria/historico': typeof AuthenticatedLLoteriaHistoricoRoute
@@ -147,8 +164,10 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/resultados': typeof ResultadosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/creditos': typeof AuthenticatedCreditosRoute
   '/_authenticated/loterias': typeof AuthenticatedLoteriasRoute
   '/_authenticated/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/_authenticated/l/$loteria/dashboard': typeof AuthenticatedLLoteriaDashboardRoute
   '/_authenticated/l/$loteria/gerador': typeof AuthenticatedLLoteriaGeradorRoute
   '/_authenticated/l/$loteria/historico': typeof AuthenticatedLLoteriaHistoricoRoute
@@ -165,8 +184,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/resultados'
     | '/sitemap.xml'
+    | '/creditos'
     | '/loterias'
     | '/l/$loteria'
+    | '/api/public/mercadopago-webhook'
     | '/l/$loteria/dashboard'
     | '/l/$loteria/gerador'
     | '/l/$loteria/historico'
@@ -181,7 +202,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/resultados'
     | '/sitemap.xml'
+    | '/creditos'
     | '/loterias'
+    | '/api/public/mercadopago-webhook'
     | '/l/$loteria/dashboard'
     | '/l/$loteria/gerador'
     | '/l/$loteria/historico'
@@ -197,8 +220,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/resultados'
     | '/sitemap.xml'
+    | '/_authenticated/creditos'
     | '/_authenticated/loterias'
     | '/_authenticated/l/$loteria'
+    | '/api/public/mercadopago-webhook'
     | '/_authenticated/l/$loteria/dashboard'
     | '/_authenticated/l/$loteria/gerador'
     | '/_authenticated/l/$loteria/historico'
@@ -215,6 +240,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   ResultadosRoute: typeof ResultadosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -267,6 +293,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/loterias'
       preLoaderRoute: typeof AuthenticatedLoteriasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creditos': {
+      id: '/_authenticated/creditos'
+      path: '/creditos'
+      fullPath: '/creditos'
+      preLoaderRoute: typeof AuthenticatedCreditosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/mercadopago-webhook': {
+      id: '/api/public/mercadopago-webhook'
+      path: '/api/public/mercadopago-webhook'
+      fullPath: '/api/public/mercadopago-webhook'
+      preLoaderRoute: typeof ApiPublicMercadopagoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/l/$loteria': {
       id: '/_authenticated/l/$loteria'
@@ -354,11 +394,13 @@ const AuthenticatedLLoteriaRouteRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCreditosRoute: typeof AuthenticatedCreditosRoute
   AuthenticatedLoteriasRoute: typeof AuthenticatedLoteriasRoute
   AuthenticatedLLoteriaRouteRoute: typeof AuthenticatedLLoteriaRouteRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCreditosRoute: AuthenticatedCreditosRoute,
   AuthenticatedLoteriasRoute: AuthenticatedLoteriasRoute,
   AuthenticatedLLoteriaRouteRoute: AuthenticatedLLoteriaRouteRouteWithChildren,
 }
@@ -373,6 +415,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   ResultadosRoute: ResultadosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
