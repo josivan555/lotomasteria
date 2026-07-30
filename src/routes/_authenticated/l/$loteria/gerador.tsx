@@ -512,9 +512,22 @@ function Gerador() {
             />
           </div>
 
-          <Button className="w-full" size="lg" onClick={gerar}>
-            <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} jogos
+          <Button className="w-full" size="lg" onClick={gerar} disabled={salvarTodosMut.isPending}>
+            <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} jogos · {custoCreditos} crédito(s)
           </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Saldo: {saldoAtual} crédito(s).{" "}
+            {semSaldo ? (
+              <Link to="/creditos" className="font-medium text-primary underline">
+                Comprar créditos
+              </Link>
+            ) : (
+              <Link to="/creditos" className="underline">
+                Gerenciar créditos
+              </Link>
+            )}
+          </p>
+
         </div>
 
         <div className="space-y-3">
