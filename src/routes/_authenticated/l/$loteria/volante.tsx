@@ -46,6 +46,26 @@ function VolantePage() {
 
   const [incluirAntigos, setIncluirAntigos] = useState(false);
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
+  const [concursoSel, setConcursoSel] = useState<string>("todos");
+
+  const grupos = useMemo(() => {
+    const map = new Map<string, typeof antigos>();
+    for (const j of antigos) {
+      const k = j.concurso_alvo != null ? String(j.concurso_alvo) : "sem";
+      if (!map.has(k)) map.set(k, []);
+      map.get(k)!.push(j);
+    }
+    return [...map.entries()].sort((a, b) => {
+      if (a[0] === "sem") return 1;
+      if (b[0] === "sem") return -1;
+      return Number(b[0]) - Number(a[0]);
+    });
+  }, [antigos]);
+
+  const gruposVisiveis = useMemo(
+    () => (concursoSel === "todos" ? grupos : grupos.filter(([k]) => k === concursoSel)),
+    [grupos, concursoSel],
+  );
 
   const toggleSelecionado = (id: string) => {
     setSelecionados((prev) => {
@@ -56,14 +76,21 @@ function VolantePage() {
     });
   };
 
-  const todosSelecionados = antigos.length > 0 && antigos.every((j) => selecionados.has(j.id));
-  const toggleTodos = () => {
-    if (todosSelecionados) {
-      setSelecionados(new Set());
-    } else {
-      setSelecionados(new Set(antigos.map((j) => j.id)));
-    }
+  const toggleGrupo = (lista: typeof antigos) => {
+    const todos = lista.every((j) => selecionados.has(j.id));
+    setSelecionados((prev) => {
+      const next = new Set(prev);
+      for (const j of lista) {
+        if (todos) next.delete(j.id);
+        else next.add(j.id);
+      }
+      return next;
+    });
   };
+
+  const visiveis = gruposVisiveis.flatMap(([, l]) => l);
+  const todosSelecionados = visiveis.length > 0 && visiveis.every((j) => selecionados.has(j.id));
+  const toggleTodos = () => toggleGrupo(visiveis);
 
   const listaFinal = useMemo(
     () => [...vigentes, ...antigos.filter((j) => selecionados.has(j.id))],
@@ -106,14 +133,29 @@ function VolantePage() {
 
         {incluirAntigos && (
           <div className="rounded-md border border-border bg-background p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-medium">Escolha quais jogos passados usar</span>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Concurso:</span>
+                <Select value={concursoSel} onValueChange={setConcursoSel}>
+                  <SelectTrigger className="h-9 w-[190px]">
+                    <SelectValue placeholder="Todos os concursos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos os concursos</SelectItem>
+                    {grupos.map(([k, l]) => (
+                      <SelectItem key={k} value={k}>
+                        {k === "sem" ? "Sem concurso" : `Concurso ${k}`} ({l.length})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={toggleTodos}
-                disabled={antigos.length === 0}
+                disabled={visiveis.length === 0}
               >
                 {todosSelecionados ? (
                   <>
@@ -127,39 +169,59 @@ function VolantePage() {
               </Button>
             </div>
 
-            {antigos.length === 0 ? (
+            {gruposVisiveis.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 Nenhum jogo de concurso passado encontrado.
               </p>
             ) : (
-              <div className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3">
-                {antigos.map((j) => (
-                  <label
-                    key={j.id}
-                    htmlFor={`antigo-${j.id}`}
-                    className="flex cursor-pointer items-start gap-2 rounded-md border border-border p-2 hover:bg-accent"
-                  >
-                    <Checkbox
-                      id={`antigo-${j.id}`}
-                      checked={selecionados.has(j.id)}
-                      onCheckedChange={() => toggleSelecionado(j.id)}
-                      className="mt-0.5"
-                    />
-                    <div className="min-w-0 text-sm">
-                      <p className="truncate font-medium">
-                        {j.nome || `Jogo ${j.dezenas.join(", ")}`}
-                      </p>
-                      <p className="truncate text-muted-foreground">
-                        {j.dezenas.join(", ")}
-                      </p>
-                      {j.concurso_alvo && (
-                        <p className="text-xs text-muted-foreground">
-                          Concurso {j.concurso_alvo}
-                        </p>
-                      )}
+              <div className="max-h-80 space-y-4 overflow-y-auto pr-1">
+                {gruposVisiveis.map(([k, lista]) => {
+                  const grupoTodos = lista.every((j) => selecionados.has(j.id));
+                  return (
+                    <div key={k} className="rounded-md border border-border p-2">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <span className="text-sm font-semibold">
+                          {k === "sem" ? "Sem concurso" : `Concurso ${k}`}
+                          <span className="ml-1 text-xs font-normal text-muted-foreground">
+                            ({lista.filter((j) => selecionados.has(j.id)).length}/{lista.length})
+                          </span>
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleGrupo(lista)}
+                        >
+                          {grupoTodos ? "Limpar" : "Marcar todos"}
+                        </Button>
+                      </div>
+                      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                        {lista.map((j) => (
+                          <label
+                            key={j.id}
+                            htmlFor={`antigo-${j.id}`}
+                            className="flex cursor-pointer items-start gap-2 rounded-md border border-border p-2 hover:bg-accent"
+                          >
+                            <Checkbox
+                              id={`antigo-${j.id}`}
+                              checked={selecionados.has(j.id)}
+                              onCheckedChange={() => toggleSelecionado(j.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="min-w-0 text-sm">
+                              <p className="truncate font-medium">
+                                {j.nome || `Jogo ${j.dezenas.join(", ")}`}
+                              </p>
+                              <p className="truncate text-muted-foreground">
+                                {j.dezenas.join(", ")}
+                              </p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </label>
-                ))}
+                  );
+                })}
               </div>
             )}
 
@@ -170,6 +232,7 @@ function VolantePage() {
           </div>
         )}
       </div>
+
 
       {isLoading ? (
         <p className="text-muted-foreground">Carregando jogos...</p>
