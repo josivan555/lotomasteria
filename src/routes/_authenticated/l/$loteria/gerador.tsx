@@ -149,6 +149,24 @@ function Gerador() {
 
   const [resultados, setResultados] = useState<Result[]>([]);
 
+  // Sempre que o usuário troca de modalidade, reseta os filtros para os padrões da loteria selecionada
+  useEffect(() => {
+    setTamanho(cfg.tamanho);
+    setSomaMin(defaults.somaMin);
+    setSomaMax(defaults.somaMax);
+    setParesMin(defaults.paresMin);
+    setParesMax(defaults.paresMax);
+    setMaxConsecutivas(defaults.maxConsecutivas);
+    setMolduraMin(defaults.molduraMin ?? 0);
+    setMolduraMax(defaults.molduraMax ?? cfg.tamanho);
+    setIncluir([]);
+    setExcluir([]);
+    setRepetirMin(defaults.repetirAnteriorMin);
+    setRepetirMax(defaults.repetirAnteriorMax);
+    setResultados([]);
+  }, [loteria]);
+
+
   function toggle(list: number[], set: (v: number[]) => void, n: number) {
     set(list.includes(n) ? list.filter((x) => x !== n) : [...list, n]);
   }
