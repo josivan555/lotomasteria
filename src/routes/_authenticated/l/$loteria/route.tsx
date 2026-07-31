@@ -72,23 +72,23 @@ function LoteriaLayout() {
     <div className="space-y-6">
       <div className="sticky top-[57px] z-20 -mx-4 border-b border-border/50 bg-card/85 px-4 py-2 backdrop-blur md:-mx-8 md:px-8">
         <div className="flex items-center gap-3">
-          <nav className="-mx-1 flex min-w-0 flex-1 gap-1.5 overflow-x-auto px-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
-            <NavPill to="/l/$loteria/dashboard" loteria={loteria} icon={<BarChart3 className="h-4 w-4" />}>
+          <nav className="-mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
+            <NavPill to="/l/$loteria/dashboard" loteria={loteria} cor={cfg.cor} icon={<BarChart3 className="h-4 w-4" />}>
               Dashboard
             </NavPill>
-            <NavPill to="/l/$loteria/gerador" loteria={loteria} icon={<Dice5 className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/gerador" loteria={loteria} cor={cfg.cor} icon={<Dice5 className="h-4 w-4" />}>
               Gerador
             </NavPill>
-            <NavPill to="/l/$loteria/historico" loteria={loteria} icon={<History className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/historico" loteria={loteria} cor={cfg.cor} icon={<History className="h-4 w-4" />}>
               Histórico
             </NavPill>
-            <NavPill to="/l/$loteria/jogos" loteria={loteria} icon={<Bookmark className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/jogos" loteria={loteria} cor={cfg.cor} icon={<Bookmark className="h-4 w-4" />}>
               Meus jogos
             </NavPill>
-            <NavPill to="/l/$loteria/resultados" loteria={loteria} icon={<ClipboardCheck className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/resultados" loteria={loteria} cor={cfg.cor} icon={<ClipboardCheck className="h-4 w-4" />}>
               Resultados
             </NavPill>
-            <NavPill to="/l/$loteria/volante" loteria={loteria} icon={<Printer className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/volante" loteria={loteria} cor={cfg.cor} icon={<Printer className="h-4 w-4" />}>
               Volante
             </NavPill>
           </nav>
