@@ -4,23 +4,13 @@ import {
   Link,
   notFound,
   useParams,
-  useNavigate,
-  useRouterState,
 } from "@tanstack/react-router";
-import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, ChevronsUpDown, Coins } from "lucide-react";
+import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, Coins } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { meuSaldo } from "@/lib/credits.functions";
 
-import { isLoteriaId, LOTERIAS, LOTERIA_IDS, type LoteriaId } from "@/lib/loterias-config";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { isLoteriaId, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria")({
