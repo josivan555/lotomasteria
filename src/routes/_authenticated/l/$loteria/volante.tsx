@@ -1,7 +1,8 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarJogosSalvos } from "@/lib/loterias.functions";
+import { useMemo } from "react";
+import { listarJogosSalvos, ultimoResultadoCaixa } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { VolanteCanvas } from "@/components/volante-canvas";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,25 @@ function VolantePage() {
     queryKey: ["jogos-salvos", loteria],
     queryFn: () => listar({ data: { loteria } }),
   });
+
+  const ultimoFn = useServerFn(ultimoResultadoCaixa);
+  const { data: oficial } = useQuery({
+    queryKey: ["ultimo-resultado", loteria],
+    queryFn: () => ultimoFn({ data: { loteria } }),
+    staleTime: 60_000,
+  });
+
+  const ultimoSorteado = oficial?.numero ?? null;
+  const vigentes = useMemo(
+    () =>
+      jogos.filter((j) =>
+        ultimoSorteado == null
+          ? true
+          : j.concurso_alvo != null && j.concurso_alvo > ultimoSorteado,
+      ),
+    [jogos, ultimoSorteado],
+  );
+
 
   return (
     <div className="space-y-6">
