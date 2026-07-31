@@ -87,7 +87,7 @@ function LoteriaLayout() {
       </div>
 
 
-      <div className="rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:p-4">
+      <div className="hidden rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:block md:p-4">
         <div className="flex min-w-0 items-center gap-3">
           <img
             src={cfg.logo}
@@ -123,7 +123,7 @@ function NavPill({
   children: React.ReactNode;
 }) {
   const ativoBase =
-    "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border-2 px-3 py-1.5 text-xs font-semibold shadow-md transition md:gap-2 md:px-4 md:py-2 md:text-sm";
+    "inline-flex w-full shrink-0 items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full border-2 px-2 py-1.5 text-[11px] font-semibold shadow-md transition md:w-auto md:justify-start md:gap-2 md:px-4 md:py-2 md:text-sm";
   return (
     <Link
       to={to}
