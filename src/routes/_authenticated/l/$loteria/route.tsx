@@ -70,72 +70,74 @@ function LoteriaLayout() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-3 rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:p-4">
-        <nav className="-mx-1 flex w-full gap-1.5 overflow-x-auto px-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
-          <NavPill to="/l/$loteria/dashboard" loteria={loteria} icon={<BarChart3 className="h-4 w-4" />}>
-            Dashboard
-          </NavPill>
-          <NavPill to="/l/$loteria/gerador" loteria={loteria} icon={<Dice5 className="h-4 w-4" />}>
-            Gerador
-          </NavPill>
-          <NavPill to="/l/$loteria/historico" loteria={loteria} icon={<History className="h-4 w-4" />}>
-            Histórico
-          </NavPill>
-          <NavPill to="/l/$loteria/jogos" loteria={loteria} icon={<Bookmark className="h-4 w-4" />}>
-            Meus jogos
-          </NavPill>
-          <NavPill to="/l/$loteria/resultados" loteria={loteria} icon={<ClipboardCheck className="h-4 w-4" />}>
-            Resultados
-          </NavPill>
-          <NavPill to="/l/$loteria/volante" loteria={loteria} icon={<Printer className="h-4 w-4" />}>
-            Volante
-          </NavPill>
-        </nav>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <img
-              src={cfg.logo}
-              alt={`Logo ${cfg.nome}`}
-              className="h-9 w-auto shrink-0 rounded-md shadow-sm md:h-11"
-            />
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground md:text-xs">
-                Modalidade
-              </p>
-              <h1 className="truncate text-lg font-bold leading-tight md:text-xl">{cfg.nome}</h1>
-            </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="ml-1 shrink-0 gap-1.5">
-                  Trocar
-                  <ChevronsUpDown className="h-3.5 w-3.5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56">
-                <DropdownMenuLabel>Escolher modalidade</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {LOTERIA_IDS.map((id) => {
-                  const l = LOTERIAS[id];
-                  return (
-                    <DropdownMenuItem
-                      key={id}
-                      onSelect={() => trocarLoteria(id)}
-                      className={id === loteria ? "bg-primary/10 text-primary" : ""}
-                    >
-                      <img src={l.logo} alt="" className="mr-2 h-5 w-5 rounded object-contain" />
-                      {l.nome}
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
+      <div className="sticky top-[57px] z-20 -mx-4 border-b border-border/50 bg-card/85 px-4 py-2 backdrop-blur md:-mx-8 md:px-8">
+        <div className="flex items-center gap-3">
+          <nav className="-mx-1 flex min-w-0 flex-1 gap-1.5 overflow-x-auto px-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
+            <NavPill to="/l/$loteria/dashboard" loteria={loteria} icon={<BarChart3 className="h-4 w-4" />}>
+              Dashboard
+            </NavPill>
+            <NavPill to="/l/$loteria/gerador" loteria={loteria} icon={<Dice5 className="h-4 w-4" />}>
+              Gerador
+            </NavPill>
+            <NavPill to="/l/$loteria/historico" loteria={loteria} icon={<History className="h-4 w-4" />}>
+              Histórico
+            </NavPill>
+            <NavPill to="/l/$loteria/jogos" loteria={loteria} icon={<Bookmark className="h-4 w-4" />}>
+              Meus jogos
+            </NavPill>
+            <NavPill to="/l/$loteria/resultados" loteria={loteria} icon={<ClipboardCheck className="h-4 w-4" />}>
+              Resultados
+            </NavPill>
+            <NavPill to="/l/$loteria/volante" loteria={loteria} icon={<Printer className="h-4 w-4" />}>
+              Volante
+            </NavPill>
+          </nav>
           <SaldoBadge />
         </div>
       </div>
+
+      <div className="rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:p-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <img
+            src={cfg.logo}
+            alt={`Logo ${cfg.nome}`}
+            className="h-9 w-auto shrink-0 rounded-md shadow-sm md:h-11"
+          />
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground md:text-xs">
+              Modalidade
+            </p>
+            <h1 className="truncate text-lg font-bold leading-tight md:text-xl">{cfg.nome}</h1>
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="ml-1 shrink-0 gap-1.5">
+                Trocar
+                <ChevronsUpDown className="h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>Escolher modalidade</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {LOTERIA_IDS.map((id) => {
+                const l = LOTERIAS[id];
+                return (
+                  <DropdownMenuItem
+                    key={id}
+                    onSelect={() => trocarLoteria(id)}
+                    className={id === loteria ? "bg-primary/10 text-primary" : ""}
+                  >
+                    <img src={l.logo} alt="" className="mr-2 h-5 w-5 rounded object-contain" />
+                    {l.nome}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
 
       <Outlet />
     </div>
