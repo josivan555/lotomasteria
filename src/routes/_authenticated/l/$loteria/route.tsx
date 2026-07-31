@@ -34,11 +34,20 @@ export const Route = createFileRoute("/_authenticated/l/$loteria")({
 function SaldoBadge() {
   const saldoFn = useServerFn(meuSaldo);
   const { data } = useQuery({ queryKey: ["saldo"], queryFn: () => saldoFn({}) });
+  const saldo = data?.balance ?? 0;
   return (
-    <Button asChild variant="secondary" size="sm" className="shrink-0 gap-1.5">
-      <Link to="/creditos">
-        <Coins className="h-3.5 w-3.5 text-primary" />
-        {data?.balance ?? 0}
+    <Button
+      asChild
+      variant="default"
+      size="sm"
+      className="shrink-0 gap-2 rounded-full px-4 shadow-lg shadow-primary/25"
+    >
+      <Link to="/creditos" className="min-w-[5.5rem] justify-center">
+        <Coins className="h-4 w-4" />
+        <span className="flex flex-col items-start leading-none">
+          <span className="text-[10px] opacity-90">Créditos</span>
+          <span className="text-base font-bold">{saldo}</span>
+        </span>
       </Link>
     </Button>
   );
