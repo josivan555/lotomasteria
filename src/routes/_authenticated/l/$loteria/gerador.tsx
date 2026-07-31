@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bookmark, Dice5, Download, Sparkles, Info } from "lucide-react";
+import { Bookmark, Dice5, Download, Sparkles, Info, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 
@@ -426,6 +426,12 @@ function Gerador() {
               <span className="text-xs text-muted-foreground">
                 {cfg.tamanhoMin}–{cfg.tamanhoMax}
               </span>
+            </div>
+            <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-100">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+              <p>
+                Aumentar as dezenas por jogo aumenta suas chances de acerto, mas também multiplica o valor que a loteria cobra por esse jogo. Cada dezena extra tem custo adicional.
+              </p>
             </div>
           </div>
 
