@@ -6,13 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, Users, Coins, CalendarClock, MapPin } from "lucide-react";
 import { formatBRL } from "@/lib/credits-config";
 
-const resultadosQuery = (loteria: LoteriaId) =>
-  queryOptions({
-    queryKey: ["resultados-publicos", loteria],
-    queryFn: () => listarConcursos({ data: { loteria } }),
-    staleTime: 1000 * 60 * 30,
-  });
-
 const oficiaisQuery = queryOptions({
   queryKey: ["resumo-oficial-todas"],
   queryFn: () => resumoOficialTodas({}),
@@ -27,13 +20,13 @@ export const Route = createFileRoute("/resultados")({
       {
         name: "description",
         content:
-          "Confira os resultados oficiais dos últimos concursos da Lotofácil, Mega-Sena e Quina: dezenas sorteadas, data de apuração e soma. Atualizado a partir da Caixa.",
+          "Confira os resultados oficiais dos últimos concursos da Lotofácil, Mega-Sena e Quina: dezenas sorteadas, prêmios, ganhadores e estimativas. Atualizado a partir da Caixa.",
       },
       { property: "og:title", content: "Resultados Lotofácil, Mega-Sena e Quina" },
       {
         property: "og:description",
         content:
-          "Resultados oficiais das três loterias com dezenas sorteadas, datas e estatísticas.",
+          "Resultados oficiais das três loterias com dezenas sorteadas, prêmios e próximos concursos.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://lotomasteria.lovable.app/resultados" },
@@ -46,42 +39,12 @@ export const Route = createFileRoute("/resultados")({
     ],
     links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/resultados" }],
   }),
-  loader: ({ context }) => {
-    context.queryClient.ensureQueryData(oficiaisQuery);
-    return Promise.all(
-      LOTERIA_IDS.map((id) => context.queryClient.ensureQueryData(resultadosQuery(id))),
-    );
-  },
+  loader: ({ context }) => context.queryClient.ensureQueryData(oficiaisQuery),
   component: ResultadosPage,
 });
 
 function ResultadosPage() {
-  const [aba, setAba] = useState<LoteriaId>("lotofacil");
-  const cfg = LOTERIAS[aba];
-  const { data: concursos } = useSuspenseQuery(resultadosQuery(aba));
   const { data: oficiais } = useSuspenseQuery(oficiaisQuery);
-  const ultimos = concursos.slice(0, 50);
-  const ultimo = ultimos[0];
-
-
-  const ballClass =
-    cfg.ballVariant === "blue"
-      ? "ball ball-blue"
-      : cfg.ballVariant === "purple"
-        ? "ball ball-purple"
-        : "ball ball-gold";
-
-  const jsonLd = ultimo
-    ? {
-        "@context": "https://schema.org",
-        "@type": "Dataset",
-        name: `Resultados da ${cfg.nome}`,
-        description: `Histórico oficial da ${cfg.nome} com dezenas sorteadas, datas de apuração e soma.`,
-        creator: { "@type": "Organization", name: "LotoMaster IA" },
-        url: "https://lotomasteria.lovable.app/resultados",
-        temporalCoverage: `../${ultimo.data_apuracao}`,
-      }
-    : null;
 
   return (
     <div className="min-h-screen">
@@ -105,7 +68,6 @@ function ResultadosPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 pb-24 md:px-6">
-
         <section className="py-10">
           <h1 className="text-4xl font-black tracking-tight md:text-5xl">
             Resultados oficiais das <span className="text-primary">loterias</span>
@@ -146,115 +108,6 @@ function ResultadosPage() {
               ))}
             </div>
           </section>
-        )}
-
-
-
-        <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Selecione a loteria">
-          {LOTERIA_IDS.map((id) => (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={aba === id}
-              onClick={() => setAba(id)}
-              className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition ${
-                aba === id
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border/60 bg-card/40 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {LOTERIAS[id].nome}
-            </button>
-          ))}
-        </div>
-
-        {ultimo && (
-          <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-primary">
-              Último concurso · {cfg.nome}
-            </h2>
-            <div className="mt-2 flex flex-wrap items-baseline gap-3">
-              <span className="text-3xl font-black">Concurso {ultimo.numero}</span>
-              <span className="text-muted-foreground">
-                {formatDate(ultimo.data_apuracao)} · Soma {ultimo.soma}
-              </span>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {ultimo.dezenas.map((d: number) => (
-                <span key={d} className={ballClass}>
-                  {String(d).padStart(2, "0")}
-                </span>
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section className="mt-12">
-          <h2 className="text-2xl font-bold">Últimos 50 concursos · {cfg.nome}</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Tabela cronológica com as dezenas sorteadas em cada sorteio recente.
-          </p>
-          <div className="mt-4 overflow-x-auto rounded-xl border border-border/60">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 text-left">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">Concurso</th>
-                  <th className="px-4 py-3 font-semibold">Data</th>
-                  <th className="px-4 py-3 font-semibold">Dezenas</th>
-                  <th className="px-4 py-3 font-semibold">Soma</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ultimos.map((c: ConcursoDto) => (
-                  <tr key={c.numero} className="border-t border-border/40">
-                    <td className="px-4 py-3 font-semibold">{c.numero}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {formatDate(c.data_apuracao)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {c.dezenas.map((d: number) => (
-                          <span
-                            key={d}
-                            className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary"
-                          >
-                            {String(d).padStart(2, "0")}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">{c.soma}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="mt-12 grid gap-6 md:grid-cols-2">
-          <article className="rounded-xl border border-border/60 bg-card/60 p-6">
-            <h2 className="text-xl font-bold">Como funciona a {cfg.nome}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">{cfg.descricaoLonga}</p>
-          </article>
-          <article className="rounded-xl border border-border/60 bg-card/60 p-6">
-            <h2 className="text-xl font-bold">Analise os resultados com IA</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              O LotoMaster IA usa todo o histórico oficial para calcular Score IA por dezena,
-              frequência, atraso e tendência.{" "}
-              <Link to="/auth" search={{ mode: "signup" }} className="text-primary hover:underline">
-                Crie sua conta grátis
-              </Link>{" "}
-              e gere jogos com filtros estatísticos avançados.
-            </p>
-          </article>
-        </section>
-
-        {jsonLd && (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          />
         )}
       </main>
 
