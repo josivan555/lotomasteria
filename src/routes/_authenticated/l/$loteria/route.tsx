@@ -147,21 +147,35 @@ function LoteriaLayout() {
 function NavPill({
   to,
   loteria,
+  cor,
   icon,
   children,
 }: {
   to: "/l/$loteria/dashboard" | "/l/$loteria/gerador" | "/l/$loteria/historico" | "/l/$loteria/jogos" | "/l/$loteria/resultados" | "/l/$loteria/volante";
   loteria: LoteriaId;
+  cor: string;
   icon: React.ReactNode;
   children: React.ReactNode;
 }) {
+  const ativoBase =
+    "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border-2 px-4 py-2 text-sm font-semibold transition shadow-md";
   return (
     <Link
       to={to}
       params={{ loteria }}
-      className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border/60 px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+      className={ativoBase}
+      inactiveProps={{
+        className:
+          "border-border/70 bg-secondary/60 text-foreground hover:bg-secondary hover:border-[color-mix(in_oklab,var(--loteria-cor)_45%,transparent)]",
+        style: { ["--loteria-cor" as string]: cor },
+      }}
       activeProps={{
-        className: "border-primary bg-primary/15 text-primary hover:bg-primary/20 hover:text-primary",
+        className: "text-white hover:brightness-110",
+        style: {
+          borderColor: cor,
+          backgroundColor: `${cor}33`,
+          boxShadow: `0 4px 14px ${cor}40`,
+        },
       }}
     >
       {icon}
