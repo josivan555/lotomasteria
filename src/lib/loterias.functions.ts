@@ -54,6 +54,12 @@ export const listarConcursos = createServerFn({ method: "GET" })
     }));
   });
 
+export const resumoOficialTodas = createServerFn({ method: "GET" }).handler(async () => {
+  const { buscarResumoTodas } = await import("./caixa.server");
+  return buscarResumoTodas();
+});
+
+
 export const ultimoResultadoCaixa = createServerFn({ method: "GET" })
   .inputValidator((raw: unknown) =>
     z.object({ loteria: loteriaEnum }).parse(raw),
