@@ -38,6 +38,13 @@ function Jogos() {
     queryFn: () => listar({ data: { loteria } }),
   });
 
+  const ultimoFn = useServerFn(ultimoResultadoCaixa);
+  const { data: oficial } = useQuery({
+    queryKey: ["ultimo-resultado", loteria],
+    queryFn: () => ultimoFn({ data: { loteria } }),
+    staleTime: 60_000,
+  });
+
   const del = useMutation({
     mutationFn: (id: string) => excluir({ data: { id } }),
     onSuccess: () => {
@@ -58,6 +65,7 @@ function Jogos() {
 
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [aberto, setAberto] = useState<number | null>(null);
 
   const jogosFiltrados = useMemo(() => {
     if (!dateFrom && !dateTo) return jogos;
@@ -68,6 +76,32 @@ function Jogos() {
       return t >= from && t <= to;
     });
   }, [jogos, dateFrom, dateTo]);
+
+  // Concurso já sorteado mais recente (jogos com alvo <= a esse número vão para o histórico)
+  const ultimoSorteado = oficial?.numero ?? null;
+
+  const jogoVigente = (alvo: number | null) =>
+    ultimoSorteado == null ? true : alvo != null && alvo > ultimoSorteado;
+
+  const vigentes = useMemo(
+    () => jogosFiltrados.filter((j) => jogoVigente(j.concurso_alvo)),
+    [jogosFiltrados, ultimoSorteado],
+  );
+
+  const historico = useMemo(() => {
+    const map = new Map<number, typeof jogos>();
+    for (const j of jogosFiltrados) {
+      if (jogoVigente(j.concurso_alvo)) continue;
+      const key = j.concurso_alvo ?? ultimoSorteado ?? 0;
+      const arr = map.get(key) ?? [];
+      arr.push(j);
+      map.set(key, arr);
+    }
+    return [...map.entries()]
+      .map(([numero, itens]) => ({ numero, itens }))
+      .sort((a, b) => b.numero - a.numero);
+  }, [jogosFiltrados, ultimoSorteado]);
+
 
   return (
     <div className="space-y-6">
