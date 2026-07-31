@@ -2,7 +2,12 @@ import { createFileRoute, useRouter, useParams, Link } from "@tanstack/react-rou
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { listarJogosSalvos, excluirJogo, excluirTodosJogos } from "@/lib/loterias.functions";
+import {
+  listarJogosSalvos,
+  excluirJogo,
+  excluirTodosJogos,
+  ultimoResultadoCaixa,
+} from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
