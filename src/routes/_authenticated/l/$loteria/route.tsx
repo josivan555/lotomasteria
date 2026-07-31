@@ -50,9 +50,17 @@ function LoteriaLayout() {
 
   return (
     <div className="space-y-6">
-      <div className="sticky top-[96px] z-20 -mx-4 md:top-[61px] border-b border-border/50 bg-card/85 px-4 py-2 backdrop-blur md:-mx-8 md:px-8">
-        <div className="flex items-center gap-2 md:gap-3">
-          <nav className="-mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
+      <div className="sticky top-[96px] z-20 -mx-4 border-b border-border/50 bg-card/85 px-3 py-2 backdrop-blur md:-mx-8 md:top-[61px] md:px-8">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+          <div className="flex items-center justify-between gap-2 md:hidden">
+            <div className="flex min-w-0 items-center gap-2">
+              <img src={cfg.logo} alt="" className="h-6 w-auto shrink-0 rounded" />
+              <span className="truncate text-sm font-semibold">{cfg.nome}</span>
+            </div>
+            <SaldoBadge />
+          </div>
+
+          <nav className="grid grid-cols-3 gap-1.5 md:flex md:min-w-0 md:flex-1 md:flex-wrap md:gap-2">
             <NavPill to="/l/$loteria/dashboard" loteria={loteria} cor={cfg.cor} icon={<BarChart3 className="h-4 w-4" />}>
               Dashboard
             </NavPill>
@@ -72,11 +80,14 @@ function LoteriaLayout() {
               Volante
             </NavPill>
           </nav>
-          <SaldoBadge />
+          <div className="hidden md:block">
+            <SaldoBadge />
+          </div>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:p-4">
+
+      <div className="hidden rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:block md:p-4">
         <div className="flex min-w-0 items-center gap-3">
           <img
             src={cfg.logo}
@@ -112,7 +123,7 @@ function NavPill({
   children: React.ReactNode;
 }) {
   const ativoBase =
-    "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border-2 px-3 py-1.5 text-xs font-semibold shadow-md transition md:gap-2 md:px-4 md:py-2 md:text-sm";
+    "inline-flex w-full shrink-0 items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full border-2 px-2 py-1.5 text-[11px] font-semibold shadow-md transition md:w-auto md:justify-start md:gap-2 md:px-4 md:py-2 md:text-sm";
   return (
     <Link
       to={to}
