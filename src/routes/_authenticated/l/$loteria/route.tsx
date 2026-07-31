@@ -8,6 +8,7 @@ import {
 import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, Coins } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { formatCreditos } from "@/lib/credits-config";
 import { meuSaldo } from "@/lib/credits.functions";
 
 import { isLoteriaId, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
@@ -36,7 +37,7 @@ function SaldoBadge() {
         <Coins className="h-4 w-4" />
         <span className="flex flex-col items-start leading-none">
           <span className="hidden text-[10px] opacity-90 sm:block">Créditos</span>
-          <span className="text-sm font-bold md:text-base">{saldo}</span>
+          <span className="text-sm font-bold md:text-base">{formatCreditos(saldo)}</span>
         </span>
       </Link>
     </Button>
