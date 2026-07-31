@@ -141,6 +141,23 @@ function ResultadosPage() {
           </div>
         </section>
 
+        {oficiais.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold">Últimos sorteios oficiais</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Prêmios, ganhadores por faixa, acumulado e próximo concurso da Mega-Sena, Lotofácil
+              e Quina — direto da Caixa.
+            </p>
+            <div className="mt-5 grid gap-5 lg:grid-cols-3">
+              {oficiais.map((r) => (
+                <ResumoCard key={r.loteria} r={r} />
+              ))}
+            </div>
+          </section>
+        )}
+
+
+
         <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Selecione a loteria">
           {LOTERIA_IDS.map((id) => (
             <button
