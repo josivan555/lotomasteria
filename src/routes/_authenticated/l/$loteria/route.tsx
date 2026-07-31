@@ -70,51 +70,8 @@ function LoteriaLayout() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:p-4">
-        <div className="flex w-full min-w-0 items-center gap-3 md:w-auto">
-          <img
-            src={cfg.logo}
-            alt={`Logo ${cfg.nome}`}
-            className="h-9 w-auto shrink-0 rounded-md shadow-sm md:h-11"
-          />
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground md:text-xs">
-              Modalidade
-            </p>
-            <h1 className="truncate text-lg font-bold leading-tight md:text-xl">{cfg.nome}</h1>
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="ml-auto shrink-0 gap-1.5 md:ml-1">
-                Trocar
-                <ChevronsUpDown className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuLabel>Escolher modalidade</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {LOTERIA_IDS.map((id) => {
-                const l = LOTERIAS[id];
-                return (
-                  <DropdownMenuItem
-                    key={id}
-                    onSelect={() => trocarLoteria(id)}
-                    className={id === loteria ? "bg-primary/10 text-primary" : ""}
-                  >
-                    <img src={l.logo} alt="" className="mr-2 h-5 w-5 rounded object-contain" />
-                    {l.nome}
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <SaldoBadge />
-        </div>
-
-
-        <nav className="-mx-1 flex w-full gap-1 overflow-x-auto px-1 pb-1 [scrollbar-width:none] md:mx-0 md:w-auto md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
+      <div className="space-y-3 rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:p-4">
+        <nav className="-mx-1 flex w-full gap-1.5 overflow-x-auto px-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
           <NavPill to="/l/$loteria/dashboard" loteria={loteria} icon={<BarChart3 className="h-4 w-4" />}>
             Dashboard
           </NavPill>
@@ -134,8 +91,51 @@ function LoteriaLayout() {
             Volante
           </NavPill>
         </nav>
-      </div>
 
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <img
+              src={cfg.logo}
+              alt={`Logo ${cfg.nome}`}
+              className="h-9 w-auto shrink-0 rounded-md shadow-sm md:h-11"
+            />
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground md:text-xs">
+                Modalidade
+              </p>
+              <h1 className="truncate text-lg font-bold leading-tight md:text-xl">{cfg.nome}</h1>
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="ml-1 shrink-0 gap-1.5">
+                  Trocar
+                  <ChevronsUpDown className="h-3.5 w-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuLabel>Escolher modalidade</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {LOTERIA_IDS.map((id) => {
+                  const l = LOTERIAS[id];
+                  return (
+                    <DropdownMenuItem
+                      key={id}
+                      onSelect={() => trocarLoteria(id)}
+                      className={id === loteria ? "bg-primary/10 text-primary" : ""}
+                    >
+                      <img src={l.logo} alt="" className="mr-2 h-5 w-5 rounded object-contain" />
+                      {l.nome}
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <SaldoBadge />
+        </div>
+      </div>
 
       <Outlet />
     </div>
