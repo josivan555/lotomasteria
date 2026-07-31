@@ -4,23 +4,13 @@ import {
   Link,
   notFound,
   useParams,
-  useNavigate,
-  useRouterState,
 } from "@tanstack/react-router";
-import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, ChevronsUpDown, Coins } from "lucide-react";
+import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, Coins } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { meuSaldo } from "@/lib/credits.functions";
 
-import { isLoteriaId, LOTERIAS, LOTERIA_IDS, type LoteriaId } from "@/lib/loterias-config";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { isLoteriaId, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria")({
@@ -54,19 +44,9 @@ function SaldoBadge() {
 }
 
 function LoteriaLayout() {
-
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria" });
-  const navigate = useNavigate();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
   if (!isLoteriaId(loteria)) return null;
   const cfg = LOTERIAS[loteria];
-
-  function trocarLoteria(destino: LoteriaId) {
-    if (destino === loteria) return;
-    // Mantém a mesma sub-aba (dashboard, gerador, historico, ...) ao trocar de loteria.
-    const sub = pathname.split(`/l/${loteria}`)[1] ?? "";
-    navigate({ to: `/l/${destino}${sub || "/dashboard"}` });
-  }
 
   return (
     <div className="space-y-6">
@@ -109,32 +89,6 @@ function LoteriaLayout() {
             </p>
             <h1 className="truncate text-lg font-bold leading-tight md:text-xl">{cfg.nome}</h1>
           </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="ml-1 shrink-0 gap-1.5">
-                Trocar
-                <ChevronsUpDown className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuLabel>Escolher modalidade</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {LOTERIA_IDS.map((id) => {
-                const l = LOTERIAS[id];
-                return (
-                  <DropdownMenuItem
-                    key={id}
-                    onSelect={() => trocarLoteria(id)}
-                    className={id === loteria ? "bg-primary/10 text-primary" : ""}
-                  >
-                    <img src={l.logo} alt="" className="mr-2 h-5 w-5 rounded object-contain" />
-                    {l.nome}
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
