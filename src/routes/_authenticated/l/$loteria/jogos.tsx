@@ -102,6 +102,49 @@ function Jogos() {
       .sort((a, b) => b.numero - a.numero);
   }, [jogosFiltrados, ultimoSorteado]);
 
+  const renderJogo = (j: (typeof jogos)[number]) => {
+    const c = j.score != null ? classificarScore(Number(j.score)) : null;
+    return (
+      <li
+        key={j.id}
+        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur"
+      >
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+          <span className="text-xs text-muted-foreground">
+            {new Date(j.created_at).toLocaleDateString("pt-BR")}
+          </span>
+          <div className="flex flex-wrap gap-1">
+            {j.dezenas.map((n) => (
+              <DezenaBall
+                key={n}
+                n={n}
+                variant={ballVariant}
+                className="h-7! w-7! text-[11px]! sm:h-8! sm:w-8! sm:text-xs!"
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {c && j.score != null && (
+            <div className="text-right">
+              <div className={`text-lg font-bold ${c.color}`}>{Number(j.score).toFixed(1)}</div>
+              <div className="text-xs text-muted-foreground">{c.label}</div>
+            </div>
+          )}
+          <Button
+            size="sm"
+            variant="ghost"
+            aria-label="Excluir jogo"
+            onClick={() => del.mutate(j.id)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </li>
+    );
+  };
+
 
   return (
     <div className="space-y-6">
