@@ -54,7 +54,7 @@ export async function buscarResumoOficial(loteria: LoteriaId): Promise<ResumoOfi
   try {
     const res = await fetch(
       `https://servicebus2.caixa.gov.br/portaldeloterias/api/${loteria}`,
-      { headers: { accept: "application/json" } },
+      { headers: { accept: "application/json" }, signal: AbortSignal.timeout(8000) },
     );
     if (!res.ok) return null;
     const j = (await res.json()) as CaixaDetalhe;
