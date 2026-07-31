@@ -13,7 +13,7 @@ import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Download, Printer, Trash } from "lucide-react";
+import { Trash2, Download, Printer, Trash, ChevronDown, History } from "lucide-react";
 import { classificarScore } from "@/lib/loteria-utils";
 import { toast } from "sonner";
 import { exportarJogosPDF } from "@/lib/pdf-export";
