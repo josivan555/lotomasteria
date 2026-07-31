@@ -54,10 +54,12 @@ export const Route = createFileRoute("/resultados")({
     ],
     links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/resultados" }],
   }),
-  loader: ({ context }) =>
-    Promise.all(
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(oficiaisQuery);
+    return Promise.all(
       LOTERIA_IDS.map((id) => context.queryClient.ensureQueryData(resultadosQuery(id))),
-    ),
+    );
+  },
   component: ResultadosPage,
 });
 
@@ -65,8 +67,10 @@ function ResultadosPage() {
   const [aba, setAba] = useState<LoteriaId>("lotofacil");
   const cfg = LOTERIAS[aba];
   const { data: concursos } = useSuspenseQuery(resultadosQuery(aba));
+  const { data: oficiais } = useSuspenseQuery(oficiaisQuery);
   const ultimos = concursos.slice(0, 50);
   const ultimo = ultimos[0];
+
 
   const ballClass =
     cfg.ballVariant === "blue"
