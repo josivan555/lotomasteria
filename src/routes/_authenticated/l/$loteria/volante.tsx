@@ -63,7 +63,7 @@ function VolantePage() {
       ) : (
         <VolanteCanvas
           cfg={cfg}
-          jogos={jogos.map((j) => ({
+          jogos={vigentes.map((j) => ({
             id: j.id,
             dezenas: j.dezenas,
             created_at: j.created_at,
