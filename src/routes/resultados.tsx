@@ -6,9 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, Users, Coins, CalendarClock, MapPin } from "lucide-react";
 import { formatBRL } from "@/lib/credits-config";
 
+type Resumo = Awaited<ReturnType<typeof resumoOficialTodas>>;
+
 const oficiaisQuery = queryOptions({
   queryKey: ["resumo-oficial-todas"],
-  queryFn: () => resumoOficialTodas({}),
+  queryFn: async (): Promise<Resumo> => {
+    try {
+      return await resumoOficialTodas({});
+    } catch {
+      return [] as unknown as Resumo;
+    }
+  },
+  retry: false,
   staleTime: 1000 * 60 * 10,
 });
 
