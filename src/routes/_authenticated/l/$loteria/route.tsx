@@ -30,13 +30,13 @@ function SaldoBadge() {
       asChild
       variant="default"
       size="sm"
-      className="shrink-0 gap-2 rounded-full px-4 shadow-lg shadow-primary/25"
+      className="h-9 shrink-0 gap-1.5 rounded-full px-3 shadow-lg shadow-primary/25 md:h-9 md:gap-2 md:px-4"
     >
-      <Link to="/creditos" className="min-w-[5.5rem] justify-center">
+      <Link to="/creditos" className="justify-center md:min-w-[5.5rem]">
         <Coins className="h-4 w-4" />
         <span className="flex flex-col items-start leading-none">
-          <span className="text-[10px] opacity-90">Créditos</span>
-          <span className="text-base font-bold">{saldo}</span>
+          <span className="hidden text-[10px] opacity-90 sm:block">Créditos</span>
+          <span className="text-sm font-bold md:text-base">{saldo}</span>
         </span>
       </Link>
     </Button>
@@ -50,8 +50,8 @@ function LoteriaLayout() {
 
   return (
     <div className="space-y-6">
-      <div className="sticky top-[57px] z-20 -mx-4 border-b border-border/50 bg-card/85 px-4 py-2 backdrop-blur md:-mx-8 md:px-8">
-        <div className="flex items-center gap-3">
+      <div className="sticky top-[96px] z-20 -mx-4 md:top-[61px] border-b border-border/50 bg-card/85 px-4 py-2 backdrop-blur md:-mx-8 md:px-8">
+        <div className="flex items-center gap-2 md:gap-3">
           <nav className="-mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
             <NavPill to="/l/$loteria/dashboard" loteria={loteria} cor={cfg.cor} icon={<BarChart3 className="h-4 w-4" />}>
               Dashboard
@@ -112,7 +112,7 @@ function NavPill({
   children: React.ReactNode;
 }) {
   const ativoBase =
-    "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border-2 px-4 py-2 text-sm font-semibold transition shadow-md";
+    "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border-2 px-3 py-1.5 text-xs font-semibold shadow-md transition md:gap-2 md:px-4 md:py-2 md:text-sm";
   return (
     <Link
       to={to}
