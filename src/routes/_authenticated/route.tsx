@@ -1,10 +1,11 @@
-import { createFileRoute, Outlet, redirect, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureBrowserSession } from "@/lib/session-guard";
 import { LogOut, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
+import { isLoteriaId, LOTERIAS, LOTERIA_IDS, type LoteriaId } from "@/lib/loterias-config";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
