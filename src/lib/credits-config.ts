@@ -1,4 +1,4 @@
-export const JOGOS_POR_CREDITO = 10;
+export const JOGOS_POR_CREDITO = 5;
 
 export type CreditPackage = {
   id: string;
