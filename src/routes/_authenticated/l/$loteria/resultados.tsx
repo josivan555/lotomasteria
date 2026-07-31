@@ -256,100 +256,58 @@ function Resultados() {
           </Link>
         </div>
       ) : (
-        grupos.map((g) => {
-          const maxHits = g.itens.reduce((m, it) => Math.max(m, it.hits), 0);
-          return (
-            <section key={g.numero} className="space-y-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <h3 className="text-lg font-semibold">Concurso {g.numero}</h3>
-                {g.aguardando ? (
-                  <span className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-secondary px-2 py-1 text-xs text-muted-foreground">
-                    <Clock className="h-3.5 w-3.5" /> Aguardando sorteio
-                  </span>
-                ) : (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-semibold text-muted-foreground">Sorteadas:</span>
-                    {g.sorteadas
-                      .slice()
-                      .sort((a, b) => a - b)
-                      .map((n) => (
-                        <DezenaBall key={n} n={n} variant={ballVariant} className="h-7! w-7! text-[11px]!" />
-                      ))}
-                  </div>
-                )}
-                <span className="ml-auto text-xs text-muted-foreground">
-                  {g.itens.length} jogo{g.itens.length > 1 ? "s" : ""}
-                </span>
+        <div className="space-y-8">
+          {emAberto.length === 0 && (
+            <div className="rounded-xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
+              Nenhum jogo aguardando sorteio. Seus jogos já conferidos estão no histórico abaixo.
+            </div>
+          )}
+          {emAberto.map(renderGrupo)}
+
+          {conferidos.length > 0 && (
+            <section className="space-y-3">
+              <div className="flex items-center gap-2">
+                <History className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-lg font-semibold">Histórico de conferências</h3>
               </div>
-
-              {!g.aguardando && (
-                <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
-                  {tierDefs.map((t) => {
-                    const count = g.itens.filter((it) => it.hits === t).length;
-                    return (
-                      <div
-                        key={t}
-                        className="rounded-xl border border-border/60 bg-card/60 p-3 text-center backdrop-blur"
+              <div className="space-y-2">
+                {conferidos.map((g) => {
+                  const open = aberto === g.numero;
+                  const melhor = g.itens.reduce((m, it) => Math.max(m, it.hits), 0);
+                  return (
+                    <div
+                      key={g.numero}
+                      className="overflow-hidden rounded-xl border border-border/60 bg-card/60 backdrop-blur"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setAberto(open ? null : g.numero)}
+                        className="flex w-full items-center gap-3 p-3 text-left hover:bg-secondary/50"
                       >
-                        <div
-                          className={`text-2xl font-bold ${count > 0 ? "" : "text-muted-foreground/40"}`}
-                          style={count > 0 ? { color: cfg.cor } : undefined}
-                        >
-                          {count}
-                        </div>
-                        <div className="mt-0.5 text-[11px] text-muted-foreground">{tierName(t)}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              <ol className="space-y-2">
-                {g.itens.map((it, i) => (
-                  <li
-                    key={it.id}
-                    className="flex flex-wrap items-center gap-3 rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur"
-                  >
-                    <span className="w-16 shrink-0 text-xs font-semibold text-muted-foreground">
-                      Jogo {pad(i + 1)}
-                    </span>
-                    <div className="flex flex-1 flex-wrap gap-1">
-                      {it.nums.map((n) => {
-                        const hit = !g.aguardando && g.drawnSet.has(n);
-                        return (
-                          <DezenaBall
-                            key={n}
-                            n={n}
-                            variant={hit ? ballVariant : "muted"}
-                            className="h-7! w-7! text-[11px]!"
-                          />
-                        );
-                      })}
+                        <ChevronDown
+                          className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+                        />
+                        <span className="font-semibold" style={{ color: cfg.cor }}>
+                          Concurso {g.numero}
+                        </span>
+                        {g.res && (
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(g.res.data_apuracao).toLocaleDateString("pt-BR")}
+                          </span>
+                        )}
+                        <span className="ml-auto text-xs text-muted-foreground">
+                          {g.itens.length} jogo{g.itens.length === 1 ? "" : "s"} · melhor {melhor}
+                        </span>
+                      </button>
+                      {open && <div className="border-t border-border/60 p-3">{renderGrupo(g)}</div>}
                     </div>
-                    <div className="ml-auto flex w-16 shrink-0 flex-col items-center">
-                      <span
-                        className="font-mono text-lg font-bold"
-                        style={
-                          !g.aguardando && it.hits === maxHits && it.hits > 0
-                            ? { color: cfg.cor }
-                            : { color: "hsl(var(--muted-foreground))" }
-                        }
-                      >
-                        {g.aguardando ? "–" : it.hits}
-                      </span>
-                      <span
-                        className="text-[10px] font-semibold uppercase tracking-wide"
-                        style={{ color: cfg.cor }}
-                      >
-                        {g.aguardando ? "" : tierLabel(it.hits)}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ol>
+                  );
+                })}
+              </div>
             </section>
-          );
-        })
+          )}
+        </div>
+
       )}
 
       {oficial && (
