@@ -1,18 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { listarConcursos, resumoOficialTodas } from "@/lib/loterias.functions";
-import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
+import { resumoOficialTodas } from "@/lib/loterias.functions";
+import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, Users, Coins, CalendarClock, MapPin } from "lucide-react";
-import { useState } from "react";
 import { formatBRL } from "@/lib/credits-config";
-
-type ConcursoDto = {
-  numero: number;
-  data_apuracao: string;
-  dezenas: number[];
-  soma: number;
-};
 
 const resultadosQuery = (loteria: LoteriaId) =>
   queryOptions({
