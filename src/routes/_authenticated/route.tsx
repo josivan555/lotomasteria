@@ -18,6 +18,12 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthedLayout,
 });
 
+function extractLoteriaAtual(pathname: string): LoteriaId | null {
+  const match = pathname.match(/^\/l\/([^/]+)/);
+  const id = match?.[1];
+  return isLoteriaId(id) ? id : null;
+}
+
 function AuthedLayout() {
   const router = useRouter();
   const qc = useQueryClient();
