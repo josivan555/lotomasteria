@@ -42,6 +42,7 @@ function VolantePage() {
       ),
     [jogos, ultimoSorteado],
   );
+  const [incluirAntigos, setIncluirAntigos] = useState(false);
   const listaFinal = incluirAntigos ? jogos : vigentes;
   const antigos = jogos.length - vigentes.length;
 
