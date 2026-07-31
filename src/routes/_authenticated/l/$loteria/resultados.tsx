@@ -12,7 +12,7 @@ import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trophy, Download, Clock } from "lucide-react";
+import { Trophy, Download, Clock, ChevronDown, History } from "lucide-react";
 import { exportarResultadosPDF } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/resultados")({
