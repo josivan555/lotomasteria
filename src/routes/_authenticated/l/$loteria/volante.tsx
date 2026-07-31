@@ -1,7 +1,9 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { listarJogosSalvos, ultimoResultadoCaixa } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { VolanteCanvas } from "@/components/volante-canvas";
@@ -40,7 +42,9 @@ function VolantePage() {
       ),
     [jogos, ultimoSorteado],
   );
-
+  const [incluirAntigos, setIncluirAntigos] = useState(false);
+  const listaFinal = incluirAntigos ? jogos : vigentes;
+  const antigos = jogos.length - vigentes.length;
 
   return (
     <div className="space-y-6">
@@ -58,18 +62,33 @@ function VolantePage() {
         </Button>
       </div>
 
+      <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
+        <Switch
+          id="incluir-antigos"
+          checked={incluirAntigos}
+          onCheckedChange={setIncluirAntigos}
+        />
+        <Label htmlFor="incluir-antigos" className="cursor-pointer text-sm">
+          Incluir jogos de concursos já sorteados
+          <span className="ml-1 text-muted-foreground">
+            ({antigos} no histórico)
+          </span>
+        </Label>
+      </div>
+
       {isLoading ? (
         <p className="text-muted-foreground">Carregando jogos...</p>
       ) : (
         <VolanteCanvas
           cfg={cfg}
-          jogos={vigentes.map((j) => ({
+          jogos={listaFinal.map((j) => ({
             id: j.id,
             dezenas: j.dezenas,
             created_at: j.created_at,
           }))}
         />
       )}
+
     </div>
   );
 }
