@@ -46,50 +46,92 @@ function AuthedLayout() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-30 border-b border-border/50 bg-card/60 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8">
-          <Link to="/loterias" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-            <img
-              src={logoAsset.url}
-              alt="LotoMaster IA"
-              className="h-9 w-9 rounded-lg object-contain ring-1 ring-border/40"
-            />
-            <span>
-              LotoMaster <span className="text-primary">IA</span>
-            </span>
-          </Link>
+      <header className="sticky top-0 z-30 border-b border-border/50 bg-card/80 backdrop-blur">
+        <div className="mx-auto max-w-6xl px-3 py-2 md:px-8 md:py-3">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 md:flex md:justify-between md:gap-3">
+            <Link
+              to="/loterias"
+              className="flex min-w-0 items-center gap-2 text-base font-bold tracking-tight md:text-lg"
+            >
+              <img
+                src={logoAsset.url}
+                alt="LotoMaster IA"
+                className="h-8 w-8 shrink-0 rounded-lg object-contain ring-1 ring-border/40 md:h-9 md:w-9"
+              />
+              <span className="truncate">
+                LotoMaster <span className="text-primary">IA</span>
+              </span>
+            </Link>
 
-          <div className="flex flex-1 items-center justify-center gap-2 px-2">
-            {loteriaAtual &&
-              LOTERIA_IDS.filter((id) => id !== loteriaAtual).map((id) => {
+            <div className="hidden flex-1 items-center justify-center gap-2 px-2 md:flex">
+              {loteriaAtual &&
+                LOTERIA_IDS.filter((id) => id !== loteriaAtual).map((id) => {
+                  const l = LOTERIAS[id];
+                  return (
+                    <Button
+                      key={id}
+                      asChild
+                      size="sm"
+                      className="shrink-0 gap-1.5 rounded-full border-2 px-3 font-semibold text-white shadow-sm transition hover:brightness-110"
+                      style={{ backgroundColor: l.cor, borderColor: l.cor }}
+                    >
+                      <Link to={trocarLoteriaUrl(id)}>
+                        <img src={l.logo} alt="" className="h-4 w-4 rounded object-contain" />
+                        <span>{l.nome}</span>
+                      </Link>
+                    </Button>
+                  );
+                })}
+            </div>
+
+            <div className="flex shrink-0 items-center gap-1">
+              <Button asChild variant="ghost" size="icon" className="md:hidden" aria-label="Loterias">
+                <Link to="/loterias">
+                  <Home className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={signOut}
+                aria-label="Sair"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
+
+              <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+                <Link to="/loterias">
+                  <Home className="mr-1.5 h-4 w-4" /> Loterias
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={signOut} className="hidden md:inline-flex">
+                <LogOut className="mr-1.5 h-4 w-4" /> Sair
+              </Button>
+            </div>
+          </div>
+
+          {loteriaAtual && (
+            <div className="mt-2 flex items-center gap-2 md:hidden">
+              {LOTERIA_IDS.filter((id) => id !== loteriaAtual).map((id) => {
                 const l = LOTERIAS[id];
                 return (
                   <Button
                     key={id}
                     asChild
                     size="sm"
-                    className="shrink-0 gap-1.5 rounded-full border-2 px-3 font-semibold text-white shadow-sm transition hover:brightness-110"
+                    className="h-8 flex-1 gap-1.5 rounded-full border-2 px-2 text-xs font-semibold text-white shadow-sm"
                     style={{ backgroundColor: l.cor, borderColor: l.cor }}
                   >
                     <Link to={trocarLoteriaUrl(id)}>
                       <img src={l.logo} alt="" className="h-4 w-4 rounded object-contain" />
-                      <span className="hidden sm:inline">{l.nome}</span>
+                      <span className="truncate">{l.nome}</span>
                     </Link>
                   </Button>
                 );
               })}
-          </div>
-
-          <div className="flex items-center gap-1">
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/loterias">
-                <Home className="mr-1.5 h-4 w-4" /> Loterias
-              </Link>
-            </Button>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="mr-1.5 h-4 w-4" /> Sair
-            </Button>
-          </div>
+            </div>
+          )}
         </div>
       </header>
 
