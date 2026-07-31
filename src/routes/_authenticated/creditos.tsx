@@ -12,7 +12,7 @@ import {
   criarPedidoCreditos,
   statusPedido,
 } from "@/lib/credits.functions";
-import { CREDIT_PACKAGES, JOGOS_POR_CREDITO, formatBRL } from "@/lib/credits-config";
+import { CREDIT_PACKAGES, JOGOS_POR_CREDITO, formatBRL, formatCreditos } from "@/lib/credits-config";
 
 export const Route = createFileRoute("/_authenticated/creditos")({
   component: CreditosPage,
@@ -102,12 +102,13 @@ function CreditosPage() {
             <p className="text-xs uppercase tracking-widest text-muted-foreground">Seu saldo</p>
             <p className="flex items-center gap-2 text-3xl font-bold">
               <Coins className="h-7 w-7 text-primary" />
-              {saldo?.balance ?? 0}
+              {formatCreditos(saldo?.balance ?? 0)}
               <span className="text-base font-normal text-muted-foreground">créditos</span>
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              1 crédito = {JOGOS_POR_CREDITO} jogos gerados · equivale a{" "}
-              {(saldo?.balance ?? 0) * JOGOS_POR_CREDITO} jogos
+              1 crédito = {JOGOS_POR_CREDITO} jogos gerados (cada jogo custa{" "}
+              {formatCreditos(1 / JOGOS_POR_CREDITO)} crédito) · equivale a{" "}
+              {Math.floor((saldo?.balance ?? 0) * JOGOS_POR_CREDITO)} jogos
             </p>
           </div>
           <Button asChild variant="outline">
@@ -185,7 +186,7 @@ function CreditosPage() {
                     }
                   >
                     {t.amount >= 0 ? "+" : ""}
-                    {t.amount}
+                    {formatCreditos(t.amount)}
                   </span>
                 </li>
               ))}

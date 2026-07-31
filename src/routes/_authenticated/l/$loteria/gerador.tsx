@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarConcursos, ultimoResultadoCaixa } from "@/lib/loterias.functions";
 import { salvarJogosComCreditos, meuSaldo } from "@/lib/credits.functions";
-import { creditosNecessarios } from "@/lib/credits-config";
+import { creditosNecessarios, formatCreditos } from "@/lib/credits-config";
 
 import {
   computeNumberStats,
@@ -222,7 +222,7 @@ function Gerador() {
 
   const custoCreditos = creditosNecessarios(qtd);
   const saldoAtual = saldo?.balance ?? 0;
-  const semSaldo = saldoAtual < custoCreditos;
+  const semSaldo = saldoAtual + 1e-9 < custoCreditos;
 
   function gerar() {
     if (!stats) {
@@ -231,7 +231,7 @@ function Gerador() {
     }
     if (semSaldo) {
       toast.error(
-        `Você precisa de ${custoCreditos} crédito(s) e tem ${saldoAtual}. Compre mais créditos.`,
+        `Você precisa de ${formatCreditos(custoCreditos)} crédito(s) e tem ${formatCreditos(saldoAtual)}. Compre mais créditos.`,
       );
       return;
     }
@@ -513,10 +513,10 @@ function Gerador() {
           </div>
 
           <Button className="w-full" size="lg" onClick={gerar} disabled={salvarTodosMut.isPending}>
-            <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} jogos · {custoCreditos} crédito(s)
+            <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} {qtd === 1 ? "jogo" : "jogos"} · {formatCreditos(custoCreditos)} crédito(s)
           </Button>
           <p className="mt-2 text-center text-xs text-muted-foreground">
-            Saldo: {saldoAtual} crédito(s).{" "}
+            Saldo: {formatCreditos(saldoAtual)} crédito(s).{" "}
             {semSaldo ? (
               <Link to="/creditos" className="font-medium text-primary underline">
                 Comprar créditos

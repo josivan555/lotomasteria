@@ -17,8 +17,13 @@ export function getPackage(id: string): CreditPackage | undefined {
   return CREDIT_PACKAGES.find((p) => p.id === id);
 }
 
+/** Custo proporcional: cada jogo custa 1/JOGOS_POR_CREDITO de crédito. */
 export function creditosNecessarios(qtdJogos: number): number {
-  return Math.ceil(qtdJogos / JOGOS_POR_CREDITO);
+  return Math.round((qtdJogos / JOGOS_POR_CREDITO) * 100) / 100;
+}
+
+export function formatCreditos(v: number): string {
+  return Number(v).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
 }
 
 export function formatBRL(v: number): string {
