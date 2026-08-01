@@ -808,6 +808,7 @@ function Gerador() {
             <AdvRow
               k="primos"
               label="Primos"
+              icon={<Hash className="h-5 w-5" />}
               info={{
               description:
                 "Conta quantos números primos entram no jogo — aqueles divisíveis só por 1 e por eles mesmos.",
