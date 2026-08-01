@@ -27,6 +27,7 @@ function SaldoBadge() {
   const saldoFn = useServerFn(meuSaldo);
   const { data } = useQuery({ queryKey: ["saldo"], queryFn: () => saldoFn({}) });
   const saldo = data?.balance ?? 0;
+  const ilimitado = data?.unlimited ?? false;
   return (
     <Button
       asChild
@@ -38,7 +39,9 @@ function SaldoBadge() {
         <Coins className="h-4 w-4 text-gold" />
         <span className="flex flex-col items-start leading-none">
           <span className="hidden text-[10px] opacity-90 sm:block">Créditos</span>
-          <span className="text-sm font-bold md:text-base">{formatCreditos(saldo)}</span>
+          <span className="text-sm font-bold md:text-base">
+            {ilimitado ? "∞" : formatCreditos(saldo)}
+          </span>
         </span>
       </Link>
     </Button>

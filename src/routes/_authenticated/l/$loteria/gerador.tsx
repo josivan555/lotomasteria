@@ -457,8 +457,9 @@ function Gerador() {
 
 
   const custoCreditos = creditosNecessarios(qtd);
+  const ilimitado = saldo?.unlimited ?? false;
   const saldoAtual = saldo?.balance ?? 0;
-  const semSaldo = saldoAtual + 1e-9 < custoCreditos;
+  const semSaldo = !ilimitado && saldoAtual + 1e-9 < custoCreditos;
 
   function gerar() {
     if (!stats) {
@@ -965,10 +966,11 @@ function Gerador() {
           </div>
 
           <Button className="w-full" size="lg" onClick={gerar} disabled={salvarTodosMut.isPending}>
-            <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} {qtd === 1 ? "jogo" : "jogos"} · {formatCreditos(custoCreditos)} crédito(s)
+            <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} {qtd === 1 ? "jogo" : "jogos"}
+            {ilimitado ? "" : ` · ${formatCreditos(custoCreditos)} crédito(s)`}
           </Button>
           <p className="mt-2 text-center text-xs text-muted-foreground">
-            Saldo: {formatCreditos(saldoAtual)} crédito(s).{" "}
+            {ilimitado ? "Créditos ilimitados (administrador). " : `Saldo: ${formatCreditos(saldoAtual)} crédito(s). `}
             {semSaldo ? (
               <Link to="/creditos" className="font-medium text-primary underline">
                 Comprar créditos
