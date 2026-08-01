@@ -895,3 +895,51 @@ function NumbersPicker({
     </div>
   );
 }
+
+function AdvRow({
+  k,
+  label,
+  info,
+  state,
+  onChange,
+  maxLimit,
+}: {
+  k: AdvKey;
+  label: string;
+  info: string;
+  state: { on: boolean; min: number; max: number };
+  onChange: (k: AdvKey, patch: Partial<{ on: boolean; min: number; max: number }>) => void;
+  maxLimit: number;
+}) {
+  return (
+    <div className="rounded-lg border border-border/50 bg-card/40 p-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <InfoLabel label={label} description={info} />
+        <Switch
+          checked={state.on}
+          onCheckedChange={(v) => onChange(k, { on: v })}
+          aria-label={`Ativar filtro ${label}`}
+        />
+      </div>
+      {state.on && (
+        <div className="mt-2 flex items-center gap-2">
+          <Input
+            type="number"
+            value={state.min}
+            min={0}
+            max={maxLimit}
+            onChange={(e) => onChange(k, { min: +e.target.value })}
+          />
+          <span className="text-muted-foreground">até</span>
+          <Input
+            type="number"
+            value={state.max}
+            min={0}
+            max={maxLimit}
+            onChange={(e) => onChange(k, { max: +e.target.value })}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
