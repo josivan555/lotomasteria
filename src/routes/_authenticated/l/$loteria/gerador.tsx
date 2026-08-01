@@ -16,6 +16,9 @@ import {
 } from "@/lib/loteria-utils";
 import { LOTERIAS, isLoteriaId, type LoteriaConfig } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
+import { useJanelaAnalise, aplicarJanela } from "@/lib/janela-analise";
+import { JanelaAnalise } from "@/components/janela-analise";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -155,10 +158,13 @@ function Gerador() {
   const { data: saldo } = useQuery({ queryKey: ["saldo"], queryFn: () => saldoFn({}) });
 
 
-  const { data: concursos = [] } = useQuery({
+  const { data: concursosAll = [] } = useQuery({
     queryKey: ["concursos", loteria],
     queryFn: () => listar({ data: { loteria } }),
   });
+  const { janela, setJanela } = useJanelaAnalise(loteria);
+  const concursos = useMemo(() => aplicarJanela(concursosAll, janela), [concursosAll, janela]);
+
 
   const ultimoFn = useServerFn(ultimoResultadoCaixa);
   const { data: ultimoOficial } = useQuery({
@@ -506,6 +512,9 @@ function Gerador() {
           .
         </p>
       </div>
+
+      <JanelaAnalise total={concursosAll.length} janela={janela} onChange={setJanela} />
+
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">

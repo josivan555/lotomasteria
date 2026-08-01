@@ -1,5 +1,8 @@
 import { createFileRoute, useRouter, Link, useParams } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useJanelaAnalise, aplicarJanela, BASE_ALVO } from "@/lib/janela-analise";
+import { JanelaAnalise } from "@/components/janela-analise";
+
 import { useServerFn } from "@tanstack/react-start";
 import {
   listarConcursos,
@@ -28,11 +31,16 @@ function Dashboard() {
   const sync = useServerFn(sincronizarConcursos);
   const ultimoCaixa = useServerFn(ultimoResultadoCaixa);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const { data: concursos = [], isLoading } = useQuery({
+
+  const { data: concursosAll = [], isLoading } = useQuery({
     queryKey: ["concursos", loteria],
     queryFn: () => listar({ data: { loteria } }),
   });
+
+  const { janela, setJanela } = useJanelaAnalise(loteria);
+  const concursos = useMemo(() => aplicarJanela(concursosAll, janela), [concursosAll, janela]);
 
   const { data: ultimoOficial } = useQuery({
     queryKey: ["ultimo-caixa", loteria],
@@ -45,16 +53,31 @@ function Dashboard() {
     [concursos, cfg],
   );
 
+
   const syncMut = useMutation({
-    mutationFn: () => sync({ data: { loteria, limite: 100 } }),
+    mutationFn: async () => {
+      let inseridos = 0;
+      let faltam = 0;
+      // Preenche a base ate ~BASE_ALVO concursos, em lotes de 200
+      for (let i = 0; i < 5; i++) {
+        const r = await sync({ data: { loteria, limite: 200 } });
+        inseridos += r.inseridos;
+        faltam = r.faltam;
+        const total = concursosAll.length + inseridos;
+        if (r.inseridos === 0 || total >= BASE_ALVO) break;
+      }
+      return { inseridos, faltam };
+    },
     onSuccess: (r) => {
       toast.success(
         r.inseridos === 0
           ? "Já está atualizado!"
           : `+${r.inseridos} concursos sincronizados${r.faltam ? ` — faltam ${r.faltam}` : ""}`,
       );
+      queryClient.invalidateQueries({ queryKey: ["concursos", loteria] });
       router.invalidate();
     },
+
     onError: (e) => toast.error(e.message),
   });
 
@@ -89,7 +112,7 @@ function Dashboard() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm text-muted-foreground">
-            {concursos.length} concursos analisados · último salvo #{latest.numero}
+            {concursos.length} de {concursosAll.length} concursos analisados · último salvo #{latest.numero}
           </p>
         </div>
         <div className="flex w-full gap-2 sm:w-auto">
@@ -109,6 +132,10 @@ function Dashboard() {
           </Button>
         </div>
       </div>
+
+      <JanelaAnalise total={concursosAll.length} janela={janela} onChange={setJanela} />
+
+
 
       <Card>
         <div className="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-start md:justify-between">
