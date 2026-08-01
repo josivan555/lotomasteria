@@ -953,6 +953,7 @@ function Gerador() {
               description="Dezenas bloqueadas: nunca entram nos jogos gerados."
               exemplo="Útil para descartar dezenas muito atrasadas ou que você não quer jogar."
               dica="Bloquear demais deixa poucas dezenas disponíveis e o gerador pode falhar."
+              icon={<Ban className="h-5 w-5" />}
             />
             <NumbersPicker
               numbers={nums}
