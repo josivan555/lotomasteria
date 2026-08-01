@@ -16,6 +16,9 @@ import {
 } from "@/lib/loteria-utils";
 import { LOTERIAS, isLoteriaId, type LoteriaConfig } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
+import { useJanelaAnalise, aplicarJanela } from "@/lib/janela-analise";
+import { JanelaAnalise } from "@/components/janela-analise";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
