@@ -49,7 +49,9 @@ export function exportarJogosPDF(opts: {
     columnStyles: { 2: { font: "courier", fontStyle: "bold" } },
   });
 
-  doc.save(`meus-jogos-${opts.loteriaNome.toLowerCase().replace(/\s+/g, "-")}.pdf`);
+  doc.save(
+    `meus-jogos-${opts.loteriaNome.toLowerCase().replace(/\s+/g, "-")}${opts.sufixoArquivo ? `-${opts.sufixoArquivo}` : ""}.pdf`,
+  );
 }
 
 export function exportarResultadosPDF(opts: {
