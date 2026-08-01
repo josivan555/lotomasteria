@@ -9,6 +9,8 @@ import { RefreshCw, CheckCircle2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useJanelaAnalise } from "@/lib/janela-analise";
+import { JanelaAnalise } from "@/components/janela-analise";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/historico")({
   component: Historico,
