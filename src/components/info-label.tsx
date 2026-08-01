@@ -53,9 +53,11 @@ export function InfoLabel({
   exemplo,
   dica,
   side = "bottom",
-}: InfoContent & { label: string; side?: "top" | "bottom" | "left" | "right" }) {
+  icon,
+}: InfoContent & { label: string; side?: "top" | "bottom" | "left" | "right"; icon?: ReactNode }) {
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-2">
+      {icon && <span className="inline-flex shrink-0 items-center justify-center text-primary">{icon}</span>}
       <Label>{label}</Label>
       <Popover>
         <PopoverTrigger asChild>
