@@ -89,6 +89,49 @@ function salvarQtd(loteria: string, qtd: number) {
   }
 }
 
+// ---- Persistência da configuração completa de filtros por modalidade ----
+const CFG_KEY = "lotomaster:config-gerador";
+
+type ConfigSalva = {
+  tamanho: number;
+  somaMin: number;
+  somaMax: number;
+  paresMin: number;
+  paresMax: number;
+  maxConsecutivas: number;
+  molduraMin: number;
+  molduraMax: number;
+  incluir: number[];
+  excluir: number[];
+  repetirMin: number;
+  repetirMax: number;
+  adv: AdvState;
+};
+
+function lerConfig(loteria: string): Partial<ConfigSalva> | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(CFG_KEY);
+    if (!raw) return null;
+    const map = JSON.parse(raw) as Record<string, Partial<ConfigSalva>>;
+    return map[loteria] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function salvarConfig(loteria: string, cfgSalva: ConfigSalva) {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = window.localStorage.getItem(CFG_KEY);
+    const map = raw ? (JSON.parse(raw) as Record<string, ConfigSalva>) : {};
+    map[loteria] = cfgSalva;
+    window.localStorage.setItem(CFG_KEY, JSON.stringify(map));
+  } catch {
+    /* ignora */
+  }
+}
+
 export const Route = createFileRoute("/_authenticated/l/$loteria/gerador")({
   component: Gerador,
 });
