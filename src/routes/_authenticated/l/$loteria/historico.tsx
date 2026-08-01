@@ -54,8 +54,9 @@ function Historico() {
         </div>
         <Button className="w-full sm:w-auto" onClick={() => syncMut.mutate()} disabled={syncMut.isPending}>
           <RefreshCw className={`mr-2 h-4 w-4 ${syncMut.isPending ? "animate-spin" : ""}`} />
-          Sincronizar próximos 100
+          Sincronizar 100 mais recentes
         </Button>
+
       </div>
 
       <Input
