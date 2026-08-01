@@ -22,12 +22,18 @@ function Historico() {
 
   const listar = useServerFn(listarConcursos);
   const sync = useServerFn(sincronizarConcursos);
+  const status = useServerFn(statusSincronizacao);
   const router = useRouter();
   const [query, setQuery] = useState("");
 
   const { data: concursos = [], isLoading } = useQuery({
     queryKey: ["concursos", loteria],
     queryFn: () => listar({ data: { loteria } }),
+  });
+
+  const { data: statusSync, refetch: refetchStatus } = useQuery({
+    queryKey: ["status-sync", loteria],
+    queryFn: () => status({ data: { loteria } }),
   });
 
   const syncMut = useMutation({
@@ -38,10 +44,17 @@ function Historico() {
           ? "Já está atualizado!"
           : `+${r.inseridos} concursos sincronizados${r.faltam ? ` — faltam ${r.faltam}` : ""}`,
       );
+      refetchStatus();
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
   });
+
+  const emDia =
+    statusSync?.ultimoOficial != null && statusSync?.ultimoNumero != null
+      ? statusSync.ultimoNumero >= statusSync.ultimoOficial
+      : null;
+
 
   const filtrados = query ? concursos.filter((c) => String(c.numero).includes(query)) : concursos;
 
