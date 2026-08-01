@@ -63,28 +63,32 @@ function AuthedLayout() {
               </span>
             </Link>
 
-            <div className="hidden flex-1 items-center justify-center gap-2 px-2 md:flex">
-              {loteriaAtual &&
-                LOTERIA_IDS.filter((id) => id !== loteriaAtual).map((id) => {
-                  const l = LOTERIAS[id];
-                  return (
-                    <Button
-                      key={id}
-                      asChild
-                      size="sm"
-                      className="shrink-0 gap-1.5 rounded-full border-2 px-3 font-semibold text-white shadow-sm transition hover:brightness-110"
-                      style={{ backgroundColor: l.cor, borderColor: l.cor }}
-                    >
-                      <Link to={trocarLoteriaUrl(id)}>
-                        <img src={l.logo} alt="" className="h-4 w-4 rounded object-contain" />
-                        <span>{l.nome}</span>
-                      </Link>
-                    </Button>
-                  );
-                })}
-            </div>
+            <div className="flex shrink-0 items-center gap-1 md:gap-2">
+              {loteriaAtual && (
+                <div className="hidden items-center gap-1 rounded-lg border border-border/60 bg-background/40 p-1 md:flex">
+                  {LOTERIA_IDS.filter((id) => id !== loteriaAtual).map((id) => {
+                    const l = LOTERIAS[id];
+                    return (
+                      <Button
+                        key={id}
+                        asChild
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 gap-2 rounded-md px-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                      >
+                        <Link to={trocarLoteriaUrl(id)}>
+                          <span
+                            className="h-2 w-2 shrink-0 rounded-full"
+                            style={{ backgroundColor: l.cor }}
+                          />
+                          <span>{l.nome}</span>
+                        </Link>
+                      </Button>
+                    );
+                  })}
+                </div>
+              )}
 
-            <div className="flex shrink-0 items-center gap-1">
               <Button asChild variant="ghost" size="icon" className="md:hidden" aria-label="Loterias">
                 <Link to="/loterias">
                   <Home className="h-5 w-5" />
@@ -112,7 +116,7 @@ function AuthedLayout() {
           </div>
 
           {loteriaAtual && (
-            <div className="mt-2 flex items-center gap-2 md:hidden">
+            <div className="mt-2 flex items-center gap-1 rounded-lg border border-border/60 bg-background/40 p-1 md:hidden">
               {LOTERIA_IDS.filter((id) => id !== loteriaAtual).map((id) => {
                 const l = LOTERIAS[id];
                 return (
@@ -120,11 +124,14 @@ function AuthedLayout() {
                     key={id}
                     asChild
                     size="sm"
-                    className="h-8 flex-1 gap-1.5 rounded-full border-2 px-2 text-xs font-semibold text-white shadow-sm"
-                    style={{ backgroundColor: l.cor, borderColor: l.cor }}
+                    variant="ghost"
+                    className="h-8 flex-1 gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground"
                   >
                     <Link to={trocarLoteriaUrl(id)}>
-                      <img src={l.logo} alt="" className="h-4 w-4 rounded object-contain" />
+                      <span
+                        className="h-2 w-2 shrink-0 rounded-full"
+                        style={{ backgroundColor: l.cor }}
+                      />
                       <span className="truncate">{l.nome}</span>
                     </Link>
                   </Button>
@@ -132,6 +139,7 @@ function AuthedLayout() {
               })}
             </div>
           )}
+
         </div>
       </header>
 
