@@ -1,5 +1,8 @@
 import { createFileRoute, useRouter, Link, useParams } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useJanelaAnalise, aplicarJanela, BASE_ALVO } from "@/lib/janela-analise";
+import { JanelaAnalise } from "@/components/janela-analise";
+
 import { useServerFn } from "@tanstack/react-start";
 import {
   listarConcursos,
