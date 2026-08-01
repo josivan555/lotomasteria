@@ -133,6 +133,10 @@ function Dashboard() {
         </div>
       </div>
 
+      <JanelaAnalise total={concursosAll.length} janela={janela} onChange={setJanela} />
+
+
+
       <Card>
         <div className="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-start md:justify-between">
           <div className="flex min-w-0 items-center gap-3">
