@@ -1127,6 +1127,7 @@ function AdvRow({
   state,
   onChange,
   maxLimit,
+  icon,
 }: {
   k: AdvKey;
   label: string;
@@ -1134,11 +1135,12 @@ function AdvRow({
   state: { on: boolean; min: number; max: number };
   onChange: (k: AdvKey, patch: Partial<{ on: boolean; min: number; max: number }>) => void;
   maxLimit: number;
+  icon?: React.ReactNode;
 }) {
   return (
     <div className="rounded-lg border border-border/50 bg-card/40 p-2.5">
       <div className="flex items-center justify-between gap-2">
-        <InfoLabel label={label} {...info} />
+        <InfoLabel label={label} {...info} icon={icon} />
         <Switch
           checked={state.on}
           onCheckedChange={(v) => onChange(k, { on: v })}
