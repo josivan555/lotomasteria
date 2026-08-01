@@ -133,7 +133,7 @@ function Dashboard() {
         </div>
       </div>
 
-      <JanelaAnalise total={concursosAll.length} janela={janela} onChange={setJanela} />
+      
 
 
 
