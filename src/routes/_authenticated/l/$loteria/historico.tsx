@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter, useParams } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarConcursos, sincronizarConcursos, statusSincronizacao } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
@@ -24,6 +24,7 @@ function Historico() {
   const sync = useServerFn(sincronizarConcursos);
   const status = useServerFn(statusSincronizacao);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
 
   const { data: concursos = [], isLoading } = useQuery({
@@ -44,6 +45,7 @@ function Historico() {
           ? "Já está atualizado!"
           : `+${r.inseridos} concursos sincronizados${r.faltam ? ` — faltam ${r.faltam}` : ""}`,
       );
+      queryClient.invalidateQueries({ queryKey: ["concursos", loteria] });
       refetchStatus();
       router.invalidate();
     },
