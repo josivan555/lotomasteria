@@ -664,6 +664,7 @@ function Gerador() {
               description={`Quantos números cada jogo terá. Mínimo ${cfg.tamanhoMin}, máximo ${cfg.tamanhoMax}.`}
               faixa={`Padrão da ${cfg.nome}: ${cfg.tamanho} dezenas.`}
               dica="Mais dezenas aumentam a chance de acerto, mas a loteria cobra bem mais caro por esse jogo."
+              icon={<IconBalls />}
             />
             <div className="mt-2 flex items-center gap-2">
               <Button
