@@ -237,6 +237,7 @@ function Gerador() {
   }
 
   const [resultados, setResultados] = useState<Result[]>([]);
+  const [iaPensando, setIaPensando] = useState(false);
   const [configCarregada, setConfigCarregada] = useState<string | null>(null);
 
   // Ao trocar de modalidade: carrega a configuração salva dela, ou os padrões
