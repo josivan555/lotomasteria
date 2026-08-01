@@ -356,8 +356,6 @@ function Jogos() {
                         </button>
                         <Button
                           size="sm"
-                        <Button
-                          size="sm"
                           variant="ghost"
                           aria-label={`Baixar PDF do concurso ${g.numero}`}
                           onClick={() =>
