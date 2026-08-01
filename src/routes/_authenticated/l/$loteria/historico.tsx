@@ -28,6 +28,7 @@ function Historico() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
+  const { janela, setJanela } = useJanelaAnalise(loteria);
 
   const { data: concursos = [], isLoading } = useQuery({
     queryKey: ["concursos", loteria],
