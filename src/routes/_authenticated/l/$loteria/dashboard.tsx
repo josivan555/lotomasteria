@@ -29,10 +29,13 @@ function Dashboard() {
   const ultimoCaixa = useServerFn(ultimoResultadoCaixa);
   const router = useRouter();
 
-  const { data: concursos = [], isLoading } = useQuery({
+  const { data: concursosAll = [], isLoading } = useQuery({
     queryKey: ["concursos", loteria],
     queryFn: () => listar({ data: { loteria } }),
   });
+
+  const { janela, setJanela } = useJanelaAnalise(loteria);
+  const concursos = useMemo(() => aplicarJanela(concursosAll, janela), [concursosAll, janela]);
 
   const { data: ultimoOficial } = useQuery({
     queryKey: ["ultimo-caixa", loteria],
@@ -44,6 +47,7 @@ function Dashboard() {
     () => (concursos.length ? computeNumberStats(cfg, concursos) : null),
     [concursos, cfg],
   );
+
 
   const syncMut = useMutation({
     mutationFn: () => sync({ data: { loteria, limite: 100 } }),
