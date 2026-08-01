@@ -54,6 +54,44 @@ export const listarConcursos = createServerFn({ method: "GET" })
     }));
   });
 
+export const statusSincronizacao = createServerFn({ method: "GET" })
+  .inputValidator((raw: unknown) => z.object({ loteria: loteriaEnum }).parse(raw))
+  .handler(async ({ data }) => {
+    const sb = serverPublicClient();
+    const [ultimoRes, recenteRes] = await Promise.all([
+      sb
+        .from("concursos")
+        .select("numero, data_apuracao, created_at")
+        .eq("loteria", data.loteria)
+        .order("numero", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      sb
+        .from("concursos")
+        .select("created_at")
+        .eq("loteria", data.loteria)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+    let ultimoOficial: number | null = null;
+    try {
+      const { buscarResumoOficial } = await import("./caixa.server");
+      const r = await buscarResumoOficial(data.loteria);
+      ultimoOficial = r?.numero ?? null;
+    } catch {
+      ultimoOficial = null;
+    }
+
+    return {
+      ultimoNumero: ultimoRes.data?.numero ?? null,
+      ultimaDataApuracao: ultimoRes.data?.data_apuracao ?? null,
+      ultimaAtualizacao: recenteRes.data?.created_at ?? null,
+      ultimoOficial,
+    };
+  });
+
 export const resumoOficialTodas = createServerFn({ method: "GET" }).handler(async () => {
   const { buscarResumoTodas } = await import("./caixa.server");
   return buscarResumoTodas();
