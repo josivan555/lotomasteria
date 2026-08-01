@@ -356,6 +356,28 @@ function Jogos() {
                         </button>
                         <Button
                           size="sm"
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          aria-label={`Baixar PDF do concurso ${g.numero}`}
+                          onClick={() =>
+                            exportarJogosPDF({
+                              loteriaNome: cfg.nome,
+                              cor: cfg.cor,
+                              titulo: `Concurso ${g.numero}`,
+                              sufixoArquivo: `concurso-${g.numero}`,
+                              jogos: g.itens.map((j) => ({
+                                dezenas: j.dezenas,
+                                score: j.score,
+                                created_at: j.created_at,
+                              })),
+                            })
+                          }
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
                           variant="ghost"
                           aria-label={`Apagar histórico do concurso ${g.numero}`}
                           disabled={delLote.isPending}
