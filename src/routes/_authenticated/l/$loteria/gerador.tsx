@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bookmark, Dice5, Download, Sparkles, Info, AlertTriangle } from "lucide-react";
+import { Bookmark, Dice5, Download, Sparkles, Info, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 
@@ -148,6 +148,7 @@ function Gerador() {
   const [repetirMax, setRepetirMax] = useState(defaults.repetirAnteriorMax);
 
   const [resultados, setResultados] = useState<Result[]>([]);
+  const [iaPensando, setIaPensando] = useState(false);
 
   // Sempre que o usuário troca de modalidade, reseta os filtros para os padrões da loteria selecionada
   useEffect(() => {
@@ -171,69 +172,76 @@ function Gerador() {
     set(list.includes(n) ? list.filter((x) => x !== n) : [...list, n]);
   }
 
-  function autoConfigurarIA() {
+  async function autoConfigurarIA() {
     if (!concursos.length) {
       toast.error("Sincronize o histórico primeiro.");
       return;
     }
-    // Coleta métricas históricas
-    const somas: number[] = [];
-    const pares: number[] = [];
-    const repeats: number[] = [];
-    const molduras: number[] = [];
-    const consecs: number[] = [];
-    const molduraSet = new Set(cfg.moldura ?? []);
-    for (let i = 0; i < concursos.length; i++) {
-      const d = [...concursos[i].dezenas].sort((a, b) => a - b);
-      somas.push(d.reduce((s, n) => s + n, 0));
-      pares.push(d.filter((n) => n % 2 === 0).length);
-      if (molduraSet.size) molduras.push(d.filter((n) => molduraSet.has(n)).length);
-      let maxSeq = 1, cur = 1;
-      for (let k = 1; k < d.length; k++) {
-        if (d[k] === d[k - 1] + 1) { cur++; maxSeq = Math.max(maxSeq, cur); } else cur = 1;
+    setIaPensando(true);
+    toast.info("IA analisando o histórico e ajustando filtros...");
+    await new Promise((resolve) => setTimeout(resolve, 2500));
+    try {
+      // Coleta métricas históricas
+      const somas: number[] = [];
+      const pares: number[] = [];
+      const repeats: number[] = [];
+      const molduras: number[] = [];
+      const consecs: number[] = [];
+      const molduraSet = new Set(cfg.moldura ?? []);
+      for (let i = 0; i < concursos.length; i++) {
+        const d = [...concursos[i].dezenas].sort((a, b) => a - b);
+        somas.push(d.reduce((s, n) => s + n, 0));
+        pares.push(d.filter((n) => n % 2 === 0).length);
+        if (molduraSet.size) molduras.push(d.filter((n) => molduraSet.has(n)).length);
+        let maxSeq = 1, cur = 1;
+        for (let k = 1; k < d.length; k++) {
+          if (d[k] === d[k - 1] + 1) { cur++; maxSeq = Math.max(maxSeq, cur); } else cur = 1;
+        }
+        consecs.push(maxSeq);
+        if (i < concursos.length - 1) {
+          const prev = new Set(concursos[i + 1].dezenas);
+          repeats.push(d.filter((n) => prev.has(n)).length);
+        }
       }
-      consecs.push(maxSeq);
-      if (i < concursos.length - 1) {
-        const prev = new Set(concursos[i + 1].dezenas);
-        repeats.push(d.filter((n) => prev.has(n)).length);
+      const mean = (a: number[]) => a.reduce((s, n) => s + n, 0) / a.length;
+      const std = (a: number[]) => {
+        const m = mean(a);
+        return Math.sqrt(a.reduce((s, n) => s + (n - m) ** 2, 0) / a.length);
+      };
+      // Tolerância aumenta com a quantidade (mais jogos = filtros mais amplos)
+      const tol =
+        qtd <= 2 ? 0.6 : qtd <= 5 ? 0.9 : qtd <= 10 ? 1.2 : qtd <= 50 ? 1.6 : qtd <= 100 ? 2.0 : 2.5;
+
+      const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, Math.round(v)));
+      const somaM = mean(somas), somaS = std(somas);
+      setSomaMin(clamp(somaM - tol * somaS, 1, 9999));
+      setSomaMax(clamp(somaM + tol * somaS, 1, 9999));
+
+      const parM = mean(pares), parS = std(pares);
+      setParesMin(clamp(parM - tol * parS, 0, cfg.tamanho));
+      setParesMax(clamp(parM + tol * parS, 0, cfg.tamanho));
+
+      if (cfg.moldura && molduras.length) {
+        const mM = mean(molduras), mS = std(molduras);
+        setMolduraMin(clamp(mM - tol * mS, 0, cfg.tamanho));
+        setMolduraMax(clamp(mM + tol * mS, 0, cfg.tamanho));
       }
+
+      if (repeats.length) {
+        const rM = mean(repeats), rS = std(repeats);
+        setRepetirMin(clamp(rM - tol * rS, 0, cfg.tamanho));
+        setRepetirMax(clamp(rM + tol * rS, 0, cfg.tamanho));
+      }
+
+      const cM = mean(consecs), cS = std(consecs);
+      setMaxConsecutivas(clamp(cM + tol * cS, 2, 10));
+
+      setIncluir([]);
+      setExcluir([]);
+      toast.success(`Filtros ajustados pela IA para ${qtd} jogo(s).`);
+    } finally {
+      setIaPensando(false);
     }
-    const mean = (a: number[]) => a.reduce((s, n) => s + n, 0) / a.length;
-    const std = (a: number[]) => {
-      const m = mean(a);
-      return Math.sqrt(a.reduce((s, n) => s + (n - m) ** 2, 0) / a.length);
-    };
-    // Tolerância aumenta com a quantidade (mais jogos = filtros mais amplos)
-    const tol =
-      qtd <= 2 ? 0.6 : qtd <= 5 ? 0.9 : qtd <= 10 ? 1.2 : qtd <= 50 ? 1.6 : qtd <= 100 ? 2.0 : 2.5;
-
-    const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, Math.round(v)));
-    const somaM = mean(somas), somaS = std(somas);
-    setSomaMin(clamp(somaM - tol * somaS, 1, 9999));
-    setSomaMax(clamp(somaM + tol * somaS, 1, 9999));
-
-    const parM = mean(pares), parS = std(pares);
-    setParesMin(clamp(parM - tol * parS, 0, cfg.tamanho));
-    setParesMax(clamp(parM + tol * parS, 0, cfg.tamanho));
-
-    if (cfg.moldura && molduras.length) {
-      const mM = mean(molduras), mS = std(molduras);
-      setMolduraMin(clamp(mM - tol * mS, 0, cfg.tamanho));
-      setMolduraMax(clamp(mM + tol * mS, 0, cfg.tamanho));
-    }
-
-    if (repeats.length) {
-      const rM = mean(repeats), rS = std(repeats);
-      setRepetirMin(clamp(rM - tol * rS, 0, cfg.tamanho));
-      setRepetirMax(clamp(rM + tol * rS, 0, cfg.tamanho));
-    }
-
-    const cM = mean(consecs), cS = std(consecs);
-    setMaxConsecutivas(clamp(cM + tol * cS, 2, 10));
-
-    setIncluir([]);
-    setExcluir([]);
-    toast.success(`Filtros ajustados pela IA para ${qtd} jogo(s).`);
   }
 
 
@@ -371,10 +379,16 @@ function Gerador() {
                 size="sm"
                 variant="outline"
                 onClick={autoConfigurarIA}
+                disabled={iaPensando}
                 className="h-7 gap-1 border-primary/50 text-primary hover:bg-primary/10"
                 title="Ajusta os filtros automaticamente com base no histórico e na quantidade escolhida"
               >
-                <Sparkles className="h-3.5 w-3.5" /> IA configurar
+                {iaPensando ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3.5 w-3.5" />
+                )}
+                {iaPensando ? "IA analisando..." : "IA configurar"}
               </Button>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
