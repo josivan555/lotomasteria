@@ -74,7 +74,8 @@ function AuthedLayout() {
                         asChild
                         size="sm"
                         variant="ghost"
-                        className="h-8 gap-2 rounded-md px-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                        className="h-8 gap-2 rounded-md border bg-background/60 px-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                        style={{ borderColor: l.cor }}
                       >
                         <Link to={trocarLoteriaUrl(id)}>
                           <span
@@ -125,7 +126,8 @@ function AuthedLayout() {
                     asChild
                     size="sm"
                     variant="ghost"
-                    className="h-8 flex-1 gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground"
+                    className="h-8 flex-1 gap-1.5 rounded-md border bg-background/60 px-2 text-xs font-medium text-muted-foreground"
+                    style={{ borderColor: l.cor }}
                   >
                     <Link to={trocarLoteriaUrl(id)}>
                       <span
