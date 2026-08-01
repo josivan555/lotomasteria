@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import {
   listarJogosSalvos,
   excluirJogo,
-  excluirTodosJogos,
+  excluirJogosPorIds,
   ultimoResultadoCaixa,
 } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
