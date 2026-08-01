@@ -1,6 +1,7 @@
 import { Info } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import type { ReactNode } from "react";
 
 export type InfoContent = {
   /** Título mostrado dentro do balão (padrão: o próprio label) */
