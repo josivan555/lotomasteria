@@ -762,6 +762,7 @@ function Gerador() {
           )}
           <RangeRow
             label="Repetir do anterior"
+            icon={<RefreshCw className="h-5 w-5" />}
             info={{
               description:
                 "Quantas dezenas do último concurso oficial devem aparecer de novo no jogo gerado. É comum vários números repetirem de um sorteio para o outro.",
