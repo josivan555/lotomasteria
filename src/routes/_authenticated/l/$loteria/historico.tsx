@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarConcursos, sincronizarConcursos } from "@/lib/loterias.functions";
+import { listarConcursos, sincronizarConcursos, statusSincronizacao } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
