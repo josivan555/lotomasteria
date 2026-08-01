@@ -148,6 +148,7 @@ function Gerador() {
   const [repetirMax, setRepetirMax] = useState(defaults.repetirAnteriorMax);
 
   const [resultados, setResultados] = useState<Result[]>([]);
+  const [iaPensando, setIaPensando] = useState(false);
 
   // Sempre que o usuário troca de modalidade, reseta os filtros para os padrões da loteria selecionada
   useEffect(() => {
