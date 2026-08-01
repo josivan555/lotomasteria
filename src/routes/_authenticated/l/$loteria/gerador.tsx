@@ -1040,6 +1040,7 @@ function RangeRow({
   setMax,
   minLimit = 0,
   maxLimit = 400,
+  icon,
 }: {
   label: string;
   info?: InfoContent;
@@ -1049,11 +1050,12 @@ function RangeRow({
   setMax: (n: number) => void;
   minLimit?: number;
   maxLimit?: number;
+  icon?: React.ReactNode;
 }) {
   return (
     <div>
       {info ? (
-        <InfoLabel label={label} {...info} />
+        <InfoLabel label={label} {...info} icon={icon} />
       ) : (
         <Label>{label}</Label>
       )}
