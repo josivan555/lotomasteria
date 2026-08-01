@@ -883,6 +883,7 @@ function Gerador() {
               <AdvRow
                 k="miolo"
                 label="Miolo"
+                icon={<Target className="h-5 w-5" />}
                 info={{
                 description:
                   "Miolo são as dezenas do centro do cartão, fora da moldura. Este filtro define quantas delas o jogo deve conter.",
