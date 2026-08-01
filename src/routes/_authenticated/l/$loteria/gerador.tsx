@@ -23,9 +23,93 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { InfoLabel, type InfoContent } from "@/components/info-label";
-import { Bookmark, Dice5, Download, Sparkles, AlertTriangle, Loader2 } from "lucide-react";
+import {
+  Bookmark,
+  Dice5,
+  Download,
+  Sparkles,
+  AlertTriangle,
+  Loader2,
+  Grid2x2,
+  Circle,
+  Calculator,
+  RefreshCw,
+  LayoutGrid,
+  Hash,
+  Activity,
+  Divide,
+  Rows3,
+  Columns3,
+  Target,
+  Ban,
+  ArrowRightLeft,
+  Pin,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
+
+/* Ícones visuais estilo infográfico para os filtros */
+function IconQuantity() {
+  return (
+    <div className="grid grid-cols-3 gap-0.5">
+      {["1", "2", "5", "10", "50", "100"].map((n, i) => (
+        <div
+          key={i}
+          className="flex h-4 w-4 items-center justify-center rounded-[3px] border border-primary/60 bg-primary/10 text-[7px] font-bold text-primary"
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function IconBalls({ count = 6 }: { count?: number }) {
+  return (
+    <div className="flex -space-x-1">
+      {Array.from({ length: Math.min(count, 6) }).map((_, i) => (
+        <div
+          key={i}
+          className="flex h-5 w-5 items-center justify-center rounded-full border border-primary/40 bg-primary/15 text-[7px] font-bold text-primary shadow-sm"
+        >
+          {String(10 + i * 13).padStart(2, "0")}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function IconSigma() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 6h14L8 12l10 6H4" />
+    </svg>
+  );
+}
+
+function IconPairBalls() {
+  return (
+    <div className="flex items-center gap-0.5">
+      <div className="h-4 w-4 rounded-full border border-primary/40 bg-primary/15" />
+      <div className="h-4 w-4 rounded-full border border-primary/40 bg-primary" />
+    </div>
+  );
+}
+
+function IconConsecBalls() {
+  return (
+    <div className="flex -space-x-1">
+      {[10, 11, 12].map((n) => (
+        <div
+          key={n}
+          className="flex h-5 w-5 items-center justify-center rounded-full border border-primary/40 bg-primary/15 text-[7px] font-bold text-primary"
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 type AdvKey =
   | "primos"
@@ -522,6 +606,7 @@ function Gerador() {
                 description="Quantos jogos serão gerados de uma vez, de 1 até 500. Cada jogo consome créditos do seu saldo."
                 exemplo="5 jogos = 1 crédito."
                 dica="Escolha a quantidade ANTES de clicar em IA configurar: a IA ajusta os filtros conforme o volume."
+                icon={<IconQuantity />}
               />
               <Button
                 size="sm"
@@ -580,6 +665,7 @@ function Gerador() {
               description={`Quantos números cada jogo terá. Mínimo ${cfg.tamanhoMin}, máximo ${cfg.tamanhoMax}.`}
               faixa={`Padrão da ${cfg.nome}: ${cfg.tamanho} dezenas.`}
               dica="Mais dezenas aumentam a chance de acerto, mas a loteria cobra bem mais caro por esse jogo."
+              icon={<IconBalls />}
             />
             <div className="mt-2 flex items-center gap-2">
               <Button
@@ -626,6 +712,7 @@ function Gerador() {
 
           <RangeRow
             label="Soma"
+            icon={<IconSigma />}
             info={{
               description:
                 "Soma de todas as dezenas do jogo. Somas muito baixas (só números pequenos) ou muito altas (só números grandes) são raras nos sorteios reais.",
@@ -640,6 +727,7 @@ function Gerador() {
           />
           <RangeRow
             label="Pares"
+            icon={<IconPairBalls />}
             info={{
               description:
                 "Quantidade de números pares no jogo. O restante são ímpares. Sorteios reais quase sempre ficam próximos do equilíbrio.",
@@ -657,6 +745,7 @@ function Gerador() {
           {cfg.moldura && (
             <RangeRow
               label="Moldura"
+              icon={<LayoutGrid className="h-5 w-5" />}
               info={{
                 description:
                   "Moldura são as dezenas da borda do cartão. O restante é o miolo (centro). A distribuição entre borda e centro se repete bastante nos sorteios.",
@@ -674,6 +763,7 @@ function Gerador() {
           )}
           <RangeRow
             label="Repetir do anterior"
+            icon={<RefreshCw className="h-5 w-5" />}
             info={{
               description:
                 "Quantas dezenas do último concurso oficial devem aparecer de novo no jogo gerado. É comum vários números repetirem de um sorteio para o outro.",
@@ -695,6 +785,7 @@ function Gerador() {
               faixa="No máximo 4 consecutivas."
               exemplo="Com o valor 3, o jogo pode ter 07-08-09, mas não 07-08-09-10."
               dica="Sequências longas são raras nos sorteios reais."
+              icon={<IconConsecBalls />}
             />
             <Input
               type="number"
@@ -718,6 +809,7 @@ function Gerador() {
             <AdvRow
               k="primos"
               label="Primos"
+              icon={<Hash className="h-5 w-5" />}
               info={{
               description:
                 "Conta quantos números primos entram no jogo — aqueles divisíveis só por 1 e por eles mesmos.",
@@ -732,6 +824,7 @@ function Gerador() {
             <AdvRow
               k="fibonacci"
               label="Fibonacci"
+              icon={<Activity className="h-5 w-5" />}
               info={{
               description:
                 "Conta quantas dezenas pertencem à sequência de Fibonacci, em que cada número é a soma dos dois anteriores.",
@@ -746,6 +839,7 @@ function Gerador() {
             <AdvRow
               k="mult3"
               label="Múltiplos de 3"
+              icon={<Divide className="h-5 w-5" />}
               info={{
               description: "Conta quantas dezenas do jogo são divisíveis por 3.",
               faixa: "4 a 6 dezenas em jogos de 15.",
@@ -759,6 +853,7 @@ function Gerador() {
             <AdvRow
               k="linha"
               label="Dezenas por linha"
+              icon={<Rows3 className="h-5 w-5" />}
               info={{
               description:
                 "Controla a distribuição horizontal: define o mínimo e o máximo de dezenas em CADA linha do volante.",
@@ -773,6 +868,7 @@ function Gerador() {
             <AdvRow
               k="coluna"
               label="Dezenas por coluna"
+              icon={<Columns3 className="h-5 w-5" />}
               info={{
               description:
                 "Mesma ideia da linha, só que na vertical: mínimo e máximo de dezenas em CADA coluna do volante.",
@@ -788,6 +884,7 @@ function Gerador() {
               <AdvRow
                 k="miolo"
                 label="Miolo"
+                icon={<Target className="h-5 w-5" />}
                 info={{
                 description:
                   "Miolo são as dezenas do centro do cartão, fora da moldura. Este filtro define quantas delas o jogo deve conter.",
@@ -803,6 +900,7 @@ function Gerador() {
             <AdvRow
               k="ausentes"
               label="Ausentes do último concurso"
+              icon={<Ban className="h-5 w-5" />}
               info={{
               description:
                 "Quantas dezenas do jogo NÃO saíram no último concurso. É o oposto do filtro Repetir do anterior.",
@@ -817,6 +915,7 @@ function Gerador() {
             <AdvRow
               k="paresConsec"
               label="Pares consecutivos"
+              icon={<ArrowRightLeft className="h-5 w-5" />}
               info={{
               description:
                 "Conta as duplas de números seguidos dentro do jogo. Diferente de Máx. consecutivas, que limita o tamanho da maior sequência.",
@@ -838,6 +937,7 @@ function Gerador() {
               description="Dezenas fixas: aparecem em todos os jogos gerados."
               exemplo="Marque seus números da sorte para que nunca fiquem de fora."
               dica="Fixar muitas dezenas reduz a variedade dos jogos e pode conflitar com os filtros."
+              icon={<Pin className="h-5 w-5" />}
             />
             <NumbersPicker
               numbers={nums}
@@ -853,6 +953,7 @@ function Gerador() {
               description="Dezenas bloqueadas: nunca entram nos jogos gerados."
               exemplo="Útil para descartar dezenas muito atrasadas ou que você não quer jogar."
               dica="Bloquear demais deixa poucas dezenas disponíveis e o gerador pode falhar."
+              icon={<Ban className="h-5 w-5" />}
             />
             <NumbersPicker
               numbers={nums}
@@ -957,6 +1058,7 @@ function RangeRow({
   setMax,
   minLimit = 0,
   maxLimit = 400,
+  icon,
 }: {
   label: string;
   info?: InfoContent;
@@ -966,11 +1068,12 @@ function RangeRow({
   setMax: (n: number) => void;
   minLimit?: number;
   maxLimit?: number;
+  icon?: React.ReactNode;
 }) {
   return (
     <div>
       {info ? (
-        <InfoLabel label={label} {...info} />
+        <InfoLabel label={label} {...info} icon={icon} />
       ) : (
         <Label>{label}</Label>
       )}
@@ -1042,6 +1145,7 @@ function AdvRow({
   state,
   onChange,
   maxLimit,
+  icon,
 }: {
   k: AdvKey;
   label: string;
@@ -1049,11 +1153,12 @@ function AdvRow({
   state: { on: boolean; min: number; max: number };
   onChange: (k: AdvKey, patch: Partial<{ on: boolean; min: number; max: number }>) => void;
   maxLimit: number;
+  icon?: React.ReactNode;
 }) {
   return (
     <div className="rounded-lg border border-border/50 bg-card/40 p-2.5">
       <div className="flex items-center justify-between gap-2">
-        <InfoLabel label={label} {...info} />
+        <InfoLabel label={label} {...info} icon={icon} />
         <Switch
           checked={state.on}
           onCheckedChange={(v) => onChange(k, { on: v })}
