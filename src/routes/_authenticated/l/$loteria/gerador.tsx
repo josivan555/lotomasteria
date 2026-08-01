@@ -838,6 +838,7 @@ function Gerador() {
             <AdvRow
               k="mult3"
               label="Múltiplos de 3"
+              icon={<Divide className="h-5 w-5" />}
               info={{
               description: "Conta quantas dezenas do jogo são divisíveis por 3.",
               faixa: "4 a 6 dezenas em jogos de 15.",
