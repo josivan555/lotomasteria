@@ -23,7 +23,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { InfoLabel, type InfoContent } from "@/components/info-label";
-import { Bookmark, Dice5, Download, Sparkles, AlertTriangle, Loader2 } from "lucide-react";
+import {
+  Bookmark,
+  Dice5,
+  Download,
+  Sparkles,
+  AlertTriangle,
+  Loader2,
+  Grid2x2,
+  Circle,
+  Calculator,
+  RefreshCw,
+  LayoutGrid,
+  Hash,
+  Activity,
+  Divide,
+  Rows3,
+  Columns3,
+  Target,
+  Ban,
+  ArrowRightLeft,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 
