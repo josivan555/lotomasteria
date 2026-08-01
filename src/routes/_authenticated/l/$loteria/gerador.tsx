@@ -379,10 +379,16 @@ function Gerador() {
                 size="sm"
                 variant="outline"
                 onClick={autoConfigurarIA}
+                disabled={iaPensando}
                 className="h-7 gap-1 border-primary/50 text-primary hover:bg-primary/10"
                 title="Ajusta os filtros automaticamente com base no histórico e na quantidade escolhida"
               >
-                <Sparkles className="h-3.5 w-3.5" /> IA configurar
+                {iaPensando ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3.5 w-3.5" />
+                )}
+                {iaPensando ? "IA analisando..." : "IA configurar"}
               </Button>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
