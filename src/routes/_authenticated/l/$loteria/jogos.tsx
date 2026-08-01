@@ -232,16 +232,21 @@ function Jogos() {
               variant="destructive"
               size="sm"
               className="flex-1 sm:flex-none"
-              disabled={jogos.length === 0 || delAll.isPending}
+              disabled={vigentes.length === 0 || delLote.isPending}
               onClick={() => {
-                if (confirm(`Tem certeza que deseja remover todos os ${jogos.length} jogos salvos da ${cfg.nome}?\n\nEssa ação não pode ser desfeita.`)) {
-                  delAll.mutate();
+                if (
+                  confirm(
+                    `Remover os ${vigentes.length} jogos em aberto da ${cfg.nome}?\n\nO histórico de concursos já sorteados será mantido.`,
+                  )
+                ) {
+                  delLote.mutate(vigentes.map((j) => j.id));
                 }
               }}
             >
               <Trash className="mr-2 h-4 w-4" />
-              Limpar todos
+              Limpar abertos
             </Button>
+
           </div>
         )}
       </div>
