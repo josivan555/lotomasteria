@@ -47,6 +47,69 @@ import {
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 
+/* Ícones visuais estilo infográfico para os filtros */
+function IconQuantity() {
+  return (
+    <div className="grid grid-cols-3 gap-0.5">
+      {["1", "2", "5", "10", "50", "100"].map((n, i) => (
+        <div
+          key={i}
+          className="flex h-4 w-4 items-center justify-center rounded-[3px] border border-primary/60 bg-primary/10 text-[7px] font-bold text-primary"
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function IconBalls({ count = 6 }: { count?: number }) {
+  return (
+    <div className="flex -space-x-1">
+      {Array.from({ length: Math.min(count, 6) }).map((_, i) => (
+        <div
+          key={i}
+          className="flex h-5 w-5 items-center justify-center rounded-full border border-primary/40 bg-primary/15 text-[7px] font-bold text-primary shadow-sm"
+        >
+          {String(10 + i * 13).padStart(2, "0")}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function IconSigma() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 6h14L8 12l10 6H4" />
+    </svg>
+  );
+}
+
+function IconPairBalls() {
+  return (
+    <div className="flex items-center gap-0.5">
+      <div className="h-4 w-4 rounded-full border border-primary/40 bg-primary/15" />
+      <div className="h-4 w-4 rounded-full border border-primary/40 bg-primary" />
+    </div>
+  );
+}
+
+function IconConsecBalls() {
+  return (
+    <div className="flex -space-x-1">
+      {[10, 11, 12].map((n) => (
+        <div
+          key={n}
+          className="flex h-5 w-5 items-center justify-center rounded-full border border-primary/40 bg-primary/15 text-[7px] font-bold text-primary"
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 type AdvKey =
   | "primos"
   | "fibonacci"
