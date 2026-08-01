@@ -255,9 +255,7 @@ function Resultados() {
   };
 
 
-  function baixarPDF() {
-    const g = conferidos[0];
-    if (!g) return;
+  function baixarPDFGrupo(g: (typeof grupos)[number]) {
     exportarResultadosPDF({
       loteriaNome: cfg.nome,
       cor: cfg.cor,
@@ -269,6 +267,13 @@ function Resultados() {
       tierLabel,
     });
   }
+
+  function baixarPDF() {
+    const g = conferidos[0];
+    if (!g) return;
+    baixarPDFGrupo(g);
+  }
+
 
   return (
     <div className="space-y-6">
@@ -377,26 +382,38 @@ function Resultados() {
                       key={g.numero}
                       className="overflow-hidden rounded-xl border border-border/60 bg-card/60 backdrop-blur"
                     >
-                      <button
-                        type="button"
-                        onClick={() => setAberto(open ? null : g.numero)}
-                        className="flex w-full items-center gap-3 p-3 text-left hover:bg-secondary/50"
-                      >
-                        <ChevronDown
-                          className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
-                        />
-                        <span className="font-semibold" style={{ color: cfg.cor }}>
-                          Concurso {g.numero}
-                        </span>
-                        {g.res && (
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(g.res.data_apuracao).toLocaleDateString("pt-BR")}
+                      <div className="flex items-center gap-1 pr-2 hover:bg-secondary/50">
+                        <button
+                          type="button"
+                          onClick={() => setAberto(open ? null : g.numero)}
+                          className="flex min-w-0 flex-1 items-center gap-3 p-3 text-left"
+                        >
+                          <ChevronDown
+                            className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+                          />
+                          <span className="font-semibold" style={{ color: cfg.cor }}>
+                            Concurso {g.numero}
                           </span>
-                        )}
-                        <span className="ml-auto text-xs text-muted-foreground">
-                          {g.itens.length} jogo{g.itens.length === 1 ? "" : "s"} · melhor {melhor}
-                        </span>
-                      </button>
+                          {g.res && (
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(g.res.data_apuracao).toLocaleDateString("pt-BR")}
+                            </span>
+                          )}
+                          <span className="ml-auto text-xs text-muted-foreground">
+                            {g.itens.length} jogo{g.itens.length === 1 ? "" : "s"} · melhor {melhor}
+                          </span>
+                        </button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          aria-label={`Baixar PDF do concurso ${g.numero}`}
+                          title="Baixar PDF deste concurso"
+                          onClick={() => baixarPDFGrupo(g)}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+
                       {open && <div className="border-t border-border/60 p-3">{renderGrupo(g)}</div>}
                     </div>
                   );
