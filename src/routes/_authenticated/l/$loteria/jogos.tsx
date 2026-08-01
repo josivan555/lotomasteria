@@ -106,6 +106,15 @@ function Jogos() {
       .sort((a, b) => b.numero - a.numero);
   }, [jogosFiltrados, ultimoSorteado]);
 
+  const totalPaginas = Math.max(1, Math.ceil(historico.length / porPagina));
+  const paginaAtual = Math.min(pagina, totalPaginas);
+  const historicoPagina = historico.slice(
+    (paginaAtual - 1) * porPagina,
+    paginaAtual * porPagina,
+  );
+
+
+
   const renderJogo = (j: (typeof jogos)[number]) => {
     const c = j.score != null ? classificarScore(Number(j.score)) : null;
     return (
