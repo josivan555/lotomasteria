@@ -5,7 +5,7 @@ import {
   notFound,
   useParams,
 } from "@tanstack/react-router";
-import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, Coins } from "lucide-react";
+import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, Coins, BookOpen } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { formatCreditos } from "@/lib/credits-config";
@@ -80,6 +80,9 @@ function LoteriaLayout() {
             <NavPill to="/l/$loteria/volante" loteria={loteria} cor={cfg.cor} icon={<Printer className="h-4 w-4" />}>
               Volante
             </NavPill>
+            <NavPill to="/l/$loteria/ajuda" loteria={loteria} cor={cfg.cor} icon={<BookOpen className="h-4 w-4" />}>
+              Como usar
+            </NavPill>
           </nav>
           <div className="hidden md:block">
             <SaldoBadge />
@@ -117,7 +120,7 @@ function NavPill({
   icon,
   children,
 }: {
-  to: "/l/$loteria/dashboard" | "/l/$loteria/gerador" | "/l/$loteria/historico" | "/l/$loteria/jogos" | "/l/$loteria/resultados" | "/l/$loteria/volante";
+  to: "/l/$loteria/dashboard" | "/l/$loteria/gerador" | "/l/$loteria/historico" | "/l/$loteria/jogos" | "/l/$loteria/resultados" | "/l/$loteria/volante" | "/l/$loteria/ajuda";
   loteria: LoteriaId;
   cor: string;
   icon: React.ReactNode;
