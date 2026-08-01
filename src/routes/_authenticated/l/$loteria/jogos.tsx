@@ -215,12 +215,14 @@ function Jogos() {
               variant="outline"
               size="sm"
               className="flex-1 sm:flex-none"
-              disabled={jogosFiltrados.length === 0}
+              disabled={vigentes.length === 0}
               onClick={() =>
                 exportarJogosPDF({
                   loteriaNome: cfg.nome,
                   cor: cfg.cor,
-                  jogos: jogosFiltrados.map((j) => ({
+                  titulo: "Jogos em aberto",
+                  sufixoArquivo: "em-aberto",
+                  jogos: vigentes.map((j) => ({
                     dezenas: j.dezenas,
                     score: j.score,
                     created_at: j.created_at,
@@ -229,7 +231,7 @@ function Jogos() {
               }
             >
               <Download className="mr-2 h-4 w-4" />
-              Baixar PDF
+              Baixar PDF (abertos)
             </Button>
             <Button size="sm" asChild className="flex-1 sm:flex-none">
               <Link to="/l/$loteria/volante" params={{ loteria }}>
