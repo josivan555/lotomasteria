@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { InfoDot } from "@/components/info-label";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { resumoOficialTodas } from "@/lib/loterias.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
@@ -106,7 +107,14 @@ function ResultadosPage() {
 
         {oficiais.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-2xl font-bold">Últimos sorteios oficiais</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-2xl font-bold">Últimos sorteios oficiais</h2>
+              <InfoDot
+                title="Resultados oficiais"
+                description="Os dados vêm direto da Caixa: dezenas sorteadas, ganhadores por faixa, valor dos prêmios, acumulado e data do próximo concurso."
+                dica="Se algum card não carregar, o serviço da Caixa pode estar fora do ar — tente novamente em instantes."
+              />
+            </div>
             <p className="mt-2 text-sm text-muted-foreground">
               Prêmios, ganhadores por faixa, acumulado e próximo concurso da Mega-Sena, Lotofácil
               e Quina — direto da Caixa.

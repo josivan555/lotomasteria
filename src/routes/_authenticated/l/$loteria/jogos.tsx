@@ -1,4 +1,5 @@
 import { createFileRoute, useRouter, useParams, Link } from "@tanstack/react-router";
+import { InfoDot } from "@/components/info-label";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -150,7 +151,15 @@ function Jogos() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-xl font-bold md:text-2xl">Meus Jogos · {cfg.nome}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold md:text-2xl">Meus Jogos · {cfg.nome}</h2>
+            <InfoDot
+              title="Meus jogos"
+              description="Todo jogo gerado é salvo aqui automaticamente e fica ligado ao concurso alvo. Em aberto ficam os concursos ainda não sorteados; os demais vão para o histórico."
+              exemplo="Use Gerar volante para imprimir os jogos em aberto no cartão oficial."
+              dica="Você pode exportar em PDF ou limpar todos os jogos a qualquer momento."
+            />
+          </div>
           <p className="text-sm text-muted-foreground">
             {jogosFiltrados.length} de {jogos.length} jogos
             {(dateFrom || dateTo) ? " (filtrados)" : " salvos"}

@@ -1,4 +1,5 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { InfoDot } from "@/components/info-label";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -108,7 +109,15 @@ function VolantePage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold">Volante · {cfg.nome}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold">Volante · {cfg.nome}</h2>
+            <InfoDot
+              title="Impressão no volante"
+              description="Esta tela imprime os quadradinhos pretos direto no volante oficial de papel. Você ajusta a posição das marcas na tela, salva a calibração e depois coloca os volantes na impressora."
+              exemplo="Margens em centímetros deslocam todas as marcas juntas, para a esquerda/direita e para cima/baixo."
+              dica="Faça um teste em papel comum, coloque por cima do volante contra a luz e ajuste as margens antes de gastar volantes de verdade."
+            />
+          </div>
           <p className="text-sm text-muted-foreground">
             Ajuste a calibração, salve e imprima os jogos direto no volante oficial.
           </p>
@@ -129,6 +138,11 @@ function VolantePage() {
               setIncluirAntigos(v);
               if (!v) setSelecionados(new Set());
             }}
+          />
+          <InfoDot
+            title="Incluir jogos já sorteados"
+            description="Por padrão só aparecem os jogos dos concursos que ainda não foram sorteados. Ative para escolher também jogos antigos, agrupados por concurso."
+            dica="Útil para reimprimir uma sequência que você gostou e quer jogar de novo."
           />
           <Label htmlFor="incluir-antigos" className="cursor-pointer text-sm">
             Incluir jogos de concursos já sorteados
