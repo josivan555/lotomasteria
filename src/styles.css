@@ -92,6 +92,57 @@
   --ring: oklch(0.72 0.18 155);
 }
 
+/* Tema imersivo por modalidade */
+:root {
+  --glow: oklch(0.22 0.05 155 / 40%);
+}
+
+[data-loteria="lotofacil"] {
+  --background: oklch(0.16 0.03 320);
+  --card: oklch(0.21 0.04 320);
+  --popover: oklch(0.21 0.04 320);
+  --secondary: oklch(0.28 0.05 320);
+  --muted: oklch(0.25 0.035 320);
+  --muted-foreground: oklch(0.74 0.03 320);
+  --primary: oklch(0.62 0.22 325);
+  --primary-foreground: oklch(0.98 0.01 325);
+  --accent: oklch(0.82 0.16 90);
+  --border: oklch(0.36 0.05 320 / 60%);
+  --input: oklch(0.28 0.04 320);
+  --ring: oklch(0.62 0.22 325);
+  --glow: oklch(0.35 0.16 325 / 40%);
+}
+
+[data-loteria="megasena"] {
+  --background: oklch(0.16 0.02 165);
+  --card: oklch(0.21 0.025 165);
+  --popover: oklch(0.21 0.025 165);
+  --secondary: oklch(0.28 0.03 165);
+  --muted: oklch(0.25 0.02 165);
+  --primary: oklch(0.72 0.18 155);
+  --primary-foreground: oklch(0.15 0.03 160);
+  --border: oklch(0.32 0.03 165 / 60%);
+  --input: oklch(0.28 0.02 165);
+  --ring: oklch(0.72 0.18 155);
+  --glow: oklch(0.28 0.12 155 / 45%);
+}
+
+[data-loteria="quina"] {
+  --background: oklch(0.15 0.035 265);
+  --card: oklch(0.2 0.045 265);
+  --popover: oklch(0.2 0.045 265);
+  --secondary: oklch(0.27 0.055 265);
+  --muted: oklch(0.24 0.04 265);
+  --muted-foreground: oklch(0.74 0.03 265);
+  --primary: oklch(0.6 0.19 265);
+  --primary-foreground: oklch(0.98 0.01 265);
+  --accent: oklch(0.82 0.16 90);
+  --border: oklch(0.36 0.06 265 / 60%);
+  --input: oklch(0.27 0.05 265);
+  --ring: oklch(0.6 0.19 265);
+  --glow: oklch(0.34 0.16 265 / 45%);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -100,17 +151,17 @@
     color-scheme: dark;
   }
   body {
-    background: radial-gradient(
-        ellipse at top,
-        oklch(0.22 0.05 155 / 40%),
-        transparent 60%
-      ),
+    background: radial-gradient(ellipse at top, var(--glow), transparent 60%),
       var(--color-background);
     color: var(--color-foreground);
     min-height: 100vh;
     font-feature-settings: "cv11", "ss01";
+    transition:
+      background-color 400ms ease,
+      color 400ms ease;
   }
 }
+
 
 @utility ball {
   display: inline-flex;
