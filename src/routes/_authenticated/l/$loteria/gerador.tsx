@@ -187,6 +187,11 @@ function Gerador() {
   const [excluir, setExcluir] = useState<number[]>([]);
   const [repetirMin, setRepetirMin] = useState(defaults.repetirAnteriorMin);
   const [repetirMax, setRepetirMax] = useState(defaults.repetirAnteriorMax);
+  const [adv, setAdv] = useState<AdvState>(() => advDefaults(cfg));
+
+  function setAdvField(k: AdvKey, patch: Partial<{ on: boolean; min: number; max: number }>) {
+    setAdv((prev) => ({ ...prev, [k]: { ...prev[k], ...patch } }));
+  }
 
   const [resultados, setResultados] = useState<Result[]>([]);
   const [iaPensando, setIaPensando] = useState(false);
@@ -205,8 +210,10 @@ function Gerador() {
     setExcluir([]);
     setRepetirMin(defaults.repetirAnteriorMin);
     setRepetirMax(defaults.repetirAnteriorMax);
+    setAdv(advDefaults(cfg));
     setResultados([]);
   }, [loteria]);
+
 
 
   function toggle(list: number[], set: (v: number[]) => void, n: number) {
