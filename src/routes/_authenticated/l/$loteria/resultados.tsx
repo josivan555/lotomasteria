@@ -255,9 +255,7 @@ function Resultados() {
   };
 
 
-  function baixarPDF() {
-    const g = conferidos[0];
-    if (!g) return;
+  function baixarPDFGrupo(g: (typeof grupos)[number]) {
     exportarResultadosPDF({
       loteriaNome: cfg.nome,
       cor: cfg.cor,
@@ -269,6 +267,13 @@ function Resultados() {
       tierLabel,
     });
   }
+
+  function baixarPDF() {
+    const g = conferidos[0];
+    if (!g) return;
+    baixarPDFGrupo(g);
+  }
+
 
   return (
     <div className="space-y-6">
