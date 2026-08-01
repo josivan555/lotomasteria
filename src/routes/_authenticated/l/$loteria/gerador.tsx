@@ -823,6 +823,7 @@ function Gerador() {
             <AdvRow
               k="fibonacci"
               label="Fibonacci"
+              icon={<Activity className="h-5 w-5" />}
               info={{
               description:
                 "Conta quantas dezenas pertencem à sequência de Fibonacci, em que cada número é a soma dos dois anteriores.",
