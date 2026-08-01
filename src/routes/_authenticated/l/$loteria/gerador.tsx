@@ -457,8 +457,9 @@ function Gerador() {
 
 
   const custoCreditos = creditosNecessarios(qtd);
+  const ilimitado = saldo?.unlimited ?? false;
   const saldoAtual = saldo?.balance ?? 0;
-  const semSaldo = saldoAtual + 1e-9 < custoCreditos;
+  const semSaldo = !ilimitado && saldoAtual + 1e-9 < custoCreditos;
 
   function gerar() {
     if (!stats) {
