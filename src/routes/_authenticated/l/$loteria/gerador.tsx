@@ -89,6 +89,49 @@ function salvarQtd(loteria: string, qtd: number) {
   }
 }
 
+// ---- Persistência da configuração completa de filtros por modalidade ----
+const CFG_KEY = "lotomaster:config-gerador";
+
+type ConfigSalva = {
+  tamanho: number;
+  somaMin: number;
+  somaMax: number;
+  paresMin: number;
+  paresMax: number;
+  maxConsecutivas: number;
+  molduraMin: number;
+  molduraMax: number;
+  incluir: number[];
+  excluir: number[];
+  repetirMin: number;
+  repetirMax: number;
+  adv: AdvState;
+};
+
+function lerConfig(loteria: string): Partial<ConfigSalva> | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(CFG_KEY);
+    if (!raw) return null;
+    const map = JSON.parse(raw) as Record<string, Partial<ConfigSalva>>;
+    return map[loteria] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function salvarConfig(loteria: string, cfgSalva: ConfigSalva) {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = window.localStorage.getItem(CFG_KEY);
+    const map = raw ? (JSON.parse(raw) as Record<string, ConfigSalva>) : {};
+    map[loteria] = cfgSalva;
+    window.localStorage.setItem(CFG_KEY, JSON.stringify(map));
+  } catch {
+    /* ignora */
+  }
+}
+
 export const Route = createFileRoute("/_authenticated/l/$loteria/gerador")({
   component: Gerador,
 });
@@ -195,24 +238,63 @@ function Gerador() {
 
   const [resultados, setResultados] = useState<Result[]>([]);
   const [iaPensando, setIaPensando] = useState(false);
+  const [configCarregada, setConfigCarregada] = useState<string | null>(null);
 
-  // Sempre que o usuário troca de modalidade, reseta os filtros para os padrões da loteria selecionada
+  // Ao trocar de modalidade: carrega a configuração salva dela, ou os padrões
   useEffect(() => {
-    setTamanho(cfg.tamanho);
-    setSomaMin(defaults.somaMin);
-    setSomaMax(defaults.somaMax);
-    setParesMin(defaults.paresMin);
-    setParesMax(defaults.paresMax);
-    setMaxConsecutivas(defaults.maxConsecutivas);
-    setMolduraMin(defaults.molduraMin ?? 0);
-    setMolduraMax(defaults.molduraMax ?? cfg.tamanho);
-    setIncluir([]);
-    setExcluir([]);
-    setRepetirMin(defaults.repetirAnteriorMin);
-    setRepetirMax(defaults.repetirAnteriorMax);
-    setAdv(advDefaults(cfg));
+    const s = lerConfig(loteria);
+    setTamanho(s?.tamanho ?? cfg.tamanho);
+    setSomaMin(s?.somaMin ?? defaults.somaMin);
+    setSomaMax(s?.somaMax ?? defaults.somaMax);
+    setParesMin(s?.paresMin ?? defaults.paresMin);
+    setParesMax(s?.paresMax ?? defaults.paresMax);
+    setMaxConsecutivas(s?.maxConsecutivas ?? defaults.maxConsecutivas);
+    setMolduraMin(s?.molduraMin ?? defaults.molduraMin ?? 0);
+    setMolduraMax(s?.molduraMax ?? defaults.molduraMax ?? cfg.tamanho);
+    setIncluir(s?.incluir ?? []);
+    setExcluir(s?.excluir ?? []);
+    setRepetirMin(s?.repetirMin ?? defaults.repetirAnteriorMin);
+    setRepetirMax(s?.repetirMax ?? defaults.repetirAnteriorMax);
+    setAdv({ ...advDefaults(cfg), ...(s?.adv ?? {}) });
     setResultados([]);
+    setConfigCarregada(loteria);
   }, [loteria]);
+
+  // Salva automaticamente qualquer alteração de filtro desta modalidade
+  useEffect(() => {
+    if (configCarregada !== loteria) return;
+    salvarConfig(loteria, {
+      tamanho,
+      somaMin,
+      somaMax,
+      paresMin,
+      paresMax,
+      maxConsecutivas,
+      molduraMin,
+      molduraMax,
+      incluir,
+      excluir,
+      repetirMin,
+      repetirMax,
+      adv,
+    });
+  }, [
+    configCarregada,
+    loteria,
+    tamanho,
+    somaMin,
+    somaMax,
+    paresMin,
+    paresMax,
+    maxConsecutivas,
+    molduraMin,
+    molduraMax,
+    incluir,
+    excluir,
+    repetirMin,
+    repetirMax,
+    adv,
+  ]);
 
 
 
