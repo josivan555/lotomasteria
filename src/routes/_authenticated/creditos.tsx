@@ -103,14 +103,20 @@ function CreditosPage() {
             <p className="text-xs uppercase tracking-widest text-muted-foreground">Seu saldo</p>
             <p className="flex items-center gap-2 text-3xl font-bold">
               <Coins className="h-7 w-7 text-primary" />
-              {formatCreditos(saldo?.balance ?? 0)}
+              {saldo?.unlimited ? "∞" : formatCreditos(saldo?.balance ?? 0)}
               <span className="text-base font-normal text-muted-foreground">créditos</span>
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              1 crédito = {JOGOS_POR_CREDITO} jogos gerados (cada jogo custa{" "}
-              {formatCreditos(1 / JOGOS_POR_CREDITO)} crédito) · equivale a{" "}
-              {Math.floor((saldo?.balance ?? 0) * JOGOS_POR_CREDITO)} jogos
-            </p>
+            {saldo?.unlimited ? (
+              <p className="mt-1 text-sm text-muted-foreground">
+                Conta de administrador: créditos ilimitados, nenhuma geração é cobrada.
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-muted-foreground">
+                1 crédito = {JOGOS_POR_CREDITO} jogos gerados (cada jogo custa{" "}
+                {formatCreditos(1 / JOGOS_POR_CREDITO)} crédito) · equivale a{" "}
+                {Math.floor((saldo?.balance ?? 0) * JOGOS_POR_CREDITO)} jogos
+              </p>
+            )}
           </div>
           <Button asChild variant="outline">
             <Link to="/loterias">Voltar às loterias</Link>
