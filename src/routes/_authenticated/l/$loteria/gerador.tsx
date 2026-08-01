@@ -390,6 +390,12 @@ function Gerador() {
                 {iaPensando ? "IA analisando..." : "IA configurar"}
               </Button>
             </div>
+            {iaPensando && (
+              <div className="mt-2 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>IA analisando o histórico e ajustando filtros...</span>
+              </div>
+            )}
             <div className="mt-2 flex flex-wrap items-center gap-2">
               {[1, 2, 5, 10, 50, 100, 500].map((v) => (
                 <Button
