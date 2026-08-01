@@ -55,10 +55,10 @@ function Jogos() {
     onError: (e) => toast.error(e.message),
   });
 
-  const delAll = useMutation({
-    mutationFn: () => excluirTodos({ data: { loteria } }),
-    onSuccess: () => {
-      toast.success("Todos os jogos desta loteria foram removidos");
+  const delLote = useMutation({
+    mutationFn: (ids: string[]) => excluirLote({ data: { ids } }),
+    onSuccess: (_d, ids) => {
+      toast.success(`${ids.length} jogo${ids.length === 1 ? "" : "s"} removido${ids.length === 1 ? "" : "s"}`);
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
@@ -67,6 +67,9 @@ function Jogos() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [aberto, setAberto] = useState<number | null>(null);
+  const [pagina, setPagina] = useState(1);
+  const [porPagina, setPorPagina] = useState(5);
+
 
   const jogosFiltrados = useMemo(() => {
     if (!dateFrom && !dateTo) return jogos;
