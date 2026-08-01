@@ -605,6 +605,7 @@ function Gerador() {
                 description="Quantos jogos serão gerados de uma vez, de 1 até 500. Cada jogo consome créditos do seu saldo."
                 exemplo="5 jogos = 1 crédito."
                 dica="Escolha a quantidade ANTES de clicar em IA configurar: a IA ajusta os filtros conforme o volume."
+                icon={<IconQuantity />}
               />
               <Button
                 size="sm"
