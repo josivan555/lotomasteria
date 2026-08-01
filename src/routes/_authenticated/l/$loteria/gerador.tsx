@@ -914,6 +914,7 @@ function Gerador() {
             <AdvRow
               k="paresConsec"
               label="Pares consecutivos"
+              icon={<ArrowRightLeft className="h-5 w-5" />}
               info={{
               description:
                 "Conta as duplas de números seguidos dentro do jogo. Diferente de Máx. consecutivas, que limita o tamanho da maior sequência.",
