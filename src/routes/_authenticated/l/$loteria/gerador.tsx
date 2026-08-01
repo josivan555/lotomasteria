@@ -936,6 +936,7 @@ function Gerador() {
               description="Dezenas fixas: aparecem em todos os jogos gerados."
               exemplo="Marque seus números da sorte para que nunca fiquem de fora."
               dica="Fixar muitas dezenas reduz a variedade dos jogos e pode conflitar com os filtros."
+              icon={<Pin className="h-5 w-5" />}
             />
             <NumbersPicker
               numbers={nums}
