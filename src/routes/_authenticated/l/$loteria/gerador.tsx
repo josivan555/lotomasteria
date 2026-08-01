@@ -711,6 +711,7 @@ function Gerador() {
 
           <RangeRow
             label="Soma"
+            icon={<IconSigma />}
             info={{
               description:
                 "Soma de todas as dezenas do jogo. Somas muito baixas (só números pequenos) ou muito altas (só números grandes) são raras nos sorteios reais.",
