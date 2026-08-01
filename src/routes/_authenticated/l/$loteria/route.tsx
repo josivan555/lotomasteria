@@ -46,8 +46,16 @@ function SaldoBadge() {
 
 function LoteriaLayout() {
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria" });
+
+  useEffect(() => {
+    if (!isLoteriaId(loteria)) return;
+    document.documentElement.setAttribute("data-loteria", loteria);
+    return () => document.documentElement.removeAttribute("data-loteria");
+  }, [loteria]);
+
   if (!isLoteriaId(loteria)) return null;
   const cfg = LOTERIAS[loteria];
+
 
   return (
     <div className="space-y-6">
