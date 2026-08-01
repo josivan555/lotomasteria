@@ -215,12 +215,14 @@ function Jogos() {
               variant="outline"
               size="sm"
               className="flex-1 sm:flex-none"
-              disabled={jogosFiltrados.length === 0}
+              disabled={vigentes.length === 0}
               onClick={() =>
                 exportarJogosPDF({
                   loteriaNome: cfg.nome,
                   cor: cfg.cor,
-                  jogos: jogosFiltrados.map((j) => ({
+                  titulo: "Jogos em aberto",
+                  sufixoArquivo: "em-aberto",
+                  jogos: vigentes.map((j) => ({
                     dezenas: j.dezenas,
                     score: j.score,
                     created_at: j.created_at,
@@ -229,7 +231,7 @@ function Jogos() {
               }
             >
               <Download className="mr-2 h-4 w-4" />
-              Baixar PDF
+              Baixar PDF (abertos)
             </Button>
             <Button size="sm" asChild className="flex-1 sm:flex-none">
               <Link to="/l/$loteria/volante" params={{ loteria }}>
@@ -352,6 +354,26 @@ function Jogos() {
                             {g.itens.length} jogo{g.itens.length === 1 ? "" : "s"}
                           </span>
                         </button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          aria-label={`Baixar PDF do concurso ${g.numero}`}
+                          onClick={() =>
+                            exportarJogosPDF({
+                              loteriaNome: cfg.nome,
+                              cor: cfg.cor,
+                              titulo: `Concurso ${g.numero}`,
+                              sufixoArquivo: `concurso-${g.numero}`,
+                              jogos: g.itens.map((j) => ({
+                                dezenas: j.dezenas,
+                                score: j.score,
+                                created_at: j.created_at,
+                              })),
+                            })
+                          }
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
                         <Button
                           size="sm"
                           variant="ghost"

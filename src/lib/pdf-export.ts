@@ -24,11 +24,13 @@ export function exportarJogosPDF(opts: {
   loteriaNome: string;
   cor: string;
   jogos: { dezenas: number[]; score?: number | null; created_at: string }[];
+  titulo?: string;
+  sufixoArquivo?: string;
 }) {
   const doc = new jsPDF();
   header(
     doc,
-    `Meus Jogos · ${opts.loteriaNome}`,
+    `${opts.titulo ?? "Meus Jogos"} · ${opts.loteriaNome}`,
     `${opts.jogos.length} jogos · Gerado em ${new Date().toLocaleString("pt-BR")}`,
     opts.cor,
   );
@@ -47,7 +49,9 @@ export function exportarJogosPDF(opts: {
     columnStyles: { 2: { font: "courier", fontStyle: "bold" } },
   });
 
-  doc.save(`meus-jogos-${opts.loteriaNome.toLowerCase().replace(/\s+/g, "-")}.pdf`);
+  doc.save(
+    `meus-jogos-${opts.loteriaNome.toLowerCase().replace(/\s+/g, "-")}${opts.sufixoArquivo ? `-${opts.sufixoArquivo}` : ""}.pdf`,
+  );
 }
 
 export function exportarResultadosPDF(opts: {
