@@ -178,7 +178,6 @@ function Gerador() {
       return;
     }
     setIaPensando(true);
-    toast.info("IA analisando o histórico e ajustando filtros...");
     await new Promise((resolve) => setTimeout(resolve, 2500));
     try {
       // Coleta métricas históricas
