@@ -72,6 +72,49 @@ function Historico() {
 
       </div>
 
+      <div className="rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Último concurso sincronizado
+            </p>
+            <p className="text-lg font-bold">
+              {statusSync?.ultimoNumero ?? "—"}
+              {statusSync?.ultimaDataApuracao && (
+                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                  {new Date(statusSync.ultimaDataApuracao + "T00:00:00").toLocaleDateString("pt-BR")}
+                </span>
+              )}
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Última atualização</p>
+            <p className="text-lg font-bold">
+              {statusSync?.ultimaAtualizacao
+                ? new Date(statusSync.ultimaAtualizacao).toLocaleString("pt-BR")
+                : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Situação</p>
+            {emDia === null ? (
+              <p className="text-sm text-muted-foreground">Não foi possível consultar a Caixa</p>
+            ) : emDia ? (
+              <p className="flex items-center gap-1.5 text-sm font-semibold text-emerald-500">
+                <CheckCircle2 className="h-4 w-4" /> Em dia (oficial: {statusSync?.ultimoOficial})
+              </p>
+            ) : (
+              <p className="flex items-center gap-1.5 text-sm font-semibold text-amber-500">
+                <AlertTriangle className="h-4 w-4" />
+                Faltam {(statusSync!.ultimoOficial ?? 0) - (statusSync!.ultimoNumero ?? 0)} concursos (oficial:{" "}
+                {statusSync?.ultimoOficial})
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+
       <Input
         placeholder="Buscar por número do concurso..."
         value={query}
