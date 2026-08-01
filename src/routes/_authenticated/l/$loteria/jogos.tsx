@@ -31,7 +31,7 @@ function Jogos() {
 
   const listar = useServerFn(listarJogosSalvos);
   const excluir = useServerFn(excluirJogo);
-  const excluirTodos = useServerFn(excluirTodosJogos);
+  const excluirLote = useServerFn(excluirJogosPorIds);
   const router = useRouter();
 
   const { data: jogos = [], isLoading } = useQuery({
