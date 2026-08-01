@@ -867,6 +867,7 @@ function Gerador() {
             <AdvRow
               k="coluna"
               label="Dezenas por coluna"
+              icon={<Columns3 className="h-5 w-5" />}
               info={{
               description:
                 "Mesma ideia da linha, só que na vertical: mínimo e máximo de dezenas em CADA coluna do volante.",
