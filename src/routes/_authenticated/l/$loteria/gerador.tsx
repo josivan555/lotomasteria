@@ -10,17 +10,58 @@ import {
   gerarJogos,
   classificarScore,
   allNumbers,
+  analisarJogo,
+  gridColunas,
   type Filtros,
 } from "@/lib/loteria-utils";
-import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
+import { LOTERIAS, isLoteriaId, type LoteriaConfig } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Bookmark, Dice5, Download, Sparkles, Info, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
+
+type AdvKey =
+  | "primos"
+  | "fibonacci"
+  | "mult3"
+  | "linha"
+  | "coluna"
+  | "miolo"
+  | "ausentes"
+  | "paresConsec";
+
+type AdvState = Record<AdvKey, { on: boolean; min: number; max: number }>;
+
+function advDefaults(cfg: LoteriaConfig): AdvState {
+  const t = cfg.tamanho;
+  const cols = gridColunas(cfg);
+  const rows = Math.ceil(cfg.total / cols);
+  const prop = (a: number, b: number) => ({
+    on: false,
+    min: Math.max(0, Math.round((a / 15) * t)),
+    max: Math.min(t, Math.round((b / 15) * t)),
+  });
+  const porCel = (divisor: number) => {
+    const m = t / divisor;
+    return { on: false, min: Math.max(0, Math.floor(m) - 1), max: Math.ceil(m) + 1 };
+  };
+  return {
+    primos: prop(4, 6),
+    fibonacci: prop(3, 5),
+    mult3: prop(4, 6),
+    linha: porCel(rows),
+    coluna: porCel(cols),
+    miolo: prop(4, 6),
+    ausentes: prop(5, 7),
+    paresConsec: prop(3, 7),
+  };
+}
+
 
 const QTD_KEY = "lotomaster:qtd-personalizada";
 
@@ -146,6 +187,11 @@ function Gerador() {
   const [excluir, setExcluir] = useState<number[]>([]);
   const [repetirMin, setRepetirMin] = useState(defaults.repetirAnteriorMin);
   const [repetirMax, setRepetirMax] = useState(defaults.repetirAnteriorMax);
+  const [adv, setAdv] = useState<AdvState>(() => advDefaults(cfg));
+
+  function setAdvField(k: AdvKey, patch: Partial<{ on: boolean; min: number; max: number }>) {
+    setAdv((prev) => ({ ...prev, [k]: { ...prev[k], ...patch } }));
+  }
 
   const [resultados, setResultados] = useState<Result[]>([]);
   const [iaPensando, setIaPensando] = useState(false);
@@ -164,8 +210,10 @@ function Gerador() {
     setExcluir([]);
     setRepetirMin(defaults.repetirAnteriorMin);
     setRepetirMax(defaults.repetirAnteriorMax);
+    setAdv(advDefaults(cfg));
     setResultados([]);
   }, [loteria]);
+
 
 
   function toggle(list: number[], set: (v: number[]) => void, n: number) {
@@ -235,9 +283,31 @@ function Gerador() {
       const cM = mean(consecs), cS = std(consecs);
       setMaxConsecutivas(clamp(cM + tol * cS, 2, 10));
 
+      // Filtros avançados: faixas calculadas a partir do histórico real
+      const amostra = concursos.slice(0, 300);
+      const an = amostra.map((c) => analisarJogo(cfg, c.dezenas));
+      const faixa = (vals: number[], lo: number, hi: number) => {
+        if (!vals.length) return null;
+        const m = mean(vals), s = std(vals);
+        return { min: clamp(m - tol * s, lo, hi), max: clamp(m + tol * s, lo, hi) };
+      };
+      const aplica = (k: AdvKey, vals: number[], lo = 0, hi = cfg.tamanho) => {
+        const f = faixa(vals, lo, hi);
+        if (f) setAdvField(k, f);
+      };
+      aplica("primos", an.map((x) => x.primos));
+      aplica("fibonacci", an.map((x) => x.fibonacci));
+      aplica("mult3", an.map((x) => x.mult3));
+      aplica("paresConsec", an.map((x) => x.paresConsecutivos));
+      aplica("linha", an.flatMap((x) => x.porLinha));
+      aplica("coluna", an.flatMap((x) => x.porColuna));
+      if (cfg.moldura) aplica("miolo", an.map((x) => x.centro));
+      if (repeats.length) aplica("ausentes", repeats.map((r) => cfg.tamanho - r));
+
       setIncluir([]);
       setExcluir([]);
       toast.success(`Filtros ajustados pela IA para ${qtd} jogo(s).`);
+
     } finally {
       setIaPensando(false);
     }
@@ -261,6 +331,9 @@ function Gerador() {
       return;
     }
 
+    const rng = (k: AdvKey) =>
+      adv[k].on ? { min: adv[k].min, max: adv[k].max } : { min: undefined, max: undefined };
+
     const filtros: Filtros = {
       somaMin,
       somaMax,
@@ -273,7 +346,24 @@ function Gerador() {
       excluir,
       repetirAnteriorMin: repetirMin,
       repetirAnteriorMax: repetirMax,
+      primosMin: rng("primos").min,
+      primosMax: rng("primos").max,
+      fibonacciMin: rng("fibonacci").min,
+      fibonacciMax: rng("fibonacci").max,
+      mult3Min: rng("mult3").min,
+      mult3Max: rng("mult3").max,
+      linhaMin: rng("linha").min,
+      linhaMax: rng("linha").max,
+      colunaMin: rng("coluna").min,
+      colunaMax: rng("coluna").max,
+      mioloMin: cfg.moldura ? rng("miolo").min : undefined,
+      mioloMax: cfg.moldura ? rng("miolo").max : undefined,
+      ausentesMin: rng("ausentes").min,
+      ausentesMax: rng("ausentes").max,
+      paresConsecutivosMin: rng("paresConsec").min,
+      paresConsecutivosMax: rng("paresConsec").max,
     };
+
     const anterior = concursos[0]?.dezenas;
     const jogos = gerarJogos(cfg, qtd, stats.scores, filtros, anterior, tamanho);
     if (!jogos.length) {
@@ -528,6 +618,85 @@ function Gerador() {
             />
           </div>
 
+          <div className="space-y-3 rounded-xl border border-border/60 bg-background/40 p-3">
+            <div>
+              <p className="text-sm font-semibold">Filtros avançados</p>
+              <p className="text-xs text-muted-foreground">
+                Opcionais e desligados por padrão. Ative só os que quiser — usar muitos ao mesmo
+                tempo pode deixar o gerador sem jogos válidos.
+              </p>
+            </div>
+
+            <AdvRow
+              k="primos"
+              label="Primos"
+              info="Quantidade de números primos no jogo (2, 3, 5, 7, 11...). Sorteios reais quase sempre trazem uma faixa parecida de primos."
+              state={adv.primos}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="fibonacci"
+              label="Fibonacci"
+              info="Quantidade de dezenas da sequência de Fibonacci (1, 2, 3, 5, 8, 13, 21, 34, 55, 89) presentes no jogo."
+              state={adv.fibonacci}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="mult3"
+              label="Múltiplos de 3"
+              info="Quantidade de dezenas divisíveis por 3 (3, 6, 9, 12...). Ajuda a evitar jogos concentrados em um só tipo de número."
+              state={adv.mult3}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="linha"
+              label="Dezenas por linha"
+              info="Espalha o jogo pelo volante: define o mínimo e o máximo de dezenas em CADA linha do cartão."
+              state={adv.linha}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="coluna"
+              label="Dezenas por coluna"
+              info="Mesma ideia da linha, mas na vertical: mínimo e máximo de dezenas em CADA coluna do volante."
+              state={adv.coluna}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            {cfg.moldura && (
+              <AdvRow
+                k="miolo"
+                label="Miolo"
+                info="Quantas dezenas do centro do volante (fora da moldura) o jogo deve conter."
+                state={adv.miolo}
+                onChange={setAdvField}
+                maxLimit={tamanho}
+              />
+            )}
+            <AdvRow
+              k="ausentes"
+              label="Ausentes do último concurso"
+              info="Quantas dezenas do jogo NÃO saíram no último sorteio — o oposto do filtro 'Repetir do anterior'."
+              state={adv.ausentes}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="paresConsec"
+              label="Pares consecutivos"
+              info="Quantidade de duplas de números seguidos no jogo (ex.: 04-05, 12-13). Diferente de 'Máx. consecutivas', que limita o tamanho da maior sequência."
+              state={adv.paresConsec}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+          </div>
+
+
+
           <div>
             <InfoLabel
               label="Incluir sempre"
@@ -723,6 +892,54 @@ function NumbersPicker({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+function AdvRow({
+  k,
+  label,
+  info,
+  state,
+  onChange,
+  maxLimit,
+}: {
+  k: AdvKey;
+  label: string;
+  info: string;
+  state: { on: boolean; min: number; max: number };
+  onChange: (k: AdvKey, patch: Partial<{ on: boolean; min: number; max: number }>) => void;
+  maxLimit: number;
+}) {
+  return (
+    <div className="rounded-lg border border-border/50 bg-card/40 p-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <InfoLabel label={label} description={info} />
+        <Switch
+          checked={state.on}
+          onCheckedChange={(v) => onChange(k, { on: v })}
+          aria-label={`Ativar filtro ${label}`}
+        />
+      </div>
+      {state.on && (
+        <div className="mt-2 flex items-center gap-2">
+          <Input
+            type="number"
+            value={state.min}
+            min={0}
+            max={maxLimit}
+            onChange={(e) => onChange(k, { min: +e.target.value })}
+          />
+          <span className="text-muted-foreground">até</span>
+          <Input
+            type="number"
+            value={state.max}
+            min={0}
+            max={maxLimit}
+            onChange={(e) => onChange(k, { max: +e.target.value })}
+          />
+        </div>
+      )}
     </div>
   );
 }
