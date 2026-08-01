@@ -10,17 +10,58 @@ import {
   gerarJogos,
   classificarScore,
   allNumbers,
+  analisarJogo,
+  gridColunas,
   type Filtros,
 } from "@/lib/loteria-utils";
-import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
+import { LOTERIAS, isLoteriaId, type LoteriaConfig } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Bookmark, Dice5, Download, Sparkles, Info, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
+
+type AdvKey =
+  | "primos"
+  | "fibonacci"
+  | "mult3"
+  | "linha"
+  | "coluna"
+  | "miolo"
+  | "ausentes"
+  | "paresConsec";
+
+type AdvState = Record<AdvKey, { on: boolean; min: number; max: number }>;
+
+function advDefaults(cfg: LoteriaConfig): AdvState {
+  const t = cfg.tamanho;
+  const cols = gridColunas(cfg);
+  const rows = Math.ceil(cfg.total / cols);
+  const prop = (a: number, b: number) => ({
+    on: false,
+    min: Math.max(0, Math.round((a / 15) * t)),
+    max: Math.min(t, Math.round((b / 15) * t)),
+  });
+  const porCel = (divisor: number) => {
+    const m = t / divisor;
+    return { on: false, min: Math.max(0, Math.floor(m) - 1), max: Math.ceil(m) + 1 };
+  };
+  return {
+    primos: prop(4, 6),
+    fibonacci: prop(3, 5),
+    mult3: prop(4, 6),
+    linha: porCel(rows),
+    coluna: porCel(cols),
+    miolo: prop(4, 6),
+    ausentes: prop(5, 7),
+    paresConsec: prop(3, 7),
+  };
+}
+
 
 const QTD_KEY = "lotomaster:qtd-personalizada";
 
