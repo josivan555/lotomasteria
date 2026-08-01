@@ -20,8 +20,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bookmark, Dice5, Download, Sparkles, Info, AlertTriangle, Loader2 } from "lucide-react";
+import { InfoLabel, type InfoContent } from "@/components/info-label";
+import { Bookmark, Dice5, Download, Sparkles, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 
@@ -137,36 +137,6 @@ export const Route = createFileRoute("/_authenticated/l/$loteria/gerador")({
 });
 
 type Result = { dezenas: number[]; score: number };
-
-function InfoLabel({ label, description }: { label: string; description: string }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <Label>{label}</Label>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="inline-flex text-muted-foreground transition hover:text-foreground"
-            aria-label={`Informações sobre ${label}`}
-          >
-            <Info className="h-4 w-4" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent
-          side="bottom"
-          align="start"
-          sideOffset={8}
-          className="w-[min(18rem,calc(100vw-2rem))] md:w-72"
-        >
-          <p className="text-sm font-semibold">{label}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
-}
-
 
 function Gerador() {
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria/gerador" });
@@ -902,7 +872,7 @@ function RangeRow({
   maxLimit = 400,
 }: {
   label: string;
-  info?: string;
+  info?: InfoContent;
   min: number;
   max: number;
   setMin: (n: number) => void;
@@ -913,7 +883,7 @@ function RangeRow({
   return (
     <div>
       {info ? (
-        <InfoLabel label={label} description={info} />
+        <InfoLabel label={label} {...info} />
       ) : (
         <Label>{label}</Label>
       )}
@@ -988,7 +958,7 @@ function AdvRow({
 }: {
   k: AdvKey;
   label: string;
-  info: string;
+  info: InfoContent;
   state: { on: boolean; min: number; max: number };
   onChange: (k: AdvKey, patch: Partial<{ on: boolean; min: number; max: number }>) => void;
   maxLimit: number;
@@ -996,7 +966,7 @@ function AdvRow({
   return (
     <div className="rounded-lg border border-border/50 bg-card/40 p-2.5">
       <div className="flex items-center justify-between gap-2">
-        <InfoLabel label={label} description={info} />
+        <InfoLabel label={label} {...info} />
         <Switch
           checked={state.on}
           onCheckedChange={(v) => onChange(k, { on: v })}
