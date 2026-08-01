@@ -1,7 +1,6 @@
 import { createFileRoute, useRouter, Link, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useJanelaAnalise, aplicarJanela, BASE_ALVO } from "@/lib/janela-analise";
-import { JanelaAnalise } from "@/components/janela-analise";
 
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -39,7 +38,7 @@ function Dashboard() {
     queryFn: () => listar({ data: { loteria } }),
   });
 
-  const { janela, setJanela } = useJanelaAnalise(loteria);
+  const { janela } = useJanelaAnalise(loteria);
   const concursos = useMemo(() => aplicarJanela(concursosAll, janela), [concursosAll, janela]);
 
   const { data: ultimoOficial } = useQuery({
@@ -133,7 +132,7 @@ function Dashboard() {
         </div>
       </div>
 
-      <JanelaAnalise total={concursosAll.length} janela={janela} onChange={setJanela} />
+      
 
 
 

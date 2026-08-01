@@ -9,6 +9,8 @@ import { RefreshCw, CheckCircle2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useJanelaAnalise } from "@/lib/janela-analise";
+import { JanelaAnalise } from "@/components/janela-analise";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/historico")({
   component: Historico,
@@ -26,6 +28,7 @@ function Historico() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
+  const { janela, setJanela } = useJanelaAnalise(loteria);
 
   const { data: concursos = [], isLoading } = useQuery({
     queryKey: ["concursos", loteria],
@@ -116,6 +119,7 @@ function Historico() {
         </div>
       </div>
 
+      <JanelaAnalise total={concursos.length} janela={janela} onChange={setJanela} />
 
       <Input
         placeholder="Buscar por número do concurso..."
