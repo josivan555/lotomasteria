@@ -50,15 +50,29 @@ function Dashboard() {
 
 
   const syncMut = useMutation({
-    mutationFn: () => sync({ data: { loteria, limite: 100 } }),
+    mutationFn: async () => {
+      let inseridos = 0;
+      let faltam = 0;
+      // Preenche a base ate ~BASE_ALVO concursos, em lotes de 200
+      for (let i = 0; i < 5; i++) {
+        const r = await sync({ data: { loteria, limite: 200 } });
+        inseridos += r.inseridos;
+        faltam = r.faltam;
+        const total = concursosAll.length + inseridos;
+        if (r.inseridos === 0 || total >= BASE_ALVO) break;
+      }
+      return { inseridos, faltam };
+    },
     onSuccess: (r) => {
       toast.success(
         r.inseridos === 0
           ? "Já está atualizado!"
           : `+${r.inseridos} concursos sincronizados${r.faltam ? ` — faltam ${r.faltam}` : ""}`,
       );
+      queryClient.invalidateQueries({ queryKey: ["concursos", loteria] });
       router.invalidate();
     },
+
     onError: (e) => toast.error(e.message),
   });
 
