@@ -20,8 +20,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bookmark, Dice5, Download, Sparkles, Info, AlertTriangle, Loader2 } from "lucide-react";
+import { InfoLabel, type InfoContent } from "@/components/info-label";
+import { Bookmark, Dice5, Download, Sparkles, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 
@@ -137,36 +137,6 @@ export const Route = createFileRoute("/_authenticated/l/$loteria/gerador")({
 });
 
 type Result = { dezenas: number[]; score: number };
-
-function InfoLabel({ label, description }: { label: string; description: string }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <Label>{label}</Label>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="inline-flex text-muted-foreground transition hover:text-foreground"
-            aria-label={`Informações sobre ${label}`}
-          >
-            <Info className="h-4 w-4" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent
-          side="bottom"
-          align="start"
-          sideOffset={8}
-          className="w-[min(18rem,calc(100vw-2rem))] md:w-72"
-        >
-          <p className="text-sm font-semibold">{label}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
-}
-
 
 function Gerador() {
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria/gerador" });
@@ -544,7 +514,9 @@ function Gerador() {
             <div className="flex items-center justify-between gap-2">
               <InfoLabel
                 label="Quantidade"
-                description="Define quantos jogos serão gerados de uma só vez, de 1 até 500."
+                description="Quantos jogos serão gerados de uma vez, de 1 até 500. Cada jogo consome créditos do seu saldo."
+                exemplo="5 jogos = 1 crédito."
+                dica="Escolha a quantidade ANTES de clicar em IA configurar: a IA ajusta os filtros conforme o volume."
               />
               <Button
                 size="sm"
@@ -600,7 +572,9 @@ function Gerador() {
           <div>
             <InfoLabel
               label="Dezenas por jogo"
-              description={`Quantos números cada jogo terá. Mínimo ${cfg.tamanhoMin}, máximo ${cfg.tamanhoMax}. O padrão da ${cfg.nome} é ${cfg.tamanho}.`}
+              description={`Quantos números cada jogo terá. Mínimo ${cfg.tamanhoMin}, máximo ${cfg.tamanhoMax}.`}
+              faixa={`Padrão da ${cfg.nome}: ${cfg.tamanho} dezenas.`}
+              dica="Mais dezenas aumentam a chance de acerto, mas a loteria cobra bem mais caro por esse jogo."
             />
             <div className="mt-2 flex items-center gap-2">
               <Button
@@ -647,7 +621,13 @@ function Gerador() {
 
           <RangeRow
             label="Soma"
-            info="Limita a soma total das dezenas do jogo. Apenas jogos cuja soma esteja dentro do intervalo mínimo e máximo são aceitos."
+            info={{
+              description:
+                "Soma de todas as dezenas do jogo. Somas muito baixas (só números pequenos) ou muito altas (só números grandes) são raras nos sorteios reais.",
+              faixa: "Use a faixa central do histórico — o botão IA configurar calcula isso pra você.",
+              exemplo: "Jogo 01-02-03-04-05... tem soma baixa; 20-21-22-23... tem soma alta.",
+              dica: "Faixa muito estreita descarta quase tudo e o gerador pode não achar jogos.",
+            }}
             min={somaMin}
             max={somaMax}
             setMin={setSomaMin}
@@ -655,7 +635,13 @@ function Gerador() {
           />
           <RangeRow
             label="Pares"
-            info="Define quantos números pares devem aparecer em cada jogo, ajudando no equilíbrio entre pares e ímpares."
+            info={{
+              description:
+                "Quantidade de números pares no jogo. O restante são ímpares. Sorteios reais quase sempre ficam próximos do equilíbrio.",
+              faixa: "Perto da metade das dezenas do jogo, com 1 ou 2 de folga para cada lado.",
+              exemplo: "Num jogo de 15 dezenas, algo entre 6 e 9 pares.",
+              dica: "Evite exigir todos pares ou todos ímpares: praticamente nunca acontece.",
+            }}
             min={paresMin}
             max={paresMax}
             setMin={setParesMin}
@@ -666,7 +652,13 @@ function Gerador() {
           {cfg.moldura && (
             <RangeRow
               label="Moldura"
-              info="Lotofácil: quantas dezenas do jogo devem estar na borda do volante (moldura), um padrão estatístico recorrente nos sorteios."
+              info={{
+                description:
+                  "Moldura são as dezenas da borda do cartão. O restante é o miolo (centro). A distribuição entre borda e centro se repete bastante nos sorteios.",
+                faixa: "9 a 11 dezenas na moldura, num jogo de 15.",
+                exemplo: "Na Lotofácil a moldura tem 16 dezenas e o miolo 9.",
+                dica: "Combine com o filtro Miolo para controlar os dois lados do volante.",
+              }}
               min={molduraMin}
               max={molduraMax}
               setMin={setMolduraMin}
@@ -677,7 +669,13 @@ function Gerador() {
           )}
           <RangeRow
             label="Repetir do anterior"
-            info="Quantas dezenas do último concurso oficial devem se repetir no próximo jogo gerado."
+            info={{
+              description:
+                "Quantas dezenas do último concurso oficial devem aparecer de novo no jogo gerado. É comum vários números repetirem de um sorteio para o outro.",
+              faixa: "Em torno da média histórica de repetições da modalidade.",
+              exemplo: "Na Lotofácil costumam repetir de 8 a 10 das 15 dezenas.",
+              dica: "Sincronize o histórico antes: o filtro usa o último resultado salvo.",
+            }}
             min={repetirMin}
             max={repetirMax}
             setMin={setRepetirMin}
@@ -688,7 +686,10 @@ function Gerador() {
           <div>
             <InfoLabel
               label="Máx. consecutivas"
-              description="Limita o maior grupo de números seguidos permitido no jogo (exemplo: no máximo 3 números consecutivos)."
+              description="Limita o tamanho da maior sequência de números seguidos dentro do jogo."
+              faixa="No máximo 4 consecutivas."
+              exemplo="Com o valor 3, o jogo pode ter 07-08-09, mas não 07-08-09-10."
+              dica="Sequências longas são raras nos sorteios reais."
             />
             <Input
               type="number"
@@ -712,7 +713,13 @@ function Gerador() {
             <AdvRow
               k="primos"
               label="Primos"
-              info="Quantidade de números primos no jogo (2, 3, 5, 7, 11...). Sorteios reais quase sempre trazem uma faixa parecida de primos."
+              info={{
+              description:
+                "Conta quantos números primos entram no jogo — aqueles divisíveis só por 1 e por eles mesmos.",
+              faixa: "4 a 6 primos em jogos de 15 dezenas.",
+              exemplo: "São primos: 2, 3, 5, 7, 11, 13, 17, 19, 23...",
+              dica: "É um jeito simples de evitar jogos concentrados em números do mesmo tipo.",
+            }}
               state={adv.primos}
               onChange={setAdvField}
               maxLimit={tamanho}
@@ -720,7 +727,13 @@ function Gerador() {
             <AdvRow
               k="fibonacci"
               label="Fibonacci"
-              info="Quantidade de dezenas da sequência de Fibonacci (1, 2, 3, 5, 8, 13, 21, 34, 55, 89) presentes no jogo."
+              info={{
+              description:
+                "Conta quantas dezenas pertencem à sequência de Fibonacci, em que cada número é a soma dos dois anteriores.",
+              faixa: "3 a 5 dezenas em jogos de 15.",
+              exemplo: "Fibonacci: 1, 2, 3, 5, 8, 13, 21, 34, 55, 89.",
+              dica: "Filtro mais restritivo: use junto com poucos outros filtros avançados.",
+            }}
               state={adv.fibonacci}
               onChange={setAdvField}
               maxLimit={tamanho}
@@ -728,7 +741,12 @@ function Gerador() {
             <AdvRow
               k="mult3"
               label="Múltiplos de 3"
-              info="Quantidade de dezenas divisíveis por 3 (3, 6, 9, 12...). Ajuda a evitar jogos concentrados em um só tipo de número."
+              info={{
+              description: "Conta quantas dezenas do jogo são divisíveis por 3.",
+              faixa: "4 a 6 dezenas em jogos de 15.",
+              exemplo: "Múltiplos de 3: 3, 6, 9, 12, 15, 18, 21, 24...",
+              dica: "Ajuda a espalhar o jogo entre grupos diferentes de números.",
+            }}
               state={adv.mult3}
               onChange={setAdvField}
               maxLimit={tamanho}
@@ -736,7 +754,13 @@ function Gerador() {
             <AdvRow
               k="linha"
               label="Dezenas por linha"
-              info="Espalha o jogo pelo volante: define o mínimo e o máximo de dezenas em CADA linha do cartão."
+              info={{
+              description:
+                "Controla a distribuição horizontal: define o mínimo e o máximo de dezenas em CADA linha do volante.",
+              faixa: "2 a 4 dezenas por linha.",
+              exemplo: "Evita jogos com 5 dezenas na primeira linha e nenhuma na última.",
+              dica: "Ótimo para deixar as marcações espalhadas no cartão impresso.",
+            }}
               state={adv.linha}
               onChange={setAdvField}
               maxLimit={tamanho}
@@ -744,7 +768,13 @@ function Gerador() {
             <AdvRow
               k="coluna"
               label="Dezenas por coluna"
-              info="Mesma ideia da linha, mas na vertical: mínimo e máximo de dezenas em CADA coluna do volante."
+              info={{
+              description:
+                "Mesma ideia da linha, só que na vertical: mínimo e máximo de dezenas em CADA coluna do volante.",
+              faixa: "2 a 4 dezenas por coluna.",
+              exemplo: "Impede que todo o jogo caia nas colunas da esquerda.",
+              dica: "Use junto com Dezenas por linha para uma cobertura equilibrada.",
+            }}
               state={adv.coluna}
               onChange={setAdvField}
               maxLimit={tamanho}
@@ -753,7 +783,13 @@ function Gerador() {
               <AdvRow
                 k="miolo"
                 label="Miolo"
-                info="Quantas dezenas do centro do volante (fora da moldura) o jogo deve conter."
+                info={{
+                description:
+                  "Miolo são as dezenas do centro do cartão, fora da moldura. Este filtro define quantas delas o jogo deve conter.",
+                faixa: "4 a 6 dezenas no miolo, num jogo de 15.",
+                exemplo: "Se o jogo tem 10 na moldura, sobram 5 no miolo.",
+                dica: "Miolo e Moldura são complementares — configure os dois com coerência.",
+              }}
                 state={adv.miolo}
                 onChange={setAdvField}
                 maxLimit={tamanho}
@@ -762,7 +798,13 @@ function Gerador() {
             <AdvRow
               k="ausentes"
               label="Ausentes do último concurso"
-              info="Quantas dezenas do jogo NÃO saíram no último sorteio — o oposto do filtro 'Repetir do anterior'."
+              info={{
+              description:
+                "Quantas dezenas do jogo NÃO saíram no último concurso. É o oposto do filtro Repetir do anterior.",
+              faixa: "5 a 7 dezenas ausentes em jogos de 15.",
+              exemplo: "Se 9 dezenas repetem do último sorteio, 6 são ausentes.",
+              dica: "Se usar os dois filtros, cuide para que as faixas somem o total de dezenas.",
+            }}
               state={adv.ausentes}
               onChange={setAdvField}
               maxLimit={tamanho}
@@ -770,7 +812,13 @@ function Gerador() {
             <AdvRow
               k="paresConsec"
               label="Pares consecutivos"
-              info="Quantidade de duplas de números seguidos no jogo (ex.: 04-05, 12-13). Diferente de 'Máx. consecutivas', que limita o tamanho da maior sequência."
+              info={{
+              description:
+                "Conta as duplas de números seguidos dentro do jogo. Diferente de Máx. consecutivas, que limita o tamanho da maior sequência.",
+              faixa: "3 a 7 duplas em jogos de 15 dezenas.",
+              exemplo: "Em 04-05-12-13-20 há 2 pares consecutivos.",
+              dica: "Sorteios reais quase sempre trazem alguns números seguidos.",
+            }}
               state={adv.paresConsec}
               onChange={setAdvField}
               maxLimit={tamanho}
@@ -782,7 +830,9 @@ function Gerador() {
           <div>
             <InfoLabel
               label="Incluir sempre"
-              description="Dezenas obrigatórias: serão incluídas em todos os jogos gerados."
+              description="Dezenas fixas: aparecem em todos os jogos gerados."
+              exemplo="Marque seus números da sorte para que nunca fiquem de fora."
+              dica="Fixar muitas dezenas reduz a variedade dos jogos e pode conflitar com os filtros."
             />
             <NumbersPicker
               numbers={nums}
@@ -795,7 +845,9 @@ function Gerador() {
           <div>
             <InfoLabel
               label="Excluir sempre"
-              description="Dezenas bloqueadas: nunca aparecerão nos jogos gerados."
+              description="Dezenas bloqueadas: nunca entram nos jogos gerados."
+              exemplo="Útil para descartar dezenas muito atrasadas ou que você não quer jogar."
+              dica="Bloquear demais deixa poucas dezenas disponíveis e o gerador pode falhar."
             />
             <NumbersPicker
               numbers={nums}
@@ -902,7 +954,7 @@ function RangeRow({
   maxLimit = 400,
 }: {
   label: string;
-  info?: string;
+  info?: InfoContent;
   min: number;
   max: number;
   setMin: (n: number) => void;
@@ -913,7 +965,7 @@ function RangeRow({
   return (
     <div>
       {info ? (
-        <InfoLabel label={label} description={info} />
+        <InfoLabel label={label} {...info} />
       ) : (
         <Label>{label}</Label>
       )}
@@ -988,7 +1040,7 @@ function AdvRow({
 }: {
   k: AdvKey;
   label: string;
-  info: string;
+  info: InfoContent;
   state: { on: boolean; min: number; max: number };
   onChange: (k: AdvKey, patch: Partial<{ on: boolean; min: number; max: number }>) => void;
   maxLimit: number;
@@ -996,7 +1048,7 @@ function AdvRow({
   return (
     <div className="rounded-lg border border-border/50 bg-card/40 p-2.5">
       <div className="flex items-center justify-between gap-2">
-        <InfoLabel label={label} description={info} />
+        <InfoLabel label={label} {...info} />
         <Switch
           checked={state.on}
           onCheckedChange={(v) => onChange(k, { on: v })}

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { InfoDot } from "@/components/info-label";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -165,7 +166,15 @@ function CreditosPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Histórico de créditos</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            Histórico de créditos
+            <InfoDot
+              title="Histórico de créditos"
+              description="Lista todas as movimentações do seu saldo: compras aprovadas, créditos grátis e os descontos feitos a cada geração de jogos."
+              exemplo="Gerar 10 jogos aparece como -2 créditos."
+              dica="Se um pagamento não aparecer aqui, aguarde alguns instantes: a confirmação é automática."
+            />
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {transacoes.length === 0 ? (
