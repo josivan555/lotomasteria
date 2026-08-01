@@ -331,6 +331,9 @@ function Gerador() {
       return;
     }
 
+    const rng = (k: AdvKey) =>
+      adv[k].on ? { min: adv[k].min, max: adv[k].max } : { min: undefined, max: undefined };
+
     const filtros: Filtros = {
       somaMin,
       somaMax,
@@ -343,7 +346,24 @@ function Gerador() {
       excluir,
       repetirAnteriorMin: repetirMin,
       repetirAnteriorMax: repetirMax,
+      primosMin: rng("primos").min,
+      primosMax: rng("primos").max,
+      fibonacciMin: rng("fibonacci").min,
+      fibonacciMax: rng("fibonacci").max,
+      mult3Min: rng("mult3").min,
+      mult3Max: rng("mult3").max,
+      linhaMin: rng("linha").min,
+      linhaMax: rng("linha").max,
+      colunaMin: rng("coluna").min,
+      colunaMax: rng("coluna").max,
+      mioloMin: cfg.moldura ? rng("miolo").min : undefined,
+      mioloMax: cfg.moldura ? rng("miolo").max : undefined,
+      ausentesMin: rng("ausentes").min,
+      ausentesMax: rng("ausentes").max,
+      paresConsecutivosMin: rng("paresConsec").min,
+      paresConsecutivosMax: rng("paresConsec").max,
     };
+
     const anterior = concursos[0]?.dezenas;
     const jogos = gerarJogos(cfg, qtd, stats.scores, filtros, anterior, tamanho);
     if (!jogos.length) {
