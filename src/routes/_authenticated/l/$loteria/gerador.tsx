@@ -618,6 +618,85 @@ function Gerador() {
             />
           </div>
 
+          <div className="space-y-3 rounded-xl border border-border/60 bg-background/40 p-3">
+            <div>
+              <p className="text-sm font-semibold">Filtros avançados</p>
+              <p className="text-xs text-muted-foreground">
+                Opcionais e desligados por padrão. Ative só os que quiser — usar muitos ao mesmo
+                tempo pode deixar o gerador sem jogos válidos.
+              </p>
+            </div>
+
+            <AdvRow
+              k="primos"
+              label="Primos"
+              info="Quantidade de números primos no jogo (2, 3, 5, 7, 11...). Sorteios reais quase sempre trazem uma faixa parecida de primos."
+              state={adv.primos}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="fibonacci"
+              label="Fibonacci"
+              info="Quantidade de dezenas da sequência de Fibonacci (1, 2, 3, 5, 8, 13, 21, 34, 55, 89) presentes no jogo."
+              state={adv.fibonacci}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="mult3"
+              label="Múltiplos de 3"
+              info="Quantidade de dezenas divisíveis por 3 (3, 6, 9, 12...). Ajuda a evitar jogos concentrados em um só tipo de número."
+              state={adv.mult3}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="linha"
+              label="Dezenas por linha"
+              info="Espalha o jogo pelo volante: define o mínimo e o máximo de dezenas em CADA linha do cartão."
+              state={adv.linha}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="coluna"
+              label="Dezenas por coluna"
+              info="Mesma ideia da linha, mas na vertical: mínimo e máximo de dezenas em CADA coluna do volante."
+              state={adv.coluna}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            {cfg.moldura && (
+              <AdvRow
+                k="miolo"
+                label="Miolo"
+                info="Quantas dezenas do centro do volante (fora da moldura) o jogo deve conter."
+                state={adv.miolo}
+                onChange={setAdvField}
+                maxLimit={tamanho}
+              />
+            )}
+            <AdvRow
+              k="ausentes"
+              label="Ausentes do último concurso"
+              info="Quantas dezenas do jogo NÃO saíram no último sorteio — o oposto do filtro 'Repetir do anterior'."
+              state={adv.ausentes}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+            <AdvRow
+              k="paresConsec"
+              label="Pares consecutivos"
+              info="Quantidade de duplas de números seguidos no jogo (ex.: 04-05, 12-13). Diferente de 'Máx. consecutivas', que limita o tamanho da maior sequência."
+              state={adv.paresConsec}
+              onChange={setAdvField}
+              maxLimit={tamanho}
+            />
+          </div>
+
+
+
           <div>
             <InfoLabel
               label="Incluir sempre"
