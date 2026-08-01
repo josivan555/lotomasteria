@@ -31,6 +31,8 @@ function Dashboard() {
   const sync = useServerFn(sincronizarConcursos);
   const ultimoCaixa = useServerFn(ultimoResultadoCaixa);
   const router = useRouter();
+  const queryClient = useQueryClient();
+
 
   const { data: concursosAll = [], isLoading } = useQuery({
     queryKey: ["concursos", loteria],
