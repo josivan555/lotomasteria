@@ -324,6 +324,22 @@ export const excluirJogo = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const excluirJogosPorIds = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(500) }).parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("jogos_salvos")
+      .delete()
+      .eq("user_id", context.userId)
+      .in("id", data.ids);
+    if (error) throw new Error(error.message);
+    return { ok: true, removidos: data.ids.length };
+  });
+
+
 export const excluirTodosJogos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => z.object({ loteria: loteriaEnum.optional() }).parse(raw ?? {}))

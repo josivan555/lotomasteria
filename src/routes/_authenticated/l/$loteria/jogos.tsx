@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import {
   listarJogosSalvos,
   excluirJogo,
-  excluirTodosJogos,
+  excluirJogosPorIds,
   ultimoResultadoCaixa,
 } from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
@@ -31,7 +31,7 @@ function Jogos() {
 
   const listar = useServerFn(listarJogosSalvos);
   const excluir = useServerFn(excluirJogo);
-  const excluirTodos = useServerFn(excluirTodosJogos);
+  const excluirLote = useServerFn(excluirJogosPorIds);
   const router = useRouter();
 
   const { data: jogos = [], isLoading } = useQuery({
@@ -55,10 +55,10 @@ function Jogos() {
     onError: (e) => toast.error(e.message),
   });
 
-  const delAll = useMutation({
-    mutationFn: () => excluirTodos({ data: { loteria } }),
-    onSuccess: () => {
-      toast.success("Todos os jogos desta loteria foram removidos");
+  const delLote = useMutation({
+    mutationFn: (ids: string[]) => excluirLote({ data: { ids } }),
+    onSuccess: (_d, ids) => {
+      toast.success(`${ids.length} jogo${ids.length === 1 ? "" : "s"} removido${ids.length === 1 ? "" : "s"}`);
       router.invalidate();
     },
     onError: (e) => toast.error(e.message),
@@ -67,6 +67,9 @@ function Jogos() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [aberto, setAberto] = useState<number | null>(null);
+  const [pagina, setPagina] = useState(1);
+  const [porPagina, setPorPagina] = useState(5);
+
 
   const jogosFiltrados = useMemo(() => {
     if (!dateFrom && !dateTo) return jogos;
@@ -102,6 +105,15 @@ function Jogos() {
       .map(([numero, itens]) => ({ numero, itens }))
       .sort((a, b) => b.numero - a.numero);
   }, [jogosFiltrados, ultimoSorteado]);
+
+  const totalPaginas = Math.max(1, Math.ceil(historico.length / porPagina));
+  const paginaAtual = Math.min(pagina, totalPaginas);
+  const historicoPagina = historico.slice(
+    (paginaAtual - 1) * porPagina,
+    paginaAtual * porPagina,
+  );
+
+
 
   const renderJogo = (j: (typeof jogos)[number]) => {
     const c = j.score != null ? classificarScore(Number(j.score)) : null;
@@ -229,16 +241,21 @@ function Jogos() {
               variant="destructive"
               size="sm"
               className="flex-1 sm:flex-none"
-              disabled={jogos.length === 0 || delAll.isPending}
+              disabled={vigentes.length === 0 || delLote.isPending}
               onClick={() => {
-                if (confirm(`Tem certeza que deseja remover todos os ${jogos.length} jogos salvos da ${cfg.nome}?\n\nEssa ação não pode ser desfeita.`)) {
-                  delAll.mutate();
+                if (
+                  confirm(
+                    `Remover os ${vigentes.length} jogos em aberto da ${cfg.nome}?\n\nO histórico de concursos já sorteados será mantido.`,
+                  )
+                ) {
+                  delLote.mutate(vigentes.map((j) => j.id));
                 }
               }}
             >
               <Trash className="mr-2 h-4 w-4" />
-              Limpar todos
+              Limpar abertos
             </Button>
+
           </div>
         )}
       </div>
@@ -277,12 +294,35 @@ function Jogos() {
 
           {historico.length > 0 && (
             <section className="space-y-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <History className="h-4 w-4 text-muted-foreground" />
                 <h3 className="text-lg font-semibold">Histórico por concurso</h3>
+                <span className="text-xs text-muted-foreground">
+                  {historico.length} concurso{historico.length === 1 ? "" : "s"}
+                </span>
+                <div className="ml-auto flex items-center gap-2">
+                  <Label htmlFor="hist-pp" className="text-xs text-muted-foreground">
+                    Por página
+                  </Label>
+                  <select
+                    id="hist-pp"
+                    value={porPagina}
+                    onChange={(e) => {
+                      setPorPagina(Number(e.target.value));
+                      setPagina(1);
+                    }}
+                    className="h-8 rounded-md border border-border/60 bg-background px-2 text-xs"
+                  >
+                    {[5, 10, 20, 50].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div className="space-y-2">
-                {historico.map((g) => {
+                {historicoPagina.map((g) => {
                   const open = aberto === g.numero;
                   const datas = g.itens.map((j) => new Date(j.created_at).getTime());
                   const dataRef = datas.length ? new Date(Math.min(...datas)) : null;
@@ -291,26 +331,46 @@ function Jogos() {
                       key={g.numero}
                       className="overflow-hidden rounded-xl border border-border/60 bg-card/60 backdrop-blur"
                     >
-                      <button
-                        type="button"
-                        onClick={() => setAberto(open ? null : g.numero)}
-                        className="flex w-full items-center gap-3 p-3 text-left hover:bg-secondary/50"
-                      >
-                        <ChevronDown
-                          className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
-                        />
-                        <span className="font-semibold" style={{ color: cfg.cor }}>
-                          Concurso {g.numero || "—"}
-                        </span>
-                        {dataRef && (
-                          <span className="text-xs text-muted-foreground">
-                            {dataRef.toLocaleDateString("pt-BR")}
+                      <div className="flex items-center gap-1 pr-2 hover:bg-secondary/50">
+                        <button
+                          type="button"
+                          onClick={() => setAberto(open ? null : g.numero)}
+                          className="flex min-w-0 flex-1 items-center gap-3 p-3 text-left"
+                        >
+                          <ChevronDown
+                            className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+                          />
+                          <span className="font-semibold" style={{ color: cfg.cor }}>
+                            Concurso {g.numero || "—"}
                           </span>
-                        )}
-                        <span className="ml-auto text-xs text-muted-foreground">
-                          {g.itens.length} jogo{g.itens.length === 1 ? "" : "s"}
-                        </span>
-                      </button>
+                          {dataRef && (
+                            <span className="text-xs text-muted-foreground">
+                              {dataRef.toLocaleDateString("pt-BR")}
+                            </span>
+                          )}
+                          <span className="ml-auto text-xs text-muted-foreground">
+                            {g.itens.length} jogo{g.itens.length === 1 ? "" : "s"}
+                          </span>
+                        </button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          aria-label={`Apagar histórico do concurso ${g.numero}`}
+                          disabled={delLote.isPending}
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => {
+                            if (
+                              confirm(
+                                `Apagar os ${g.itens.length} jogos do concurso ${g.numero}?\n\nEssa ação não pode ser desfeita.`,
+                              )
+                            ) {
+                              delLote.mutate(g.itens.map((j) => j.id));
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                       {open && (
                         <ol className="space-y-2 border-t border-border/60 p-3">
                           {g.itens.map(renderJogo)}
@@ -320,8 +380,32 @@ function Jogos() {
                   );
                 })}
               </div>
+              {totalPaginas > 1 && (
+                <div className="flex items-center justify-center gap-3 pt-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={paginaAtual <= 1}
+                    onClick={() => setPagina(paginaAtual - 1)}
+                  >
+                    Anterior
+                  </Button>
+                  <span className="text-xs text-muted-foreground">
+                    Página {paginaAtual} de {totalPaginas}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={paginaAtual >= totalPaginas}
+                    onClick={() => setPagina(paginaAtual + 1)}
+                  >
+                    Próxima
+                  </Button>
+                </div>
+              )}
             </section>
           )}
+
         </div>
       )}
     </div>
