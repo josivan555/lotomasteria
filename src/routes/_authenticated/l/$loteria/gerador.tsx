@@ -514,7 +514,9 @@ function Gerador() {
             <div className="flex items-center justify-between gap-2">
               <InfoLabel
                 label="Quantidade"
-                description="Define quantos jogos serão gerados de uma só vez, de 1 até 500."
+                description="Quantos jogos serão gerados de uma vez, de 1 até 500. Cada jogo consome créditos do seu saldo."
+                exemplo="5 jogos = 1 crédito."
+                dica="Escolha a quantidade ANTES de clicar em IA configurar: a IA ajusta os filtros conforme o volume."
               />
               <Button
                 size="sm"
@@ -570,7 +572,9 @@ function Gerador() {
           <div>
             <InfoLabel
               label="Dezenas por jogo"
-              description={`Quantos números cada jogo terá. Mínimo ${cfg.tamanhoMin}, máximo ${cfg.tamanhoMax}. O padrão da ${cfg.nome} é ${cfg.tamanho}.`}
+              description={`Quantos números cada jogo terá. Mínimo ${cfg.tamanhoMin}, máximo ${cfg.tamanhoMax}.`}
+              faixa={`Padrão da ${cfg.nome}: ${cfg.tamanho} dezenas.`}
+              dica="Mais dezenas aumentam a chance de acerto, mas a loteria cobra bem mais caro por esse jogo."
             />
             <div className="mt-2 flex items-center gap-2">
               <Button
@@ -682,7 +686,10 @@ function Gerador() {
           <div>
             <InfoLabel
               label="Máx. consecutivas"
-              description="Limita o maior grupo de números seguidos permitido no jogo (exemplo: no máximo 3 números consecutivos)."
+              description="Limita o tamanho da maior sequência de números seguidos dentro do jogo."
+              faixa="No máximo 4 consecutivas."
+              exemplo="Com o valor 3, o jogo pode ter 07-08-09, mas não 07-08-09-10."
+              dica="Sequências longas são raras nos sorteios reais."
             />
             <Input
               type="number"
@@ -823,7 +830,9 @@ function Gerador() {
           <div>
             <InfoLabel
               label="Incluir sempre"
-              description="Dezenas obrigatórias: serão incluídas em todos os jogos gerados."
+              description="Dezenas fixas: aparecem em todos os jogos gerados."
+              exemplo="Marque seus números da sorte para que nunca fiquem de fora."
+              dica="Fixar muitas dezenas reduz a variedade dos jogos e pode conflitar com os filtros."
             />
             <NumbersPicker
               numbers={nums}
@@ -836,7 +845,9 @@ function Gerador() {
           <div>
             <InfoLabel
               label="Excluir sempre"
-              description="Dezenas bloqueadas: nunca aparecerão nos jogos gerados."
+              description="Dezenas bloqueadas: nunca entram nos jogos gerados."
+              exemplo="Útil para descartar dezenas muito atrasadas ou que você não quer jogar."
+              dica="Bloquear demais deixa poucas dezenas disponíveis e o gerador pode falhar."
             />
             <NumbersPicker
               numbers={nums}
