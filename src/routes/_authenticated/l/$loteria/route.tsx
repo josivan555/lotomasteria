@@ -6,6 +6,7 @@ import {
   useParams,
 } from "@tanstack/react-router";
 import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, Coins, BookOpen } from "lucide-react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { formatCreditos } from "@/lib/credits-config";
