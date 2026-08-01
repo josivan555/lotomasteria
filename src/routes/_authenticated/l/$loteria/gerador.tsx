@@ -784,6 +784,7 @@ function Gerador() {
               faixa="No máximo 4 consecutivas."
               exemplo="Com o valor 3, o jogo pode ter 07-08-09, mas não 07-08-09-10."
               dica="Sequências longas são raras nos sorteios reais."
+              icon={<IconConsecBalls />}
             />
             <Input
               type="number"
