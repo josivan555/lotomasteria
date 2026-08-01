@@ -116,6 +116,7 @@ function Historico() {
         </div>
       </div>
 
+      <JanelaAnalise total={concursos.length} janela={janela} onChange={setJanela} />
 
       <Input
         placeholder="Buscar por número do concurso..."
