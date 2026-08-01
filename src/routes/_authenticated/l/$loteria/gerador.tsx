@@ -283,9 +283,31 @@ function Gerador() {
       const cM = mean(consecs), cS = std(consecs);
       setMaxConsecutivas(clamp(cM + tol * cS, 2, 10));
 
+      // Filtros avançados: faixas calculadas a partir do histórico real
+      const amostra = concursos.slice(0, 300);
+      const an = amostra.map((c) => analisarJogo(cfg, c.dezenas));
+      const faixa = (vals: number[], lo: number, hi: number) => {
+        if (!vals.length) return null;
+        const m = mean(vals), s = std(vals);
+        return { min: clamp(m - tol * s, lo, hi), max: clamp(m + tol * s, lo, hi) };
+      };
+      const aplica = (k: AdvKey, vals: number[], lo = 0, hi = cfg.tamanho) => {
+        const f = faixa(vals, lo, hi);
+        if (f) setAdvField(k, f);
+      };
+      aplica("primos", an.map((x) => x.primos));
+      aplica("fibonacci", an.map((x) => x.fibonacci));
+      aplica("mult3", an.map((x) => x.mult3));
+      aplica("paresConsec", an.map((x) => x.paresConsecutivos));
+      aplica("linha", an.flatMap((x) => x.porLinha));
+      aplica("coluna", an.flatMap((x) => x.porColuna));
+      if (cfg.moldura) aplica("miolo", an.map((x) => x.centro));
+      if (repeats.length) aplica("ausentes", repeats.map((r) => cfg.tamanho - r));
+
       setIncluir([]);
       setExcluir([]);
       toast.success(`Filtros ajustados pela IA para ${qtd} jogo(s).`);
+
     } finally {
       setIaPensando(false);
     }
