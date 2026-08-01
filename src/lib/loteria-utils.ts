@@ -151,6 +151,23 @@ export type Filtros = {
   excluir?: number[];
   repetirAnteriorMin?: number;
   repetirAnteriorMax?: number;
+  // Filtros avancados (todos opcionais)
+  primosMin?: number;
+  primosMax?: number;
+  fibonacciMin?: number;
+  fibonacciMax?: number;
+  mult3Min?: number;
+  mult3Max?: number;
+  linhaMin?: number;
+  linhaMax?: number;
+  colunaMin?: number;
+  colunaMax?: number;
+  mioloMin?: number;
+  mioloMax?: number;
+  ausentesMin?: number;
+  ausentesMax?: number;
+  paresConsecutivosMin?: number;
+  paresConsecutivosMax?: number;
 };
 
 export function contarConsecutivas(dezenas: number[]) {
@@ -166,6 +183,53 @@ export function contarConsecutivas(dezenas: number[]) {
   return maxRun;
 }
 
+// ---- Conjuntos matematicos ----
+export function isPrimo(n: number) {
+  if (n < 2) return false;
+  for (let i = 2; i * i <= n; i++) if (n % i === 0) return false;
+  return true;
+}
+
+const FIBONACCI = new Set([1, 2, 3, 5, 8, 13, 21, 34, 55, 89]);
+export function isFibonacci(n: number) {
+  return FIBONACCI.has(n);
+}
+
+export function isMultiplo3(n: number) {
+  return n % 3 === 0;
+}
+
+// Colunas do volante fisico: Lotofacil 5x5, Mega/Quina 10 colunas.
+export function gridColunas(cfg: LoteriaConfig) {
+  return cfg.total <= 25 ? 5 : 10;
+}
+
+export function distribuicaoGrid(cfg: LoteriaConfig, dezenas: number[]) {
+  const cols = gridColunas(cfg);
+  const linhas = new Map<number, number>();
+  const colunas = new Map<number, number>();
+  for (const d of dezenas) {
+    const linha = Math.floor((d - 1) / cols);
+    const coluna = (d - 1) % cols;
+    linhas.set(linha, (linhas.get(linha) ?? 0) + 1);
+    colunas.set(coluna, (colunas.get(coluna) ?? 0) + 1);
+  }
+  const totalLinhas = Math.ceil(cfg.total / cols);
+  const porLinha: number[] = [];
+  for (let i = 0; i < totalLinhas; i++) porLinha.push(linhas.get(i) ?? 0);
+  const porColuna: number[] = [];
+  for (let i = 0; i < cols; i++) porColuna.push(colunas.get(i) ?? 0);
+  return { porLinha, porColuna };
+}
+
+// Quantidade de duplas de numeros seguidos (ex.: 4-5, 12-13).
+export function contarParesConsecutivos(dezenas: number[]) {
+  const s = [...dezenas].sort((a, b) => a - b);
+  let c = 0;
+  for (let i = 1; i < s.length; i++) if (s[i] === s[i - 1] + 1) c++;
+  return c;
+}
+
 export function analisarJogo(cfg: LoteriaConfig, dezenas: number[]) {
   const soma = dezenas.reduce((a, b) => a + b, 0);
   const pares = dezenas.filter(isPar).length;
@@ -173,7 +237,25 @@ export function analisarJogo(cfg: LoteriaConfig, dezenas: number[]) {
   const moldura = cfg.moldura ? dezenas.filter((d) => cfg.moldura!.has(d)).length : 0;
   const centro = cfg.moldura ? dezenas.length - moldura : 0;
   const consecutivas = contarConsecutivas(dezenas);
-  return { soma, pares, impares, moldura, centro, consecutivas };
+  const primos = dezenas.filter(isPrimo).length;
+  const fibonacci = dezenas.filter(isFibonacci).length;
+  const mult3 = dezenas.filter(isMultiplo3).length;
+  const paresConsecutivos = contarParesConsecutivos(dezenas);
+  const { porLinha, porColuna } = distribuicaoGrid(cfg, dezenas);
+  return {
+    soma,
+    pares,
+    impares,
+    moldura,
+    centro,
+    consecutivas,
+    primos,
+    fibonacci,
+    mult3,
+    paresConsecutivos,
+    porLinha,
+    porColuna,
+  };
 }
 
 export function passaFiltros(
@@ -191,16 +273,46 @@ export function passaFiltros(
   if (cfg.moldura) {
     if (f.molduraMin != null && a.moldura < f.molduraMin) return false;
     if (f.molduraMax != null && a.moldura > f.molduraMax) return false;
+    if (f.mioloMin != null && a.centro < f.mioloMin) return false;
+    if (f.mioloMax != null && a.centro > f.mioloMax) return false;
+  }
+  if (f.primosMin != null && a.primos < f.primosMin) return false;
+  if (f.primosMax != null && a.primos > f.primosMax) return false;
+  if (f.fibonacciMin != null && a.fibonacci < f.fibonacciMin) return false;
+  if (f.fibonacciMax != null && a.fibonacci > f.fibonacciMax) return false;
+  if (f.mult3Min != null && a.mult3 < f.mult3Min) return false;
+  if (f.mult3Max != null && a.mult3 > f.mult3Max) return false;
+  if (f.paresConsecutivosMin != null && a.paresConsecutivos < f.paresConsecutivosMin) return false;
+  if (f.paresConsecutivosMax != null && a.paresConsecutivos > f.paresConsecutivosMax) return false;
+  if (f.linhaMin != null || f.linhaMax != null) {
+    for (const q of a.porLinha) {
+      if (f.linhaMin != null && q < f.linhaMin) return false;
+      if (f.linhaMax != null && q > f.linhaMax) return false;
+    }
+  }
+  if (f.colunaMin != null || f.colunaMax != null) {
+    for (const q of a.porColuna) {
+      if (f.colunaMin != null && q < f.colunaMin) return false;
+      if (f.colunaMax != null && q > f.colunaMax) return false;
+    }
   }
   if (f.incluir?.length) for (const n of f.incluir) if (!dezenas.includes(n)) return false;
   if (f.excluir?.length) for (const n of f.excluir) if (dezenas.includes(n)) return false;
-  if (anterior && (f.repetirAnteriorMin != null || f.repetirAnteriorMax != null)) {
-    const rep = dezenas.filter((d) => anterior.includes(d)).length;
-    if (f.repetirAnteriorMin != null && rep < f.repetirAnteriorMin) return false;
-    if (f.repetirAnteriorMax != null && rep > f.repetirAnteriorMax) return false;
+  if (anterior) {
+    if (f.repetirAnteriorMin != null || f.repetirAnteriorMax != null) {
+      const rep = dezenas.filter((d) => anterior.includes(d)).length;
+      if (f.repetirAnteriorMin != null && rep < f.repetirAnteriorMin) return false;
+      if (f.repetirAnteriorMax != null && rep > f.repetirAnteriorMax) return false;
+    }
+    if (f.ausentesMin != null || f.ausentesMax != null) {
+      const aus = dezenas.filter((d) => !anterior.includes(d)).length;
+      if (f.ausentesMin != null && aus < f.ausentesMin) return false;
+      if (f.ausentesMax != null && aus > f.ausentesMax) return false;
+    }
   }
   return true;
 }
+
 
 export function scoreJogo(cfg: LoteriaConfig, dezenas: number[], scores: Record<number, number>) {
   const a = analisarJogo(cfg, dezenas);
