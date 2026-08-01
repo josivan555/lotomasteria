@@ -726,6 +726,7 @@ function Gerador() {
           />
           <RangeRow
             label="Pares"
+            icon={<IconPairBalls />}
             info={{
               description:
                 "Quantidade de números pares no jogo. O restante são ímpares. Sorteios reais quase sempre ficam próximos do equilíbrio.",
