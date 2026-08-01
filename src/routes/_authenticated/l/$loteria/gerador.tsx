@@ -43,6 +43,7 @@ import {
   Target,
   Ban,
   ArrowRightLeft,
+  Pin,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
