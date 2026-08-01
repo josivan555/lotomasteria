@@ -155,10 +155,13 @@ function Gerador() {
   const { data: saldo } = useQuery({ queryKey: ["saldo"], queryFn: () => saldoFn({}) });
 
 
-  const { data: concursos = [] } = useQuery({
+  const { data: concursosAll = [] } = useQuery({
     queryKey: ["concursos", loteria],
     queryFn: () => listar({ data: { loteria } }),
   });
+  const { janela, setJanela } = useJanelaAnalise(loteria);
+  const concursos = useMemo(() => aplicarJanela(concursosAll, janela), [concursosAll, janela]);
+
 
   const ultimoFn = useServerFn(ultimoResultadoCaixa);
   const { data: ultimoOficial } = useQuery({
