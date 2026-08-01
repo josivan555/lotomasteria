@@ -744,6 +744,7 @@ function Gerador() {
           {cfg.moldura && (
             <RangeRow
               label="Moldura"
+              icon={<LayoutGrid className="h-5 w-5" />}
               info={{
                 description:
                   "Moldura são as dezenas da borda do cartão. O restante é o miolo (centro). A distribuição entre borda e centro se repete bastante nos sorteios.",
