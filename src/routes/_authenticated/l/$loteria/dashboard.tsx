@@ -38,7 +38,7 @@ function Dashboard() {
     queryFn: () => listar({ data: { loteria } }),
   });
 
-  const { janela, setJanela } = useJanelaAnalise(loteria);
+  const { janela } = useJanelaAnalise(loteria);
   const concursos = useMemo(() => aplicarJanela(concursosAll, janela), [concursosAll, janela]);
 
   const { data: ultimoOficial } = useQuery({
