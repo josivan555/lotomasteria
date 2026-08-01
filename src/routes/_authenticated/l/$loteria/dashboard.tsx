@@ -112,7 +112,7 @@ function Dashboard() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm text-muted-foreground">
-            {concursos.length} concursos analisados · último salvo #{latest.numero}
+            {concursos.length} de {concursosAll.length} concursos analisados · último salvo #{latest.numero}
           </p>
         </div>
         <div className="flex w-full gap-2 sm:w-auto">
