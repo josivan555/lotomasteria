@@ -899,6 +899,7 @@ function Gerador() {
             <AdvRow
               k="ausentes"
               label="Ausentes do último concurso"
+              icon={<Ban className="h-5 w-5" />}
               info={{
               description:
                 "Quantas dezenas do jogo NÃO saíram no último concurso. É o oposto do filtro Repetir do anterior.",
