@@ -852,6 +852,7 @@ function Gerador() {
             <AdvRow
               k="linha"
               label="Dezenas por linha"
+              icon={<Rows3 className="h-5 w-5" />}
               info={{
               description:
                 "Controla a distribuição horizontal: define o mínimo e o máximo de dezenas em CADA linha do volante.",
