@@ -135,22 +135,26 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: ultimo } = await supabaseAdmin
-      .from("concursos")
-      .select("numero")
-      .eq("loteria", data.loteria)
-      .order("numero", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
     const latest = await fetchCaixa(data.loteria);
     if (!latest) throw new Error("Nao foi possivel acessar a API da Caixa agora. Tente novamente.");
-
     const alvo = latest.numero;
-    const inicio = (ultimo?.numero ?? 0) + 1;
-    if (inicio > alvo) return { inseridos: 0, ultimo: alvo, faltam: 0 };
 
-    const fim = Math.min(alvo, inicio + data.limite - 1);
+    // Numeros ja salvos (para pular buracos e sincronizar do mais recente para o mais antigo)
+    const { data: existentes } = await supabaseAdmin
+      .from("concursos")
+      .select("numero")
+      .eq("loteria", data.loteria);
+    const salvos = new Set((existentes ?? []).map((r) => r.numero));
+
+    // Alvos: do concurso mais recente para tras, pulando os que ja temos
+    const pendentes: number[] = [];
+    for (let n = alvo; n >= 1 && pendentes.length < data.limite; n--) {
+      if (!salvos.has(n)) pendentes.push(n);
+    }
+    if (pendentes.length === 0) {
+      return { inseridos: 0, ultimo: alvo, faltam: Math.max(0, alvo - salvos.size) };
+    }
+
     const rows: {
       loteria: LoteriaId;
       numero: number;
@@ -158,17 +162,25 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
       dezenas: number[];
       soma: number;
     }[] = [];
-    for (let n = inicio; n <= fim; n++) {
-      const r = n === alvo ? latest : await fetchCaixa(data.loteria, n);
-      if (!r) continue;
-      const dz = r.listaDezenas.map(Number).sort((a, b) => a - b);
-      rows.push({
-        loteria: data.loteria,
-        numero: r.numero,
-        data_apuracao: parseData(r.dataApuracao),
-        dezenas: dz,
-        soma: dz.reduce((a, b) => a + b, 0),
-      });
+
+    // Busca em lotes paralelos para acelerar
+    const CHUNK = 8;
+    for (let i = 0; i < pendentes.length; i += CHUNK) {
+      const lote = pendentes.slice(i, i + CHUNK);
+      const resultados = await Promise.all(
+        lote.map((n) => (n === alvo ? Promise.resolve(latest) : fetchCaixa(data.loteria, n))),
+      );
+      for (const r of resultados) {
+        if (!r || !r.listaDezenas?.length) continue;
+        const dz = r.listaDezenas.map(Number).sort((a, b) => a - b);
+        rows.push({
+          loteria: data.loteria,
+          numero: r.numero,
+          data_apuracao: parseData(r.dataApuracao),
+          dezenas: dz,
+          soma: dz.reduce((a, b) => a + b, 0),
+        });
+      }
     }
 
     if (rows.length) {
@@ -181,9 +193,10 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
     return {
       inseridos: rows.length,
       ultimo: alvo,
-      faltam: Math.max(0, alvo - fim),
+      faltam: Math.max(0, alvo - (salvos.size + rows.length)),
     };
   });
+
 
 export const resultadoDoConcurso = createServerFn({ method: "GET" })
   .inputValidator((raw: unknown) =>
