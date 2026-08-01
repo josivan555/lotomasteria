@@ -32,10 +32,10 @@ function SaldoBadge() {
       asChild
       variant="default"
       size="sm"
-      className="h-9 shrink-0 gap-1.5 rounded-full px-3 shadow-lg shadow-primary/25 md:h-9 md:gap-2 md:px-4"
+      className="h-9 shrink-0 gap-1.5 rounded-full border border-gold px-3 shadow-lg shadow-gold/25 md:h-9 md:gap-2 md:px-4"
     >
       <Link to="/creditos" className="justify-center md:min-w-[5.5rem]">
-        <Coins className="h-4 w-4" />
+        <Coins className="h-4 w-4 text-gold" />
         <span className="flex flex-col items-start leading-none">
           <span className="hidden text-[10px] opacity-90 sm:block">Créditos</span>
           <span className="text-sm font-bold md:text-base">{formatCreditos(saldo)}</span>
