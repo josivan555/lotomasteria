@@ -104,11 +104,11 @@ const PADROES: Record<LoteriaId, Calibracao> = {
     usarSecao3: true, secao3Y: 5, papel: "A4",
   },
   quina: {
-    offsetX: 8, offsetY: 5.05, passoX: 0.63, passoY: 0.32,
-    marcaW: 0.3, marcaH: 0.17,
-    cartaoX: 6.6, cartaoY: 0.6, cartaoW: 8.1, mostrarCartao: true,
-    ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
-    usarSecao3: true, secao3Y: 5, papel: "A4",
+    offsetX: 8, offsetY: 4, passoX: 0.63, passoY: 0.32,
+    marcaW: 0.33, marcaH: 0.19,
+    cartaoX: 6.4, cartaoY: 0.3, cartaoW: 8.1, mostrarCartao: true,
+    ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 3.2,
+    usarSecao3: true, secao3Y: 6.35, papel: "A4",
   },
 };
 
