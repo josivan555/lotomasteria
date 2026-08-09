@@ -90,25 +90,25 @@ export type Calibracao = {
 
 const PADROES: Record<LoteriaId, Calibracao> = {
   lotofacil: {
-    offsetX: 3.49, offsetY: 4.53, passoX: 1.91, passoY: 0.89,
-    marcaW: 0.89, marcaH: 0.6,
-    cartaoX: 1.5, cartaoY: 1.0, cartaoW: 12, mostrarCartao: true,
-    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 5.4,
-    usarSecao3: true, secao3Y: 10.8, papel: "A4",
+    offsetX: 8, offsetY: 5.05, passoX: 0.63, passoY: 0.32,
+    marcaW: 0.3, marcaH: 0.17,
+    cartaoX: 6.6, cartaoY: 0.6, cartaoW: 8.1, mostrarCartao: true,
+    ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
+    usarSecao3: true, secao3Y: 5, papel: "A4",
   },
   megasena: {
-    offsetX: 2.33, offsetY: 3.74, passoX: 0.79, passoY: 0.6,
-    marcaW: 0.58, marcaH: 0.33,
-    cartaoX: 1.5, cartaoY: 1.0, cartaoW: 10.5, mostrarCartao: true,
-    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 4.05,
-    usarSecao3: true, secao3Y: 8.1, papel: "A4",
+    offsetX: 8, offsetY: 5.05, passoX: 0.63, passoY: 0.32,
+    marcaW: 0.3, marcaH: 0.17,
+    cartaoX: 6.6, cartaoY: 0.6, cartaoW: 8.1, mostrarCartao: true,
+    ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
+    usarSecao3: true, secao3Y: 5, papel: "A4",
   },
   quina: {
-    offsetX: 2.98, offsetY: 5.29, passoX: 0.77, passoY: 0.37,
-    marcaW: 0.57, marcaH: 0.29,
-    cartaoX: 1.5, cartaoY: 1.0, cartaoW: 9.5, mostrarCartao: true,
-    ajusteEsquerda: 0, ajusteTopo: 0, usarSecao2: true, secao2Y: 3.6,
-    usarSecao3: true, secao3Y: 7.2, papel: "A4",
+    offsetX: 8, offsetY: 5.05, passoX: 0.63, passoY: 0.32,
+    marcaW: 0.3, marcaH: 0.17,
+    cartaoX: 6.6, cartaoY: 0.6, cartaoW: 8.1, mostrarCartao: true,
+    ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
+    usarSecao3: true, secao3Y: 5, papel: "A4",
   },
 };
 
