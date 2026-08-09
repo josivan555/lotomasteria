@@ -90,11 +90,11 @@ export type Calibracao = {
 
 const PADROES: Record<LoteriaId, Calibracao> = {
   lotofacil: {
-    offsetX: 8, offsetY: 5.05, passoX: 0.63, passoY: 0.32,
-    marcaW: 0.3, marcaH: 0.17,
-    cartaoX: 6.6, cartaoY: 0.6, cartaoW: 8.1, mostrarCartao: true,
-    ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
-    usarSecao3: true, secao3Y: 5, papel: "A4",
+    offsetX: 7.85, offsetY: 4.95, passoX: 1.26, passoY: 0.45,
+    marcaW: 0.38, marcaH: 0.22,
+    cartaoX: 6.5, cartaoY: 0.5, cartaoW: 8.2, mostrarCartao: true,
+    ajusteEsquerda: -0.1, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
+    usarSecao3: true, secao3Y: 5.05, papel: "A4",
   },
   megasena: {
     offsetX: 8, offsetY: 5.05, passoX: 0.63, passoY: 0.32,
