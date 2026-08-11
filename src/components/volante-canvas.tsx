@@ -85,6 +85,9 @@ export type Calibracao = {
   usarSecao3: boolean;
   /** distancia vertical do inicio da 1a secao ate a 3a (cm) */
   secao3Y: number;
+  /** posicao da marca de quantidade de dezenas (cm) */
+  qtdX: number;
+  qtdY: number;
   papel: "A4" | "Letter";
 };
 
