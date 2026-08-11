@@ -147,7 +147,7 @@ export function VolanteCanvas({
   const [selecionados, setSelecionados] = useState<string[]>([]);
   const [expandido, setExpandido] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+  const dragRef = useRef<{ x: number; y: number; ox: number; oy: number; type: "grade" | "qtd" } | null>(null);
   const [art, setArt] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
