@@ -289,6 +289,25 @@ export function VolanteCanvas({
         cm(layout.rows * cal.passoY),
       );
     }
+
+    // Desenha a marca de quantidade (qtd)
+    const qx = cm(cal.qtdX + cal.ajusteEsquerda);
+    const qy = cm(cal.qtdY + cal.ajusteTopo);
+    const qw = cm(cal.marcaW);
+    const qh = cm(cal.marcaH);
+    ctx.fillStyle = "#111827";
+    ctx.fillRect(qx - qw / 2, qy - qh / 2, qw, qh);
+
+    // Destaque visual para indicar que e arrastavel
+    ctx.strokeStyle = "#fbbf24";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(qx - qw / 2 - 2, qy - qh / 2 - 2, qw + 4, qh + 4);
+    
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "bold 9px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("QTD", qx, qy - qh / 2 - 6);
+
   }, [cal, cfg, layout, jogoPreview, jogoPreview2, jogoPreview3, paper, art]);
 
   function set<K extends keyof Calibracao>(k: K, v: Calibracao[K]) {
