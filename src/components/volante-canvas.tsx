@@ -98,6 +98,7 @@ const PADROES: Record<LoteriaId, Calibracao> = {
     cartaoX: 6.5, cartaoY: 0.5, cartaoW: 8.2, mostrarCartao: true,
     ajusteEsquerda: -0.1, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
     usarSecao3: true, secao3Y: 5.05, papel: "A4",
+    qtdX: 7.85, qtdY: 13.5,
   },
   megasena: {
     offsetX: 8, offsetY: 5.05, passoX: 0.63, passoY: 0.32,
@@ -105,6 +106,7 @@ const PADROES: Record<LoteriaId, Calibracao> = {
     cartaoX: 6.6, cartaoY: 0.6, cartaoW: 8.1, mostrarCartao: true,
     ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
     usarSecao3: true, secao3Y: 5, papel: "A4",
+    qtdX: 8, qtdY: 13.5,
   },
   quina: {
     offsetX: 8, offsetY: 4, passoX: 0.63, passoY: 0.32,
@@ -112,6 +114,7 @@ const PADROES: Record<LoteriaId, Calibracao> = {
     cartaoX: 6.4, cartaoY: 0.3, cartaoW: 8.1, mostrarCartao: true,
     ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 3.2,
     usarSecao3: true, secao3Y: 6.35, papel: "A4",
+    qtdX: 8, qtdY: 13.5,
   },
 };
 
