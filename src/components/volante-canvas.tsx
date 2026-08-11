@@ -326,7 +326,21 @@ export function VolanteCanvas({
 
   /* arrastar a grade no canvas (mouse ou toque) */
   function startDrag(x: number, y: number) {
-    dragRef.current = { x, y, ox: cal.offsetX, oy: cal.offsetY };
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scale = rect.width / paper.w;
+    const clickX = (x - rect.left) / scale;
+    const clickY = (y - rect.top) / scale;
+
+    // verifica se clicou perto da marca de QTD
+    const distQtd = Math.sqrt(Math.pow(clickX - (cal.qtdX + cal.ajusteEsquerda), 2) + Math.pow(clickY - (cal.qtdY + cal.ajusteTopo), 2));
+    
+    if (distQtd < 1.5) { // raio de 1.5cm para facilitar o clique
+      dragRef.current = { x, y, ox: cal.qtdX, oy: cal.qtdY, type: "qtd" };
+    } else {
+      dragRef.current = { x, y, ox: cal.offsetX, oy: cal.offsetY, type: "grade" };
+    }
   }
   function moveDrag(x: number, y: number) {
     const d = dragRef.current;
@@ -335,11 +349,20 @@ export function VolanteCanvas({
     const scale = canvas.getBoundingClientRect().width / paper.w;
     const dx = (x - d.x) / scale;
     const dy = (y - d.y) / scale;
-    setCal((c) => ({
-      ...c,
-      offsetX: +(d.ox + dx).toFixed(2),
-      offsetY: +(d.oy + dy).toFixed(2),
-    }));
+    
+    if (d.type === "qtd") {
+      setCal((c) => ({
+        ...c,
+        qtdX: +(d.ox + dx).toFixed(2),
+        qtdY: +(d.oy + dy).toFixed(2),
+      }));
+    } else {
+      setCal((c) => ({
+        ...c,
+        offsetX: +(d.ox + dx).toFixed(2),
+        offsetY: +(d.oy + dy).toFixed(2),
+      }));
+    }
   }
   function onDown(e: React.MouseEvent<HTMLCanvasElement>) {
     startDrag(e.clientX, e.clientY);
