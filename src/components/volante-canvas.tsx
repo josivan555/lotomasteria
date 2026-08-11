@@ -597,6 +597,18 @@ ${paginas}
           </div>
 
           <div className="rounded-lg border border-dashed border-border/60 p-3">
+            <p className="mb-2 text-xs font-semibold">Marca de quantidade (QTD)</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {num("Posição X (cm)", "qtdX", 0.05, 0, paper.w)}
+              {num("Posição Y (cm)", "qtdY", 0.05, 0, paper.h)}
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Esta marca indica no volante quantos números estão sendo jogados (ex: 15 na Lotofácil).
+              Você pode arrastar o quadrado amarelo no canvas ou ajustar aqui.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-dashed border-border/60 p-3">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-xs font-semibold">Cartão guia</p>
               <Button
