@@ -406,7 +406,15 @@ export function VolanteCanvas({
         const marcas = grupo
           .map((j, idx) => {
             const oySec = oy + (offsetsSecao[idx] ?? 0);
-            return j.dezenas
+            
+            // Marca de quantidade (qtd)
+            const qLeft = cal.qtdX + cal.ajusteEsquerda - cal.marcaW / 2;
+            const qTop = cal.qtdY + cal.ajusteTopo - cal.marcaH / 2;
+            const qBw = (cal.marcaH / 2).toFixed(3);
+            const qBh = (cal.marcaW / 2).toFixed(3);
+            const marcaQtd = `<div class="m" style="left:${qLeft.toFixed(3)}cm;top:${qTop.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm;border-width:${qBw}cm ${qBh}cm"></div>`;
+
+            const marcasNumeros = j.dezenas
               .map((n) => {
                 const { col, row } = layout.pos(n);
                 const left = ox + col * cal.passoX - cal.marcaW / 2;
@@ -418,6 +426,8 @@ export function VolanteCanvas({
                 return `<div class="m" style="left:${left.toFixed(3)}cm;top:${top.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm;border-width:${bw}cm ${bh}cm"></div>`;
               })
               .join("");
+
+            return marcasNumeros + marcaQtd;
           })
           .join("");
         return `<div class="pg">${marcas}</div>`;
