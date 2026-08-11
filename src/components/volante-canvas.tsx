@@ -85,6 +85,9 @@ export type Calibracao = {
   usarSecao3: boolean;
   /** distancia vertical do inicio da 1a secao ate a 3a (cm) */
   secao3Y: number;
+  /** posicao da marca de quantidade de dezenas (cm) */
+  qtdX: number;
+  qtdY: number;
   papel: "A4" | "Letter";
 };
 
@@ -95,6 +98,7 @@ const PADROES: Record<LoteriaId, Calibracao> = {
     cartaoX: 6.5, cartaoY: 0.5, cartaoW: 8.2, mostrarCartao: true,
     ajusteEsquerda: -0.1, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
     usarSecao3: true, secao3Y: 5.05, papel: "A4",
+    qtdX: 7.85, qtdY: 13.5,
   },
   megasena: {
     offsetX: 8, offsetY: 5.05, passoX: 0.63, passoY: 0.32,
@@ -102,6 +106,7 @@ const PADROES: Record<LoteriaId, Calibracao> = {
     cartaoX: 6.6, cartaoY: 0.6, cartaoW: 8.1, mostrarCartao: true,
     ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 2.5,
     usarSecao3: true, secao3Y: 5, papel: "A4",
+    qtdX: 8, qtdY: 13.5,
   },
   quina: {
     offsetX: 8, offsetY: 4, passoX: 0.63, passoY: 0.32,
@@ -109,6 +114,7 @@ const PADROES: Record<LoteriaId, Calibracao> = {
     cartaoX: 6.4, cartaoY: 0.3, cartaoW: 8.1, mostrarCartao: true,
     ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: true, secao2Y: 3.2,
     usarSecao3: true, secao3Y: 6.35, papel: "A4",
+    qtdX: 8, qtdY: 13.5,
   },
 };
 
@@ -141,7 +147,7 @@ export function VolanteCanvas({
   const [selecionados, setSelecionados] = useState<string[]>([]);
   const [expandido, setExpandido] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+  const dragRef = useRef<{ x: number; y: number; ox: number; oy: number; type: "grade" | "qtd" } | null>(null);
   const [art, setArt] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
@@ -283,6 +289,25 @@ export function VolanteCanvas({
         cm(layout.rows * cal.passoY),
       );
     }
+
+    // Desenha a marca de quantidade (qtd)
+    const qx = cm(cal.qtdX + cal.ajusteEsquerda);
+    const qy = cm(cal.qtdY + cal.ajusteTopo);
+    const qw = cm(cal.marcaW);
+    const qh = cm(cal.marcaH);
+    ctx.fillStyle = "#111827";
+    ctx.fillRect(qx - qw / 2, qy - qh / 2, qw, qh);
+
+    // Destaque visual para indicar que e arrastavel
+    ctx.strokeStyle = "#fbbf24";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(qx - qw / 2 - 2, qy - qh / 2 - 2, qw + 4, qh + 4);
+    
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "bold 9px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("QTD", qx, qy - qh / 2 - 6);
+
   }, [cal, cfg, layout, jogoPreview, jogoPreview2, jogoPreview3, paper, art]);
 
   function set<K extends keyof Calibracao>(k: K, v: Calibracao[K]) {
@@ -301,7 +326,21 @@ export function VolanteCanvas({
 
   /* arrastar a grade no canvas (mouse ou toque) */
   function startDrag(x: number, y: number) {
-    dragRef.current = { x, y, ox: cal.offsetX, oy: cal.offsetY };
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scale = rect.width / paper.w;
+    const clickX = (x - rect.left) / scale;
+    const clickY = (y - rect.top) / scale;
+
+    // verifica se clicou perto da marca de QTD
+    const distQtd = Math.sqrt(Math.pow(clickX - (cal.qtdX + cal.ajusteEsquerda), 2) + Math.pow(clickY - (cal.qtdY + cal.ajusteTopo), 2));
+    
+    if (distQtd < 1.5) { // raio de 1.5cm para facilitar o clique
+      dragRef.current = { x, y, ox: cal.qtdX, oy: cal.qtdY, type: "qtd" };
+    } else {
+      dragRef.current = { x, y, ox: cal.offsetX, oy: cal.offsetY, type: "grade" };
+    }
   }
   function moveDrag(x: number, y: number) {
     const d = dragRef.current;
@@ -310,11 +349,20 @@ export function VolanteCanvas({
     const scale = canvas.getBoundingClientRect().width / paper.w;
     const dx = (x - d.x) / scale;
     const dy = (y - d.y) / scale;
-    setCal((c) => ({
-      ...c,
-      offsetX: +(d.ox + dx).toFixed(2),
-      offsetY: +(d.oy + dy).toFixed(2),
-    }));
+    
+    if (d.type === "qtd") {
+      setCal((c) => ({
+        ...c,
+        qtdX: +(d.ox + dx).toFixed(2),
+        qtdY: +(d.oy + dy).toFixed(2),
+      }));
+    } else {
+      setCal((c) => ({
+        ...c,
+        offsetX: +(d.ox + dx).toFixed(2),
+        offsetY: +(d.oy + dy).toFixed(2),
+      }));
+    }
   }
   function onDown(e: React.MouseEvent<HTMLCanvasElement>) {
     startDrag(e.clientX, e.clientY);
@@ -358,7 +406,15 @@ export function VolanteCanvas({
         const marcas = grupo
           .map((j, idx) => {
             const oySec = oy + (offsetsSecao[idx] ?? 0);
-            return j.dezenas
+            
+            // Marca de quantidade (qtd)
+            const qLeft = cal.qtdX + cal.ajusteEsquerda - cal.marcaW / 2;
+            const qTop = cal.qtdY + cal.ajusteTopo - cal.marcaH / 2;
+            const qBw = (cal.marcaH / 2).toFixed(3);
+            const qBh = (cal.marcaW / 2).toFixed(3);
+            const marcaQtd = `<div class="m" style="left:${qLeft.toFixed(3)}cm;top:${qTop.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm;border-width:${qBw}cm ${qBh}cm"></div>`;
+
+            const marcasNumeros = j.dezenas
               .map((n) => {
                 const { col, row } = layout.pos(n);
                 const left = ox + col * cal.passoX - cal.marcaW / 2;
@@ -370,6 +426,8 @@ export function VolanteCanvas({
                 return `<div class="m" style="left:${left.toFixed(3)}cm;top:${top.toFixed(3)}cm;width:${cal.marcaW}cm;height:${cal.marcaH}cm;border-width:${bw}cm ${bh}cm"></div>`;
               })
               .join("");
+
+            return marcasNumeros + marcaQtd;
           })
           .join("");
         return `<div class="pg">${marcas}</div>`;
@@ -536,6 +594,18 @@ ${paginas}
                 </Button>
               ))}
             </div>
+          </div>
+
+          <div className="rounded-lg border border-dashed border-border/60 p-3">
+            <p className="mb-2 text-xs font-semibold">Marca de quantidade (QTD)</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {num("Posição X (cm)", "qtdX", 0.05, 0, paper.w)}
+              {num("Posição Y (cm)", "qtdY", 0.05, 0, paper.h)}
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Esta marca indica no volante quantos números estão sendo jogados (ex: 15 na Lotofácil).
+              Você pode arrastar o quadrado amarelo no canvas ou ajustar aqui.
+            </p>
           </div>
 
           <div className="rounded-lg border border-dashed border-border/60 p-3">
