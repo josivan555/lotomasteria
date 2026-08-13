@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, QrCode } from "lucide-react";
+import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, QrCode, Download, Copy, Share2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -47,43 +47,115 @@ function DetalheBolao() {
 
   if (sucesso) {
     return (
-      <div className="mx-auto max-w-xl px-4 py-12 md:py-20 text-center">
-        <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-500/10 text-green-500">
-          <CheckCircle2 className="h-10 w-10" />
+      <div className="mx-auto max-w-xl px-4 py-12 md:py-20">
+        <div className="text-center mb-8">
+          <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-500/10 text-green-500">
+            <CheckCircle2 className="h-10 w-10" />
+          </div>
+          <h1 className="text-3xl font-black mb-2">Reserva Realizada!</h1>
+          <p className="text-muted-foreground">
+            Guarde seu comprovante de reserva.
+          </p>
         </div>
-        <h1 className="text-3xl font-black mb-4">Reserva Realizada!</h1>
-        <p className="text-muted-foreground mb-8 text-lg">
-          Olá <span className="text-foreground font-bold">{form.nome}</span>, sua reserva para o bolão 
-          <span className="text-foreground font-bold"> {bolao.nome}</span> foi registrada com sucesso.
-        </p>
 
-        <div className="rounded-2xl border border-border/60 bg-card p-8 mb-8 text-left shadow-xl">
-          <div className="flex justify-between items-center mb-6 border-b border-border pb-4">
-            <span className="text-sm text-muted-foreground">Código de Referência:</span>
-            <span className="font-mono font-bold text-primary">{sucesso.ref}</span>
+        <div id="comprovante-reserva" className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl mb-8">
+          <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: cfg.cor }} />
+          
+          <div className="p-8">
+            <div className="text-center border-b border-border pb-6 mb-6">
+              <h2 className="text-xl font-black uppercase tracking-tighter">Comprovante de Reserva</h2>
+              <p className="text-xs text-muted-foreground mt-1">LotoMaster IA · Sistema Inteligente</p>
+            </div>
+
+            <div className="space-y-4 mb-8">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Cliente:</span>
+                <span className="font-bold">{form.nome}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Bolão:</span>
+                <span className="font-bold">{bolao.nome}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Cotas:</span>
+                <span className="font-bold">{form.cotas}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Total:</span>
+                <span className="text-lg font-black text-primary">{formatBRL(sucesso.total)}</span>
+              </div>
+            </div>
+
+            <div className="bg-secondary/30 rounded-2xl p-6 text-center border border-border/40">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Código de Referência</p>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <span className="text-2xl font-mono font-black tracking-wider text-foreground">{sucesso.ref}</span>
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  className="h-8 w-8 text-muted-foreground"
+                  onClick={() => {
+                    navigator.clipboard.writeText(sucesso.ref);
+                    toast.success("Código copiado!");
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-[10px] text-muted-foreground leading-tight uppercase tracking-widest">
+                Utilize este código para confirmar seu pagamento na área de "Minhas Reservas"
+              </p>
+            </div>
           </div>
           
-          <div className="flex justify-between items-center mb-8">
-            <span className="text-sm text-muted-foreground">Total a pagar:</span>
-            <span className="text-2xl font-black text-foreground">{formatBRL(sucesso.total)}</span>
-          </div>
-
-          <div className="bg-secondary/30 rounded-xl p-6 text-center space-y-4">
-            <p className="text-sm font-medium">Instruções para pagamento via PIX</p>
-            <div className="mx-auto w-32 h-32 bg-white rounded-lg flex items-center justify-center p-2">
-              <QrCode className="w-full h-full text-slate-900" />
-            </div>
-            <p className="text-[10px] text-muted-foreground leading-relaxed uppercase tracking-wider">
-              Copie o código PIX acima ou escaneie o QR Code no seu aplicativo do banco.
-              O prazo para compensação é de até 30 minutos.
+          <div className="bg-muted/50 p-4 border-t border-border flex justify-center">
+            <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tighter">
+              Emitido em {new Date().toLocaleString('pt-BR')}
             </p>
-            <Button className="w-full" variant="outline">Copiar Código PIX</Button>
           </div>
         </div>
 
-        <Button asChild variant="ghost">
-          <Link to="/">Voltar para a página inicial</Link>
-        </Button>
+        <div className="grid grid-cols-2 gap-3 mb-8">
+          <Button 
+            variant="outline" 
+            className="h-12 font-bold"
+            onClick={() => {
+              const element = document.getElementById('comprovante-reserva');
+              if (element) {
+                toast.info("Função de salvar imagem disponível em breve. Por enquanto, tire um print da tela.");
+              }
+            }}
+          >
+            <Download className="mr-2 h-4 w-4" /> Salvar
+          </Button>
+          <Button 
+            variant="outline" 
+            className="h-12 font-bold"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: `Reserva Bolão - ${bolao.nome}`,
+                  text: `Minha reserva no LotoMaster IA. Código: ${sucesso.ref}`,
+                  url: window.location.href
+                });
+              } else {
+                navigator.clipboard.writeText(`Minha reserva no LotoMaster IA. Código: ${sucesso.ref}`);
+                toast.success("Informações copiadas para compartilhar!");
+              }
+            }}
+          >
+            <Share2 className="mr-2 h-4 w-4" /> Compartilhar
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          <Button className="w-full h-14 text-lg font-black" asChild>
+            <Link to="/boloes/reserva">Ir para Pagamento</Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full">
+            <Link to="/">Voltar para a página inicial</Link>
+          </Button>
+        </div>
       </div>
     );
   }
