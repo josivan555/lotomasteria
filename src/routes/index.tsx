@@ -94,26 +94,26 @@ function Landing() {
 
 
       <main className="mx-auto max-w-6xl px-4 md:px-6">
-        <section className="py-12 text-center md:py-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary">
+        <section className="py-10 text-center md:py-20 overflow-hidden">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] sm:text-xs text-primary animate-in fade-in slide-in-from-bottom-4 duration-1000">
             <Sparkles className="h-3 w-3" /> Análise estatística inteligente
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-4 text-xs sm:text-sm text-muted-foreground">
             Veja também os{" "}
             <Link to="/resultados" className="text-primary hover:underline">
               últimos resultados oficiais da Lotofácil
             </Link>
             .
           </p>
-          <h1 className="mt-6 text-3xl font-black tracking-tight sm:text-5xl md:text-6xl">
+          <h1 className="mt-6 text-2xl font-black tracking-tight sm:text-5xl md:text-6xl px-2 leading-[1.1]">
             Domine a{" "}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent block sm:inline">
               Lotofácil, Mega-Sena e Quina
             </span>
-            <br />
-            com IA estatística
+            <span className="block sm:inline mt-1 sm:mt-0"> com IA estatística</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground md:text-lg">
+          <p className="mx-auto mt-6 max-w-2xl text-sm sm:text-base text-muted-foreground md:text-lg px-4 leading-relaxed">
+
             O LotoMaster IA analisa todo o histórico oficial das três loterias, calcula um{" "}
             <strong className="text-foreground">Score IA</strong> para cada dezena e gera jogos
             equilibrados com dezenas de filtros estatísticos — dashboards e geradores dedicados
