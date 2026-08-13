@@ -73,6 +73,41 @@ export const listarUsuarios = createServerFn({ method: "GET" })
     }));
   });
 
+export const atualizarBolao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => 
+    z.object({ 
+      id: z.string().uuid(),
+      nome: z.string().optional(),
+      concurso_numero: z.number().optional(),
+      data_sorteio: z.string().optional(),
+      horario_sorteio: z.string().optional(),
+      total_cotas: z.number().optional(),
+      valor_cota: z.number().optional(),
+      premio_estimado: z.number().optional(),
+    }).parse(raw)
+  )
+  .handler(async ({ data, context }) => {
+    await checkAdmin(context);
+    const { id, ...updateData } = data;
+    
+    // Se mudou cota ou valor, atualiza o total
+    const { data: current } = await context.supabase.from("boloes").select("total_cotas, valor_cota").eq("id", id).single();
+    if (current) {
+      const finalCotas = data.total_cotas ?? current.total_cotas;
+      const finalValor = data.valor_cota ?? current.valor_cota;
+      (updateData as any).valor_total = finalCotas * finalValor;
+    }
+
+    const { error } = await context.supabase
+      .from("boloes")
+      .update(updateData)
+      .eq("id", id);
+
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const atualizarStatusBolao = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => 
