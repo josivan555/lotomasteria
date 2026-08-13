@@ -201,16 +201,33 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
   });
 
 export const buscarReservaBolao = createServerFn({ method: "GET" })
-  .inputValidator((raw: unknown) => z.object({ codigo: z.string().min(5) }).parse(raw))
+  .inputValidator((raw: unknown) => z.object({ codigo: z.string().min(3) }).parse(raw))
   .handler(async ({ data }) => {
-    const { data: reserva, error } = await supabase
+    // 1. Tentar busca exata por código de referência
+    let { data: reserva, error } = await supabase
       .from("bolao_participantes")
       .select("*, boloes(*)")
       .eq("codigo_referencia", data.codigo.toUpperCase())
       .maybeSingle();
 
     if (error) throw new Error(error.message);
-    if (!reserva) throw new Error("Reserva não encontrada. Verifique o código informado.");
+
+    // 2. Se não encontrou por código, tentar por nome completo (busca aproximada)
+    if (!reserva) {
+      const { data: reservasPorNome, error: nameError } = await supabase
+        .from("bolao_participantes")
+        .select("*, boloes(*)")
+        .ilike("nome_completo", `%${data.codigo}%`)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (nameError) throw new Error(nameError.message);
+      reserva = reservasPorNome?.[0] || null;
+    }
+
+    if (!reserva) {
+      throw new Error("Reserva não encontrada. Verifique o código ou nome informado.");
+    }
 
     return reserva;
   });

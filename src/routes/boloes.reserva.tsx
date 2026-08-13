@@ -61,7 +61,7 @@ function BuscaReserva() {
             </div>
             <h1 className="text-2xl font-black">Consultar Reserva</h1>
             <p className="text-muted-foreground mt-2">
-              Informe o código de referência que você recebeu ao reservar sua cota.
+              Informe o código de referência ou seu nome completo para localizar sua reserva.
             </p>
           </div>
 
@@ -72,10 +72,10 @@ function BuscaReserva() {
               </Label>
               <Input
                 id="codigo"
-                placeholder="Ex: BOL-XXXXXXX"
+                placeholder="Código ou Seu Nome Completo"
                 value={codigo}
                 onChange={(e) => setCodigo(e.target.value)}
-                className="h-14 text-center text-xl font-mono font-bold uppercase"
+                className="h-14 text-center text-xl font-bold uppercase"
                 required
               />
             </div>
@@ -88,8 +88,7 @@ function BuscaReserva() {
           <div className="mt-8 rounded-xl bg-muted/30 p-4 flex gap-3 items-start border border-border/40">
             <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Dica: O código de referência foi exibido na tela logo após você preencher seus dados de reserva. 
-              Caso não tenha anotado, entre em contato com o administrador.
+              Dica: Você pode pesquisar pelo código BOL-XXXX que recebeu ou pelo seu nome completo cadastrado na reserva.
             </p>
           </div>
         </div>
