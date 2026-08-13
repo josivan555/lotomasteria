@@ -66,31 +66,32 @@ function Landing() {
 
   return (
     <div className="min-h-screen">
-      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-6 md:py-6">
+      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-5 md:px-6 md:py-6">
         <Link to={isLoggedIn ? "/loterias" : "/"} className="flex items-center gap-2 text-lg font-bold tracking-tight">
           <div className="ball h-8! w-8! text-sm! bg-primary text-primary-foreground font-black flex items-center justify-center rounded-full">L</div>
-          LotoMaster <span className="text-primary">IA</span>
+          <span>LotoMaster <span className="text-primary">IA</span></span>
         </Link>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button asChild variant="ghost" size="sm">
+        <nav className="flex flex-wrap items-center gap-2 sm:gap-4">
+          <Button asChild variant="ghost" size="sm" className="px-2 sm:px-4">
             <Link to="/resultados">Resultados</Link>
           </Button>
           {!isLoggedIn ? (
-            <>
-              <Button asChild variant="ghost" size="sm">
+            <div className="flex items-center gap-2">
+              <Button asChild variant="ghost" size="sm" className="px-2 sm:px-4 hidden sm:inline-flex">
                 <Link to="/auth" search={{ mode: "login" }}>Entrar</Link>
               </Button>
-              <Button asChild size="sm">
+              <Button asChild size="sm" className="px-3 sm:px-6">
                 <Link to="/auth" search={{ mode: "signup" }}>Criar conta</Link>
               </Button>
-            </>
+            </div>
           ) : (
-            <Button asChild size="sm">
+            <Button asChild size="sm" className="px-3 sm:px-6">
               <Link to="/loterias">Minha Área</Link>
             </Button>
           )}
-        </div>
+        </nav>
       </header>
+
 
       <main className="mx-auto max-w-6xl px-4 md:px-6">
         <section className="py-12 text-center md:py-20">
