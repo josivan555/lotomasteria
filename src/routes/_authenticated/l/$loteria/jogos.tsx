@@ -432,6 +432,15 @@ function Jogos() {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="horarioEncerramento">Horário de Encerramento (Vendas)</Label>
+              <Input
+                id="horarioEncerramento"
+                type="time"
+                value={formBolao.horarioEncerramento}
+                onChange={(e) => setFormBolao({ ...formBolao, horarioEncerramento: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="premio">Prêmio Estimado (R$)</Label>
               <Input
                 id="premio"
