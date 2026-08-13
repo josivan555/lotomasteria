@@ -1,0 +1,1 @@
+ALTER TABLE public.bolao_participantes ADD COLUMN IF NOT EXISTS pix_data jsonb;
