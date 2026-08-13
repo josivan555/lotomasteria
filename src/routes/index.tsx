@@ -45,23 +45,41 @@ function Landing() {
     queryFn: () => listarBoloesFn(),
   });
 
+  const { data: userSession } = useQuery({
+    queryKey: ["auth-session"],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
+  const isLoggedIn = !!userSession;
+
   return (
     <div className="min-h-screen">
       <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-6 md:py-6">
-        <div className="flex items-center gap-2 text-lg font-bold tracking-tight">
+        <Link to={isLoggedIn ? "/loterias" : "/"} className="flex items-center gap-2 text-lg font-bold tracking-tight">
           <div className="ball h-8! w-8! text-sm! bg-primary text-primary-foreground font-black flex items-center justify-center rounded-full">L</div>
           LotoMaster <span className="text-primary">IA</span>
-        </div>
+        </Link>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="ghost" size="sm">
             <Link to="/resultados">Resultados</Link>
           </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/auth" search={{ mode: "login" }}>Entrar</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link to="/auth" search={{ mode: "signup" }}>Criar conta</Link>
-          </Button>
+          {!isLoggedIn ? (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/auth" search={{ mode: "login" }}>Entrar</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link to="/auth" search={{ mode: "signup" }}>Criar conta</Link>
+              </Button>
+            </>
+          ) : (
+            <Button asChild size="sm">
+              <Link to="/loterias">Minha Área</Link>
+            </Button>
+          )}
         </div>
       </header>
 
@@ -92,12 +110,20 @@ function Landing() {
             para cada modalidade.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button asChild size="lg">
-              <Link to="/auth" search={{ mode: "signup" }}>Começar grátis</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link to="/auth" search={{ mode: "login" }}>Já tenho conta</Link>
-            </Button>
+            {!isLoggedIn ? (
+              <>
+                <Button asChild size="lg">
+                  <Link to="/auth" search={{ mode: "signup" }}>Começar grátis</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <Link to="/auth" search={{ mode: "login" }}>Já tenho conta</Link>
+                </Button>
+              </>
+            ) : (
+              <Button asChild size="lg">
+                <Link to="/loterias">Acessar Painel IA</Link>
+              </Button>
+            )}
           </div>
         </section>
         <section className="py-12 md:py-20 border-y border-border/40">
