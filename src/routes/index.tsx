@@ -177,12 +177,12 @@ function Landing() {
 
                       <div className="grid grid-cols-2 gap-2">
                         <Button className="font-bold shadow-md shadow-primary/20 bg-primary hover:bg-primary/90" asChild>
-                          <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }}>
+                          <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                             Ver Reservas
                           </Link>
                         </Button>
                         <Button variant="outline" className="font-bold border-primary/30 text-primary hover:bg-primary/5" asChild>
-                          <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }}>
+                          <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
                             Ver Jogos
                           </Link>
                         </Button>
