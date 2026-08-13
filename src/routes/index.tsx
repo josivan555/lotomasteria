@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight } from "lucide-react";
+import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarBoloesPublicos } from "@/lib/boloes.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -41,6 +43,8 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   const listarBoloesFn = useServerFn(listarBoloesPublicos);
+  const [searchTerm, setSearchTerm] = useState("");
+  
   const { data: boloes = [], isLoading: isLoadingBoloes } = useQuery({
     queryKey: ["boloes-publicos"],
     queryFn: () => listarBoloesFn(),
@@ -55,6 +59,10 @@ function Landing() {
   });
 
   const isLoggedIn = !!userSession;
+
+  const filteredBoloes = (boloes ?? []).filter((b: any) => 
+    b.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen">
@@ -128,30 +136,45 @@ function Landing() {
           </div>
         </section>
         <section className="py-12 md:py-20 border-y border-border/40">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Bolões LotoMaster</h2>
               <p className="text-muted-foreground mt-1">Participe de apostas coletivas geradas com nossa inteligência</p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/boloes/reserva">Minhas Reservas</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/auth" search={{ mode: "signup" }}>Ver todos <ChevronRight className="ml-2 h-4 w-4" /></Link>
-              </Button>
+            
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Pesquisar bolão pelo nome..."
+                  className="pl-9 bg-card/50 border-border/40"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button variant="ghost" size="sm" asChild className="flex-1 sm:flex-none">
+                  <Link to="/boloes/reserva">Minhas Reservas</Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild className="flex-1 sm:flex-none">
+                  <Link to="/auth" search={{ mode: "signup" }}>Ver todos <ChevronRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
+              </div>
             </div>
           </div>
 
           {isLoadingBoloes ? (
             <div className="text-center py-10 text-muted-foreground">Carregando bolões...</div>
-          ) : (boloes ?? []).length === 0 ? (
+          ) : filteredBoloes.length === 0 ? (
             <div className="text-center py-10 rounded-xl border border-dashed border-border/60 text-muted-foreground">
-              Nenhum bolão disponível no momento. Volte em breve!
+              {searchTerm 
+                ? `Nenhum bolão encontrado com o nome "${searchTerm}".`
+                : "Nenhum bolão disponível no momento. Volte em breve!"}
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {(boloes ?? []).slice(0, 6).map((b: any) => {
+              {filteredBoloes.slice(0, 6).map((b: any) => {
                 const cfg = LOTERIAS[b.loteria_id as LoteriaId];
                 const progresso = (b.cotas_compradas / b.total_cotas) * 100;
                 
