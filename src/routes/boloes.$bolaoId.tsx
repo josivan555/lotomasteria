@@ -406,16 +406,29 @@ function ParticipantesList({ bolaoId }: { bolaoId: string }) {
 
   const isAdmin = perfil?.isAdmin;
 
-  const { data: participantes = [], isLoading } = useQuery({
-    queryKey: ["bolao-participantes", bolaoId],
-    queryFn: () => getParticipantes({ data: { bolaoId } }),
-    enabled: true, // A lista agora é pública (versão limitada)
+  const [page, setPage] = useState(1);
+  const [allParticipantes, setAllParticipantes] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(false);
+
+  const { isLoading } = useQuery({
+    queryKey: ["bolao-participantes", bolaoId, page],
+    queryFn: async () => {
+      const res = await getParticipantes({ data: { bolaoId, page, pageSize: 20 } });
+      if (page === 1) {
+        setAllParticipantes(res.items);
+      } else {
+        setAllParticipantes(prev => [...prev, ...res.items]);
+      }
+      setHasMore(res.hasMore);
+      return res;
+    },
   });
 
   const mutationUpdate = useMutation({
     mutationFn: (payload: any) => updatePart({ data: payload }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bolao-participantes", bolaoId] });
+      setPage(1); // Reset to first page to see updates
       setEditingId(null);
       toast.success("Participante atualizado");
     },
@@ -426,128 +439,135 @@ function ParticipantesList({ bolaoId }: { bolaoId: string }) {
     mutationFn: (id: string) => removePart({ data: { id } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bolao-participantes", bolaoId] });
+      setPage(1); // Reset to first page
       toast.success("Participante removido");
     },
     onError: (e) => toast.error(e.message),
   });
 
-  if (!isAdmin) {
-    return (
-      <div className="space-y-4">
-        {participantes.length === 0 ? (
-          <div className="p-8 text-center border border-dashed border-border/60 rounded-2xl bg-muted/20 text-muted-foreground">
-            Nenhum participante ainda.
-          </div>
-        ) : (
-          participantes.map((p: any) => (
-            <div key={p.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/40 bg-card/60 backdrop-blur">
-              <div className="flex-1 min-w-0 pr-4">
-                <p className="font-bold truncate">{p.nome_completo}</p>
-                <p className="text-[10px] text-muted-foreground">{p.quantidade_cotas} cota(s)</p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all ${
-                  p.status === 'pago' 
-                    ? 'bg-green-500/10 text-green-500 border-green-500/20' 
-                    : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                }`}>
-                  <div className={`h-1.5 w-1.5 rounded-full ${p.status === 'pago' ? 'bg-green-500' : 'bg-amber-500'}`} />
-                  {p.status === 'pago' ? 'PAGO' : 'RESERVADO'}
-                </div>
-              </div>
-            </div>
-          ))
-        )}
+  const renderItem = (p: any) => {
+    const statusBadge = (
+      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all ${
+        p.status === 'pago' 
+          ? 'bg-green-500/10 text-green-500 border-green-500/20' 
+          : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+      }`}>
+        <div className={`h-1.5 w-1.5 rounded-full ${p.status === 'pago' ? 'bg-green-500' : 'bg-amber-500'}`} />
+        {p.status === 'pago' ? 'PAGO' : 'RESERVADO'}
       </div>
     );
-  }
 
-  if (isLoading) return <div className="text-center py-10 text-muted-foreground">Carregando participantes...</div>;
+    if (!isAdmin) {
+      return (
+        <div key={p.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/40 bg-card/60 backdrop-blur">
+          <div className="flex-1 min-w-0 pr-4">
+            <p className="font-bold truncate">{p.nome_completo}</p>
+            <p className="text-[10px] text-muted-foreground">{p.quantidade_cotas} cota(s)</p>
+          </div>
+          <div className="flex items-center gap-3">
+            {statusBadge}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div key={p.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/40 bg-card/60 backdrop-blur">
+        <div className="flex-1 min-w-0 pr-4">
+          {editingId === p.id ? (
+            <div className="flex items-center gap-2">
+              <Input 
+                size={20}
+                value={editName}
+                onChange={e => setEditName(e.target.value)}
+                className="h-8 text-sm"
+                autoFocus
+              />
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                className="h-8 w-8 text-green-500"
+                onClick={() => mutationUpdate.mutate({ id: p.id, nome_completo: editName })}
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <>
+              <p className="font-bold truncate">{p.nome_completo}</p>
+              <p className="text-[10px] text-muted-foreground">{p.celular} · {p.quantidade_cotas} cota(s)</p>
+            </>
+          )}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => mutationUpdate.mutate({ id: p.id, status: p.status === 'pago' ? 'reservado' : 'pago' })}
+            className="transition-transform active:scale-95"
+          >
+            {statusBadge}
+          </button>
+
+          <div className="flex items-center gap-1">
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="h-7 w-7 text-muted-foreground"
+              onClick={() => {
+                setEditingId(p.id);
+                setEditName(p.nome_completo);
+              }}
+            >
+              <Edit2 className="h-3.5 w-3.5" />
+            </Button>
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => {
+                if (confirm(`Excluir a reserva de ${p.nome_completo}?`)) {
+                  mutationDelete.mutate(p.id);
+                }
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-4">
-      {participantes.length === 0 ? (
+      {allParticipantes.length === 0 && !isLoading ? (
         <div className="p-8 text-center border border-dashed border-border/60 rounded-2xl bg-muted/20 text-muted-foreground">
           Nenhum participante ainda.
         </div>
       ) : (
-        participantes.map((p: any) => (
-          <div key={p.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/40 bg-card/60 backdrop-blur">
-            <div className="flex-1 min-w-0 pr-4">
-              {editingId === p.id ? (
-                <div className="flex items-center gap-2">
-                  <Input 
-                    size={20}
-                    value={editName}
-                    onChange={e => setEditName(e.target.value)}
-                    className="h-8 text-sm"
-                    autoFocus
-                  />
-                  <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    className="h-8 w-8 text-green-500"
-                    onClick={() => mutationUpdate.mutate({ id: p.id, nome_completo: editName })}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <p className="font-bold truncate">{p.nome_completo}</p>
-                  <p className="text-[10px] text-muted-foreground">{p.celular} · {p.quantidade_cotas} cota(s)</p>
-                </>
-              )}
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => {
-                  if (isAdmin) {
-                    mutationUpdate.mutate({ id: p.id, status: p.status === 'pago' ? 'reservado' : 'pago' });
-                  }
-                }}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all ${
-                p.status === 'pago' 
-                  ? 'bg-green-500/10 text-green-500 border-green-500/20' 
-                  : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-              }`}
+        <>
+          {allParticipantes.map(renderItem)}
+          
+          {hasMore && (
+            <div className="py-4 flex justify-center">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setPage(prev => prev + 1)}
+                disabled={isLoading}
+                className="rounded-full px-8 font-bold text-xs"
               >
-                <div className={`h-1.5 w-1.5 rounded-full ${p.status === 'pago' ? 'bg-green-500' : 'bg-amber-500'}`} />
-                {p.status === 'pago' ? 'PAGO' : 'RESERVADO'}
-              </button>
-
-              {isAdmin && (
-                <div className="flex items-center gap-1">
-                  <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    className="h-7 w-7 text-muted-foreground"
-                    onClick={() => {
-                      setEditingId(p.id);
-                      setEditName(p.nome_completo);
-                    }}
-                  >
-                    <Edit2 className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => {
-                      if (confirm(`Excluir a reserva de ${p.nome_completo}?`)) {
-                        mutationDelete.mutate(p.id);
-                      }
-                    }}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              )}
+                {isLoading ? "Carregando..." : "Carregar mais participantes"}
+              </Button>
             </div>
-          </div>
-        ))
+          )}
+
+          {isLoading && page === 1 && (
+            <div className="text-center py-10 text-muted-foreground text-sm">
+              Carregando participantes...
+            </div>
+          )}
+        </>
       )}
     </div>
   );
