@@ -96,3 +96,80 @@ export const listarBoloesPublicos = createServerFn({ method: "GET" })
 
     return boloesComInfo;
   });
+
+export const obterBolao = createServerFn({ method: "GET" })
+  .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
+  .handler(async ({ data }) => {
+    const { data: bolao, error } = await supabase
+      .from("boloes")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+
+    if (error) throw new Error(error.message);
+    if (!bolao) throw new Error("Bolão não encontrado");
+
+    const { data: p } = await supabase
+      .from("bolao_participantes")
+      .select("quantidade_cotas, status")
+      .eq("bolao_id", bolao.id);
+
+    const compradas = (p ?? [])
+      .filter((x: any) => x.status === "pago")
+      .reduce((acc: number, curr: any) => acc + curr.quantidade_cotas, 0);
+    const reservadas = (p ?? [])
+      .filter((x: any) => x.status === "reservado")
+      .reduce((acc: number, curr: any) => acc + curr.quantidade_cotas, 0);
+
+    return {
+      ...bolao,
+      cotas_compradas: compradas,
+      cotas_reservadas: reservadas,
+      cotas_disponiveis: bolao.total_cotas - compradas - reservadas,
+    };
+  });
+
+export const comprarCotasBolao = createServerFn({ method: "POST" })
+  .inputValidator((raw: unknown) =>
+    z
+      .object({
+        bolaoId: z.string().uuid(),
+        nome: z.string().min(3),
+        celular: z.string().min(10),
+        cotas: z.number().int().min(1),
+      })
+      .parse(raw),
+  )
+  .handler(async ({ data }) => {
+    // 1. Verificar disponibilidade
+    const bolao = await obterBolao({ data: { id: data.bolaoId } });
+    if (data.cotas > bolao.cotas_disponiveis) {
+      throw new Error(`Apenas ${bolao.cotas_disponiveis} cotas disponíveis.`);
+    }
+
+    const valorTotal = data.cotas * bolao.valor_cota;
+
+    // 2. Criar registro de participante (status reservado)
+    const { data: participante, error } = await supabase
+      .from("bolao_participantes")
+      .insert({
+        bolao_id: data.bolaoId,
+        nome_completo: data.nome,
+        celular: data.celular,
+        quantidade_cotas: data.cotas,
+        valor_total: valorTotal,
+        status: "reservado",
+        codigo_referencia: `BOL-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+      })
+      .select("id, codigo_referencia")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    return {
+      id: participante.id,
+      codigoReferencia: participante.codigo_referencia,
+      valorTotal,
+    };
+  });
+
