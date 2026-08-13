@@ -88,8 +88,7 @@ function BuscaReserva() {
           <div className="mt-8 rounded-xl bg-muted/30 p-4 flex gap-3 items-start border border-border/40">
             <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Dica: O código de referência foi exibido na tela logo após você preencher seus dados de reserva. 
-              Caso não tenha anotado, entre em contato com o administrador.
+              Dica: Você pode pesquisar pelo código BOL-XXXX que recebeu ou pelo seu nome completo cadastrado na reserva.
             </p>
           </div>
         </div>
