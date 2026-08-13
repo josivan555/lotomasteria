@@ -354,6 +354,7 @@ export const excluirTodosJogos = createServerFn({ method: "POST" })
 export const meuPerfil = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    // RLS will restrict these reads to the user's own data or admin access
     const { data: roleRows } = await context.supabase
       .from("user_roles")
       .select("role")
@@ -368,9 +369,9 @@ export const meuPerfil = createServerFn({ method: "GET" })
     return {
       id: context.userId,
       email: (context.claims as any)?.email,
-      roles: roleRows?.map(r => r.role) ?? [],
-      isAdmin: roleRows?.some(r => r.role === 'admin') ?? false,
-      profile
+      roles: roleRows?.map((r: any) => r.role) ?? [],
+      isAdmin: roleRows?.some((r: any) => r.role === "admin") ?? false,
+      profile,
     };
   });
 
