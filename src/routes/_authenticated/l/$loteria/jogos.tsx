@@ -44,7 +44,14 @@ function Jogos() {
   const listar = useServerFn(listarJogosSalvos);
   const excluir = useServerFn(excluirJogo);
   const excluirLote = useServerFn(excluirJogosPorIds);
+  const meuPerfilFn = useServerFn(meuPerfil);
+  const criarBolaoFn = useServerFn(criarBolao);
   const router = useRouter();
+
+  const { data: userProfile } = useQuery({
+    queryKey: ["meu-perfil"],
+    queryFn: () => meuPerfilFn(),
+  });
 
   const { data: jogos = [], isLoading } = useQuery({
     queryKey: ["jogos-salvos", loteria],
@@ -76,11 +83,46 @@ function Jogos() {
     onError: (e) => toast.error(e.message),
   });
 
+  const mutationCriarBolao = useMutation({
+    mutationFn: (payload: any) => criarBolaoFn({ data: payload }),
+    onSuccess: () => {
+      toast.success("Bolão criado com sucesso!");
+      setModalBolao(false);
+      setJogosSelecionados([]);
+    },
+    onError: (e) => toast.error("Erro ao criar bolão: " + e.message),
+  });
+
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [aberto, setAberto] = useState<number | null>(null);
   const [pagina, setPagina] = useState(1);
   const [porPagina, setPorPagina] = useState(5);
+
+  const [jogosSelecionados, setJogosSelecionados] = useState<string[]>([]);
+  const [modalBolao, setModalBolao] = useState(false);
+  const [formBolao, setFormBolao] = useState({
+    nome: "",
+    concursoNumero: 0,
+    dataSorteio: "",
+    horarioSorteio: "20:00",
+    prazoVendas: "",
+    totalCotas: 10,
+    valorCota: 10,
+    premioEstimado: 0,
+  });
+
+  useEffect(() => {
+    if (oficial) {
+      setFormBolao(prev => ({
+        ...prev,
+        concursoNumero: (oficial.numero || 0) + 1,
+        dataSorteio: oficial.proximoData || "",
+        prazoVendas: oficial.proximoData || "",
+        premioEstimado: oficial.estimativaProximo || 0,
+      }));
+    }
+  }, [oficial]);
 
 
   const jogosFiltrados = useMemo(() => {
