@@ -173,3 +173,18 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
     };
   });
 
+export const buscarReservaBolao = createServerFn({ method: "GET" })
+  .inputValidator((raw: unknown) => z.object({ codigo: z.string().min(5) }).parse(raw))
+  .handler(async ({ data }) => {
+    const { data: reserva, error } = await supabase
+      .from("bolao_participantes")
+      .select("*, boloes(*)")
+      .eq("codigo_referencia", data.codigo.toUpperCase())
+      .maybeSingle();
+
+    if (error) throw new Error(error.message);
+    if (!reserva) throw new Error("Reserva não encontrada. Verifique o código informado.");
+
+    return reserva;
+  });
+

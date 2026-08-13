@@ -164,7 +164,12 @@ function DetalheBolao() {
 
         <div className="space-y-6">
           <div className="rounded-3xl border border-border/60 bg-card p-8 shadow-xl">
-            <h2 className="text-xl font-black mb-6">Comprar Cotas</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-black">Comprar Cotas</h2>
+              <Button variant="link" size="sm" asChild className="text-primary font-bold p-0 h-auto">
+                <Link to="/boloes/reserva">Já tenho uma reserva</Link>
+              </Button>
+            </div>
             
             {esgotado ? (
               <div className="bg-destructive/10 text-destructive rounded-xl p-6 text-center">
