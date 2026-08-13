@@ -144,13 +144,18 @@ function BuscaReserva() {
                   <p className="text-xs text-muted-foreground">Escaneie o QR Code abaixo no seu aplicativo do banco</p>
                 </div>
                 
-                <div className="mx-auto w-40 h-40 bg-white rounded-2xl flex items-center justify-center p-3 shadow-inner">
-                  <QrCode className="w-full h-full text-slate-900" />
+                <div className="mx-auto w-48 h-48 bg-white rounded-2xl flex items-center justify-center p-3 shadow-inner">
+                  {reserva.pix?.qrCodeBase64 ? (
+                    <img src={`data:image/png;base64,${reserva.pix.qrCodeBase64}`} alt="QR Code PIX" className="w-full h-full" />
+                  ) : (
+                    <QrCode className="w-full h-full text-slate-900" />
+                  )}
                 </div>
                 
                 <div className="space-y-3">
                   <Button className="w-full font-bold h-12" variant="outline" onClick={() => {
-                    navigator.clipboard.writeText("CHAVE-PIX-EXEMPLO");
+                    const code = reserva.pix?.qrCode || "CHAVE-PIX-EXEMPLO";
+                    navigator.clipboard.writeText(code);
                     toast.success("Código PIX copiado!");
                   }}>
                     Copiar Código PIX
