@@ -106,9 +106,14 @@ function Landing() {
               <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Bolões LotoMaster</h2>
               <p className="text-muted-foreground mt-1">Participe de apostas coletivas geradas com nossa inteligência</p>
             </div>
-            <Button variant="ghost" asChild>
-              <Link to="/auth" search={{ mode: "signup" }}>Ver todos <ChevronRight className="ml-2 h-4 w-4" /></Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/boloes/reserva">Minhas Reservas</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/auth" search={{ mode: "signup" }}>Ver todos <ChevronRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
+            </div>
           </div>
 
           {isLoadingBoloes ? (

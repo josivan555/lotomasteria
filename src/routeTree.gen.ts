@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BoloesReservaRouteImport } from './routes/boloes.reserva'
 import { Route as BoloesBolaoIdRouteImport } from './routes/boloes.$bolaoId'
 import { Route as AuthenticatedLoteriasRouteImport } from './routes/_authenticated/loterias'
 import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticated/creditos'
@@ -58,6 +59,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoloesReservaRoute = BoloesReservaRouteImport.update({
+  id: '/boloes/reserva',
+  path: '/boloes/reserva',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BoloesBolaoIdRoute = BoloesBolaoIdRouteImport.update({
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/creditos': typeof AuthenticatedCreditosRoute
   '/loterias': typeof AuthenticatedLoteriasRoute
   '/boloes/$bolaoId': typeof BoloesBolaoIdRoute
+  '/boloes/reserva': typeof BoloesReservaRoute
   '/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/creditos': typeof AuthenticatedCreditosRoute
   '/loterias': typeof AuthenticatedLoteriasRoute
   '/boloes/$bolaoId': typeof BoloesBolaoIdRoute
+  '/boloes/reserva': typeof BoloesReservaRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/l/$loteria/ajuda': typeof AuthenticatedLLoteriaAjudaRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/_authenticated/creditos': typeof AuthenticatedCreditosRoute
   '/_authenticated/loterias': typeof AuthenticatedLoteriasRoute
   '/boloes/$bolaoId': typeof BoloesBolaoIdRoute
+  '/boloes/reserva': typeof BoloesReservaRoute
   '/_authenticated/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -224,6 +233,7 @@ export interface FileRouteTypes {
     | '/creditos'
     | '/loterias'
     | '/boloes/$bolaoId'
+    | '/boloes/reserva'
     | '/l/$loteria'
     | '/api/public/mercadopago-webhook'
     | '/admin/'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/creditos'
     | '/loterias'
     | '/boloes/$bolaoId'
+    | '/boloes/reserva'
     | '/api/public/mercadopago-webhook'
     | '/admin'
     | '/l/$loteria/ajuda'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/_authenticated/creditos'
     | '/_authenticated/loterias'
     | '/boloes/$bolaoId'
+    | '/boloes/reserva'
     | '/_authenticated/l/$loteria'
     | '/api/public/mercadopago-webhook'
     | '/_authenticated/admin/'
@@ -288,6 +300,7 @@ export interface RootRouteChildren {
   ResultadosRoute: typeof ResultadosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   BoloesBolaoIdRoute: typeof BoloesBolaoIdRoute
+  BoloesReservaRoute: typeof BoloesReservaRoute
   ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
 }
 
@@ -333,6 +346,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boloes/reserva': {
+      id: '/boloes/reserva'
+      path: '/boloes/reserva'
+      fullPath: '/boloes/reserva'
+      preLoaderRoute: typeof BoloesReservaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/boloes/$bolaoId': {
@@ -510,6 +530,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResultadosRoute: ResultadosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   BoloesBolaoIdRoute: BoloesBolaoIdRoute,
+  BoloesReservaRoute: BoloesReservaRoute,
   ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
 }
 export const routeTree = rootRouteImport
