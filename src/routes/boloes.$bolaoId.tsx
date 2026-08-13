@@ -278,7 +278,7 @@ function DetalheBolao() {
             </TabsContent>
 
             <TabsContent value="participantes" className="mt-4">
-              <ParticipantesList bolaoId={bolao.id} />
+              <ParticipantesList bolaoId={bolao.id} bolao={bolao} />
             </TabsContent>
           </Tabs>
         </div>
@@ -393,7 +393,7 @@ function DetalheBolao() {
   );
 }
 
-function ParticipantesList({ bolaoId }: { bolaoId: string }) {
+function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) {
   const queryClient = useQueryClient();
   const getParticipantes = useServerFn(listarParticipantesBolao);
   const getPerfil = useServerFn(meuPerfil);
