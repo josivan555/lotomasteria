@@ -329,111 +329,113 @@ function DetalheBolao() {
 
         </div>
 
-        <div className="space-y-6">
-          <div className="rounded-3xl border border-border/60 bg-card p-5 sm:p-8 shadow-xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-black">Comprar Cotas</h2>
-              <Button variant="link" size="sm" asChild className="text-primary font-bold p-0 h-auto">
-                <Link to="/boloes/reserva">Já tenho uma reserva</Link>
-              </Button>
-            </div>
-            
-            {esgotado ? (
-              <div className="bg-destructive/10 text-destructive rounded-xl p-6 text-center">
-                <p className="font-bold">Bolão Esgotado</p>
-                <p className="text-sm mt-1">Todas as cotas já foram vendidas. Fique atento para os próximos lançamentos!</p>
-              </div>
-            ) : (
-              <form 
-                className="space-y-5" 
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  mutation.mutate({ bolaoId, ...form });
-                }}
-              >
-                <div className="space-y-2">
-                  <Label htmlFor="nome" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nome Completo</Label>
-                  <Input 
-                    id="nome" 
-                    placeholder="Seu nome para o bolão" 
-                    required 
-                    className="h-12 text-base"
-                    value={form.nome}
-                    onChange={e => setForm({...form, nome: e.target.value})}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="celular" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">WhatsApp / Celular</Label>
-                  <Input 
-                    id="celular" 
-                    type="tel" 
-                    placeholder="(00) 00000-0000" 
-                    required 
-                    className="h-12 text-base"
-                    value={form.celular}
-                    onChange={e => setForm({...form, celular: e.target.value})}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="cotas" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Quantidade de Cotas</Label>
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      className="h-12 w-12 rounded-xl text-xl font-bold"
-                      onClick={() => setForm({...form, cotas: Math.max(1, form.cotas - 1)})}
-                    >
-                      -
-                    </Button>
-                    <Input 
-                      id="cotas" 
-                      type="number" 
-                      readOnly 
-                      className="h-12 flex-1 text-center text-lg font-black"
-                      value={form.cotas}
-                    />
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      className="h-12 w-12 rounded-xl text-xl font-bold"
-                      onClick={() => setForm({...form, cotas: Math.min(bolao.cotas_disponiveis, form.cotas + 1)})}
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <p className="text-[10px] text-center text-muted-foreground font-medium">
-                    Máximo disponível: {bolao.cotas_disponiveis} cotas
-                  </p>
-                </div>
-
-                <div className="mt-8 rounded-2xl bg-secondary/50 p-6 space-y-3">
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Subtotal ({form.cotas}x)</span>
-                    <span>{formatBRL(form.cotas * bolao.valor_cota)}</span>
-                  </div>
-                  <div className="flex justify-between text-lg font-black border-t border-border pt-3">
-                    <span>Total a pagar</span>
-                    <span className="text-primary">{formatBRL(form.cotas * bolao.valor_cota)}</span>
-                  </div>
-                </div>
-
-                <Button 
-                  className="w-full h-14 text-lg font-black shadow-xl shadow-primary/20" 
-                  disabled={mutation.isPending}
-                >
-                  {mutation.isPending ? "Processando..." : "Confirmar e Pagar"}
+        {tab !== "conferir" && (
+          <div className="space-y-6">
+            <div className="rounded-3xl border border-border/60 bg-card p-5 sm:p-8 shadow-xl">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-black">Comprar Cotas</h2>
+                <Button variant="link" size="sm" asChild className="text-primary font-bold p-0 h-auto">
+                  <Link to="/boloes/reserva">Já tenho uma reserva</Link>
                 </Button>
-                
-                <p className="text-[10px] text-center text-muted-foreground">
-                  Ao clicar em confirmar, você reserva suas cotas e será direcionado para as instruções de pagamento. 
-                  Sua reserva expira em 30 minutos caso o pagamento não seja confirmado.
-                </p>
-              </form>
-            )}
+              </div>
+              
+              {esgotado ? (
+                <div className="bg-destructive/10 text-destructive rounded-xl p-6 text-center">
+                  <p className="font-bold">Bolão Esgotado</p>
+                  <p className="text-sm mt-1">Todas as cotas já foram vendidas. Fique atento para os próximos lançamentos!</p>
+                </div>
+              ) : (
+                <form 
+                  className="space-y-5" 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    mutation.mutate({ bolaoId, ...form });
+                  }}
+                >
+                  <div className="space-y-2">
+                    <Label htmlFor="nome" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nome Completo</Label>
+                    <Input 
+                      id="nome" 
+                      placeholder="Seu nome para o bolão" 
+                      required 
+                      className="h-12 text-base"
+                      value={form.nome}
+                      onChange={e => setForm({...form, nome: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="celular" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">WhatsApp / Celular</Label>
+                    <Input 
+                      id="celular" 
+                      type="tel" 
+                      placeholder="(00) 00000-0000" 
+                      required 
+                      className="h-12 text-base"
+                      value={form.celular}
+                      onChange={e => setForm({...form, celular: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="cotas" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Quantidade de Cotas</Label>
+                    <div className="flex items-center gap-4">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="h-12 w-12 rounded-xl text-xl font-bold"
+                        onClick={() => setForm({...form, cotas: Math.max(1, form.cotas - 1)})}
+                      >
+                        -
+                      </Button>
+                      <Input 
+                        id="cotas" 
+                        type="number" 
+                        readOnly 
+                        className="h-12 flex-1 text-center text-lg font-black"
+                        value={form.cotas}
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="h-12 w-12 rounded-xl text-xl font-bold"
+                        onClick={() => setForm({...form, cotas: Math.min(bolao.cotas_disponiveis, form.cotas + 1)})}
+                      >
+                        +
+                      </Button>
+                    </div>
+                    <p className="text-[10px] text-center text-muted-foreground font-medium">
+                      Máximo disponível: {bolao.cotas_disponiveis} cotas
+                    </p>
+                  </div>
+
+                  <div className="mt-8 rounded-2xl bg-secondary/50 p-6 space-y-3">
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>Subtotal ({form.cotas}x)</span>
+                      <span>{formatBRL(form.cotas * bolao.valor_cota)}</span>
+                    </div>
+                    <div className="flex justify-between text-lg font-black border-t border-border pt-3">
+                      <span>Total a pagar</span>
+                      <span className="text-primary">{formatBRL(form.cotas * bolao.valor_cota)}</span>
+                    </div>
+                  </div>
+
+                  <Button 
+                    className="w-full h-14 text-lg font-black shadow-xl shadow-primary/20" 
+                    disabled={mutation.isPending}
+                  >
+                    {mutation.isPending ? "Processando..." : "Confirmar e Pagar"}
+                  </Button>
+                  
+                  <p className="text-[10px] text-center text-muted-foreground">
+                    Ao clicar em confirmar, você reserva suas cotas e será direcionado para as instruções de pagamento. 
+                    Sua reserva expira em 30 minutos caso o pagamento não seja confirmado.
+                  </p>
+                </form>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
