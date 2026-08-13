@@ -346,9 +346,136 @@ function Jogos() {
               Limpar abertos
             </Button>
 
+            {userProfile?.isAdmin && (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="flex-1 border-primary/40 sm:flex-none"
+                disabled={jogosSelecionados.length === 0}
+                onClick={() => setModalBolao(true)}
+              >
+                <div className="mr-2 h-2 w-2 rounded-full bg-primary animate-pulse" />
+                Gerar Bolão ({jogosSelecionados.length})
+              </Button>
+            )}
           </div>
         )}
       </div>
+
+      <Dialog open={modalBolao} onOpenChange={setModalBolao}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Gerar Novo Bolão — {cfg.nome}</DialogTitle>
+            <DialogDescription>
+              Configurar detalhes do bolão para os {jogosSelecionados.length} jogos selecionados.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 gap-4 py-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="nome">Nome do Bolão</Label>
+              <Input
+                id="nome"
+                placeholder="Ex: Bolão da Virada"
+                value={formBolao.nome}
+                onChange={(e) => setFormBolao({ ...formBolao, nome: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="concurso">Concurso</Label>
+              <Input
+                id="concurso"
+                type="number"
+                value={formBolao.concursoNumero}
+                onChange={(e) => setFormBolao({ ...formBolao, concursoNumero: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="data">Data do Sorteio</Label>
+              <Input
+                id="data"
+                type="date"
+                value={formBolao.dataSorteio}
+                onChange={(e) => setFormBolao({ ...formBolao, dataSorteio: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="horario">Horário do Sorteio</Label>
+              <Input
+                id="horario"
+                type="time"
+                value={formBolao.horarioSorteio}
+                onChange={(e) => setFormBolao({ ...formBolao, horarioSorteio: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="prazo">Prazo para Vendas (Data)</Label>
+              <Input
+                id="prazo"
+                type="date"
+                value={formBolao.prazoVendas}
+                onChange={(e) => setFormBolao({ ...formBolao, prazoVendas: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="premio">Prêmio Estimado (R$)</Label>
+              <Input
+                id="premio"
+                type="number"
+                value={formBolao.premioEstimado}
+                onChange={(e) => setFormBolao({ ...formBolao, premioEstimado: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cotas">Total de Cotas</Label>
+              <Input
+                id="cotas"
+                type="number"
+                value={formBolao.totalCotas}
+                onChange={(e) => setFormBolao({ ...formBolao, totalCotas: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="valor">Valor por Cota (R$)</Label>
+              <Input
+                id="valor"
+                type="number"
+                step="0.01"
+                value={formBolao.valorCota}
+                onChange={(e) => setFormBolao({ ...formBolao, valorCota: Number(e.target.value) })}
+              />
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-secondary/30 p-4">
+            <h4 className="mb-2 text-sm font-medium">Jogos Incluídos</h4>
+            <ScrollArea className="h-[120px]">
+              <div className="space-y-1">
+                {vigentes
+                  .filter((j) => jogosSelecionados.includes(j.id))
+                  .map((j) => (
+                    <div key={j.id} className="flex gap-1">
+                      {j.dezenas.map((n) => (
+                        <div key={n} className="h-4 w-4 rounded-full bg-primary/20 text-[8px] flex items-center justify-center font-bold">
+                          {n}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+              </div>
+            </ScrollArea>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setModalBolao(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCriarBolao} disabled={mutationCriarBolao.isPending}>
+              {mutationCriarBolao.isPending ? "Criando..." : "Criar Bolão Público"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
 
 
