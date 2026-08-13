@@ -489,7 +489,22 @@ function Jogos() {
         <div className="space-y-8">
           <section className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-lg font-semibold">Jogos em aberto</h3>
+              <div className="flex items-center gap-2">
+                {userProfile?.isAdmin && vigentes.length > 0 && (
+                  <Checkbox
+                    id="select-all-vigentes"
+                    checked={jogosSelecionados.length === vigentes.length && vigentes.length > 0}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setJogosSelecionados(vigentes.map((j) => j.id));
+                      } else {
+                        setJogosSelecionados([]);
+                      }
+                    }}
+                  />
+                )}
+                <h3 className="text-lg font-semibold">Jogos em aberto</h3>
+              </div>
               {ultimoSorteado != null && (
                 <span className="rounded-md border border-border/60 bg-secondary px-2 py-1 font-mono text-[11px] text-muted-foreground">
                   Concurso atual: {ultimoSorteado + 1}
