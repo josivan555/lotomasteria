@@ -17,6 +17,7 @@ export const criarBolao = createServerFn({ method: "POST" })
         dataSorteio: z.string(),
         horarioSorteio: z.string(),
         prazoVendas: z.string(),
+        horarioEncerramento: z.string().optional(),
         totalCotas: z.number().int().positive(),
         valorCota: z.number().positive(),
         premioEstimado: z.number().optional(),
@@ -48,6 +49,7 @@ export const criarBolao = createServerFn({ method: "POST" })
         data_sorteio: data.dataSorteio,
         horario_sorteio: data.horarioSorteio,
         prazo_vendas: data.prazoVendas,
+        horario_encerramento: data.horarioEncerramento,
         total_jogos: data.jogos.length,
         total_cotas: data.totalCotas,
         valor_cota: data.valorCota,
@@ -143,6 +145,31 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     // 1. Verificar disponibilidade
     const bolao = await obterBolao({ data: { id: data.bolaoId } });
+    
+    // Verificar se o prazo de vendas expirou
+    const agora = new Date();
+    const horario = bolao.horario_encerramento || '23:59:59';
+    const dataPrazo = new Date(`${bolao.prazo_vendas}T${horario}`);
+    
+    // Buscar perfil para verificar se é admin
+    const session = await supabase.auth.getSession();
+    const userId = session.data.session?.user.id;
+    
+    let isAdmin = false;
+    if (userId) {
+      const { data: roleRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      isAdmin = !!roleRow;
+    }
+
+    if (agora > dataPrazo && !isAdmin) {
+      throw new Error("O prazo para compra deste bolão já se encerrou.");
+    }
+
     if (data.cotas > bolao.cotas_disponiveis) {
       throw new Error(`Apenas ${bolao.cotas_disponiveis} cotas disponíveis.`);
     }

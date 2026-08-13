@@ -74,6 +74,7 @@ export type Database = {
           criador_id: string
           data_sorteio: string
           game_snapshot: Json
+          horario_encerramento: string | null
           horario_sorteio: string
           id: string
           loteria_id: string
@@ -93,6 +94,7 @@ export type Database = {
           criador_id: string
           data_sorteio: string
           game_snapshot: Json
+          horario_encerramento?: string | null
           horario_sorteio: string
           id?: string
           loteria_id: string
@@ -112,6 +114,7 @@ export type Database = {
           criador_id?: string
           data_sorteio?: string
           game_snapshot?: Json
+          horario_encerramento?: string | null
           horario_sorteio?: string
           id?: string
           loteria_id?: string

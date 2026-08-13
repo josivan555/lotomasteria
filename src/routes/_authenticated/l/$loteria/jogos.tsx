@@ -110,6 +110,7 @@ function Jogos() {
     totalCotas: 10,
     valorCota: 10,
     premioEstimado: 0,
+    horarioEncerramento: "18:00",
   });
 
   useEffect(() => {
