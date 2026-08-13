@@ -211,7 +211,8 @@ function DetalheBolao() {
         <div className="lg:col-span-2 space-y-8">
           <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl">
             <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: cfg.cor }} />
-            <div className="p-8">
+            <div className="p-5 sm:p-8">
+
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">
                   <div className="ball h-10 w-10 text-sm font-bold" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
@@ -222,14 +223,14 @@ function DetalheBolao() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4 mb-8">
                 <div className="rounded-2xl bg-secondary/30 p-4 border border-border/40">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">Estimativa de Prêmio</p>
                   <p className="text-lg font-black text-foreground">{formatBRL(bolao.premio_estimado || 0)}</p>
                 </div>
                 <div className="rounded-2xl bg-primary/10 p-4 border border-primary/20">
                   <p className="text-[10px] uppercase tracking-wider text-primary font-bold mb-1">Valor da Cota</p>
-                  <p className="text-xl font-black text-primary">{formatBRL(bolao.valor_cota)}</p>
+                  <p className="text-lg sm:text-xl font-black text-primary">{formatBRL(bolao.valor_cota)}</p>
                 </div>
               </div>
 
@@ -316,7 +317,7 @@ function DetalheBolao() {
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-3xl border border-border/60 bg-card p-8 shadow-xl">
+          <div className="rounded-3xl border border-border/60 bg-card p-5 sm:p-8 shadow-xl">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-black">Comprar Cotas</h2>
               <Button variant="link" size="sm" asChild className="text-primary font-bold p-0 h-auto">
