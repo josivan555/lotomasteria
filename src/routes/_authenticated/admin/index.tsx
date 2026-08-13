@@ -165,11 +165,11 @@ function AdminDashboard() {
                           {isEditing ? (
                             <div className="space-y-2 max-w-[200px]">
                               <Input 
-                                size="sm" 
                                 value={editBolaoForm.nome} 
                                 onChange={e => setEditBolaoForm({...editBolaoForm, nome: e.target.value})}
                                 className="h-7 text-xs font-bold"
                               />
+
                               <div className="flex items-center gap-2">
                                 <span className="text-[10px] text-muted-foreground uppercase font-black">Conc.</span>
                                 <Input 
