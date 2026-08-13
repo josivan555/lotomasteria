@@ -312,10 +312,19 @@ function DetalheBolao() {
               </div>
             </TabsContent>
 
+            <TabsContent value="conferir" className="mt-4">
+              <ConferidorJogos
+                jogos={(bolao.game_snapshot as any[]) ?? []}
+                loteriaId={bolao.loteria_id as LoteriaId}
+                resultadoOficial={bolao.resultado_oficial as number[] | null}
+              />
+            </TabsContent>
+
             <TabsContent value="participantes" className="mt-4">
               <ParticipantesList bolaoId={bolao.id} bolao={bolao} />
             </TabsContent>
           </Tabs>
+
         </div>
 
         <div className="space-y-6">
