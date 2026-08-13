@@ -30,7 +30,7 @@ function DetalheBolao() {
   const comprarCotas = useServerFn(comprarCotasBolao);
 
   const [form, setForm] = useState({ nome: "", celular: "", cotas: 1 });
-  const [sucesso, setSucesso] = useState<{ ref: string; total: number } | null>(null);
+  const [sucesso, setSucesso] = useState<{ ref: string; total: number; pix?: any } | null>(null);
 
   const { data: bolao, isLoading, error } = useQuery({
     queryKey: ["bolao", bolaoId],
