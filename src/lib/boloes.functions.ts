@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { LOTERIA_IDS, type LoteriaId } from "./loterias-config";
 
 const loteriaEnum = z.enum(LOTERIA_IDS as [LoteriaId, ...LoteriaId[]]);
@@ -193,10 +194,56 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
 
+    // 3. Gerar PIX via Mercado Pago
+    let pixData = null;
+    try {
+      const accessToken = process.env['MERCADOPAGO_ACCESS_TOKEN'];
+      if (accessToken) {
+        const response = await fetch('https://api.mercadopago.com/v1/payments', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'X-Idempotency-Key': participante.id,
+          },
+          body: JSON.stringify({
+            transaction_amount: valorTotal,
+            description: `Bolão LotoMaster - ${bolao.nome}`,
+            payment_method_id: 'pix',
+            external_reference: participante.id,
+            notification_url: `${process.env['SITE_URL'] || 'https://lotomasteria.lovable.app'}/api/public/webhook`,
+            payer: {
+              email: `${participante.id.substring(0, 8)}@lotomasteria.app`,
+              first_name: data.nome.split(' ')[0],
+              last_name: data.nome.split(' ').slice(1).join(' ') || 'Cliente',
+            },
+          }),
+        });
+
+        if (response.ok) {
+          const mpResult = await response.json();
+          pixData = {
+            qrCode: mpResult.point_of_interaction.transaction_data.qr_code,
+            qrCodeBase64: mpResult.point_of_interaction.transaction_data.qr_code_base64,
+            paymentId: mpResult.id,
+          };
+          
+          // Salvar o ID do pagamento no participante
+          await supabaseAdmin
+            .from('bolao_participantes')
+            .update({ payment_id: mpResult.id.toString() })
+            .eq('id', participante.id);
+        }
+      }
+    } catch (mpError) {
+      console.error('Erro ao gerar PIX MP:', mpError);
+    }
+
     return {
       id: participante.id,
       codigoReferencia: participante.codigo_referencia,
       valorTotal,
+      pix: pixData,
     };
   });
 

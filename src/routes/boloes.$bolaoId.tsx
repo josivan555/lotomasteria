@@ -30,7 +30,7 @@ function DetalheBolao() {
   const comprarCotas = useServerFn(comprarCotasBolao);
 
   const [form, setForm] = useState({ nome: "", celular: "", cotas: 1 });
-  const [sucesso, setSucesso] = useState<{ ref: string; total: number } | null>(null);
+  const [sucesso, setSucesso] = useState<{ ref: string; total: number; pix?: any } | null>(null);
 
   const { data: bolao, isLoading, error } = useQuery({
     queryKey: ["bolao", bolaoId],
@@ -40,7 +40,7 @@ function DetalheBolao() {
   const mutation = useMutation({
     mutationFn: (payload: any) => comprarCotas({ data: payload }),
     onSuccess: (res) => {
-      setSucesso({ ref: res.codigoReferencia, total: res.valorTotal });
+      setSucesso({ ref: res.codigoReferencia, total: res.valorTotal, pix: res.pix });
       toast.success("Reserva realizada! Siga as instruções para pagamento.");
     },
     onError: (e) => toast.error(e.message),
@@ -108,12 +108,42 @@ function DetalheBolao() {
                   }}
                 >
                   <Copy className="h-4 w-4" />
-                </Button>
+                  </Button>
+                </div>
+
+                {sucesso.pix && (
+                  <div className="mt-6 space-y-4 border-t border-border pt-6">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Pagar agora via PIX</p>
+                    <div className="mx-auto w-40 h-40 bg-white rounded-2xl flex items-center justify-center p-3 shadow-inner">
+                      {sucesso.pix.qrCodeBase64 ? (
+                        <img src={`data:image/png;base64,${sucesso.pix.qrCodeBase64}`} alt="QR Code PIX" className="w-full h-full" />
+                      ) : (
+                        <QrCode className="w-full h-full text-slate-900" />
+                      )}
+                    </div>
+                    <Button 
+                      className="w-full font-bold h-10" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        const code = sucesso.pix?.qrCode || "";
+                        if (code) {
+                          navigator.clipboard.writeText(code);
+                          toast.success("Código PIX copiado!");
+                        }
+                      }}
+                    >
+                      Copiar Código PIX
+                    </Button>
+                  </div>
+                )}
+
+                <p className="text-[10px] text-muted-foreground leading-tight uppercase tracking-widest mt-4">
+                  {sucesso.pix 
+                    ? "Após o pagamento, sua reserva será confirmada automaticamente."
+                    : "Utilize este código para confirmar seu pagamento na área de \"Minhas Reservas\""}
+                </p>
               </div>
-              <p className="text-[10px] text-muted-foreground leading-tight uppercase tracking-widest">
-                Utilize este código para confirmar seu pagamento na área de "Minhas Reservas"
-              </p>
-            </div>
           </div>
           
           <div className="bg-muted/50 p-4 border-t border-border flex justify-center">
