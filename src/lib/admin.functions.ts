@@ -112,19 +112,28 @@ export const excluirBolao = createServerFn({ method: "POST" })
 
 export const listarParticipantesBolao = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ bolaoId: z.string().uuid() }).parse(raw))
+  .inputValidator((raw: unknown) => z.object({ 
+    bolaoId: z.string().uuid(),
+    page: z.number().default(1),
+    pageSize: z.number().default(20)
+  }).parse(raw))
   .handler(async ({ data, context }) => {
-    // Permitir se for admin OU se houver um usuário autenticado (visão limitada para usuários comuns)
-    // O checkAdmin só é chamado se quisermos restringir a escrita ou dados sensíveis.
+    const from = (data.page - 1) * data.pageSize;
+    const to = from + data.pageSize - 1;
 
-    const { data: participantes, error } = await context.supabase
+    const { data: participantes, error, count } = await context.supabase
       .from("bolao_participantes")
-      .select("id, nome_completo, quantidade_cotas, status, created_at")
+      .select("id, nome_completo, quantidade_cotas, status, created_at, celular", { count: 'exact' })
       .eq("bolao_id", data.bolaoId)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
     if (error) throw new Error(error.message);
-    return participantes;
+    return { 
+      items: participantes || [], 
+      total: count || 0,
+      hasMore: (count || 0) > to + 1
+    };
   });
 
 export const atualizarParticipanteBolao = createServerFn({ method: "POST" })
