@@ -351,3 +351,26 @@ export const excluirTodosJogos = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const meuPerfil = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: roleRows } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    return {
+      id: context.userId,
+      email: (context.claims as any)?.email,
+      roles: roleRows?.map(r => r.role) ?? [],
+      isAdmin: roleRows?.some(r => r.role === 'admin') ?? false,
+      profile
+    };
+  });
+

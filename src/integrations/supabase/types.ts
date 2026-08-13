@@ -14,6 +14,127 @@ export type Database = {
   }
   public: {
     Tables: {
+      bolao_participantes: {
+        Row: {
+          bolao_id: string
+          celular: string
+          codigo_referencia: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          nome_completo: string
+          payment_id: string | null
+          payment_method: string | null
+          quantidade_cotas: number
+          status: string
+          valor_total: number
+        }
+        Insert: {
+          bolao_id: string
+          celular: string
+          codigo_referencia: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nome_completo: string
+          payment_id?: string | null
+          payment_method?: string | null
+          quantidade_cotas: number
+          status?: string
+          valor_total: number
+        }
+        Update: {
+          bolao_id?: string
+          celular?: string
+          codigo_referencia?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nome_completo?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          quantidade_cotas?: number
+          status?: string
+          valor_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bolao_participantes_bolao_id_fkey"
+            columns: ["bolao_id"]
+            isOneToOne: false
+            referencedRelation: "boloes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      boloes: {
+        Row: {
+          concurso_numero: number
+          created_at: string | null
+          criador_id: string
+          data_sorteio: string
+          game_snapshot: Json
+          horario_sorteio: string
+          id: string
+          loteria_id: string
+          nome: string
+          prazo_vendas: string
+          premio_estimado: number | null
+          resultado_oficial: number[] | null
+          status: string
+          total_cotas: number
+          total_jogos: number
+          valor_cota: number
+          valor_total: number
+        }
+        Insert: {
+          concurso_numero: number
+          created_at?: string | null
+          criador_id: string
+          data_sorteio: string
+          game_snapshot: Json
+          horario_sorteio: string
+          id?: string
+          loteria_id: string
+          nome: string
+          prazo_vendas: string
+          premio_estimado?: number | null
+          resultado_oficial?: number[] | null
+          status?: string
+          total_cotas: number
+          total_jogos: number
+          valor_cota: number
+          valor_total: number
+        }
+        Update: {
+          concurso_numero?: number
+          created_at?: string | null
+          criador_id?: string
+          data_sorteio?: string
+          game_snapshot?: Json
+          horario_sorteio?: string
+          id?: string
+          loteria_id?: string
+          nome?: string
+          prazo_vendas?: string
+          premio_estimado?: number | null
+          resultado_oficial?: number[] | null
+          status?: string
+          total_cotas?: number
+          total_jogos?: number
+          valor_cota?: number
+          valor_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "boloes_loteria_id_fkey"
+            columns: ["loteria_id"]
+            isOneToOne: false
+            referencedRelation: "loterias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concursos: {
         Row: {
           created_at: string

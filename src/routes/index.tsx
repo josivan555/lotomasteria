@@ -1,6 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkles, BarChart3, Filter, Trophy } from "lucide-react";
+import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { listarBoloesPublicos } from "@/lib/boloes.functions";
+import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,6 +39,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const listarBoloesFn = useServerFn(listarBoloesPublicos);
+  const { data: boloes = [], isLoading: isLoadingBoloes } = useQuery({
+    queryKey: ["boloes-publicos"],
+    queryFn: () => listarBoloesFn(),
+  });
+
   return (
     <div className="min-h-screen">
       <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-6 md:py-6">
@@ -90,9 +100,92 @@ function Landing() {
             </Button>
           </div>
         </section>
+        <section className="py-12 md:py-20 border-y border-border/40">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Bolões LotoMaster</h2>
+              <p className="text-muted-foreground mt-1">Participe de apostas coletivas geradas com nossa inteligência</p>
+            </div>
+            <Button variant="ghost" asChild>
+              <Link to="/auth" search={{ mode: "signup" }}>Ver todos <ChevronRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+          </div>
+
+          {isLoadingBoloes ? (
+            <div className="text-center py-10 text-muted-foreground">Carregando bolões...</div>
+          ) : (boloes ?? []).length === 0 ? (
+            <div className="text-center py-10 rounded-xl border border-dashed border-border/60 text-muted-foreground">
+              Nenhum bolão disponível no momento. Volte em breve!
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {(boloes ?? []).slice(0, 6).map((b: any) => {
+                const cfg = LOTERIAS[b.loteria_id as LoteriaId];
+                const progresso = (b.cotas_compradas / b.total_cotas) * 100;
+                
+                return (
+                  <div key={b.id} className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/60 backdrop-blur hover:border-primary/50 transition-all hover:shadow-lg">
+                    <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: cfg.cor }} />
+                    
+                    <div className="p-5">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="ball h-7 w-7 text-[10px]" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
+                          <span className="font-bold text-sm">{cfg.nome}</span>
+                        </div>
+                        <div className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Concurso {b.concurso_numero}
+                        </div>
+                      </div>
+
+                      <h3 className="text-lg font-bold mb-1 group-hover:text-primary transition-colors">{b.nome}</h3>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
+                        <Clock className="h-3 w-3" />
+                        <span>Sorteio: {new Date(b.data_sorteio).toLocaleDateString('pt-BR')} às {b.horario_sorteio}</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 mb-4 rounded-lg bg-secondary/30 p-3 border border-border/40">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Prêmio Estimado</p>
+                          <p className="text-sm font-bold text-foreground">
+                            {b.premio_estimado ? `R$ ${b.premio_estimado.toLocaleString('pt-BR')}` : 'Não informado'}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Valor da Cota</p>
+                          <p className="text-lg font-black text-primary">R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 mb-6">
+                        <div className="flex justify-between text-xs font-medium">
+                          <span className="text-muted-foreground">Progresso</span>
+                          <span className="text-foreground">{b.cotas_compradas} de {b.total_cotas} cotas</span>
+                        </div>
+                        <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                          <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progresso}%` }} />
+                        </div>
+                        <div className="flex justify-between text-[10px] text-muted-foreground">
+                          <span>{b.total_jogos} jogos incluídos</span>
+                          <span className="font-bold text-primary">{b.cotas_disponiveis} disponíveis</span>
+                        </div>
+                      </div>
+
+                      <Button className="w-full font-bold shadow-md shadow-primary/20" asChild>
+                        <Link to="/auth" search={{ mode: "signup" }}>
+                          <Users className="mr-2 h-4 w-4" /> Compre seu bolão
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
 
 
-        <section className="pb-24">
+        <section className="pb-24 pt-12">
           <h2 className="mb-6 text-center text-2xl font-bold tracking-tight md:text-3xl">
             Recursos do LotoMaster IA
           </h2>

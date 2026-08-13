@@ -2,13 +2,25 @@ import { createFileRoute, useRouter, useParams, Link } from "@tanstack/react-rou
 import { InfoDot } from "@/components/info-label";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   listarJogosSalvos,
   excluirJogo,
   excluirJogosPorIds,
   ultimoResultadoCaixa,
+  meuPerfil,
 } from "@/lib/loterias.functions";
+import { criarBolao } from "@/lib/boloes.functions";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
@@ -32,7 +44,14 @@ function Jogos() {
   const listar = useServerFn(listarJogosSalvos);
   const excluir = useServerFn(excluirJogo);
   const excluirLote = useServerFn(excluirJogosPorIds);
+  const meuPerfilFn = useServerFn(meuPerfil);
+  const criarBolaoFn = useServerFn(criarBolao);
   const router = useRouter();
+
+  const { data: userProfile } = useQuery({
+    queryKey: ["meu-perfil"],
+    queryFn: () => meuPerfilFn(),
+  });
 
   const { data: jogos = [], isLoading } = useQuery({
     queryKey: ["jogos-salvos", loteria],
@@ -64,11 +83,46 @@ function Jogos() {
     onError: (e) => toast.error(e.message),
   });
 
+  const mutationCriarBolao = useMutation({
+    mutationFn: (payload: any) => criarBolaoFn({ data: payload }),
+    onSuccess: () => {
+      toast.success("Bolão criado com sucesso!");
+      setModalBolao(false);
+      setJogosSelecionados([]);
+    },
+    onError: (e) => toast.error("Erro ao criar bolão: " + e.message),
+  });
+
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [aberto, setAberto] = useState<number | null>(null);
   const [pagina, setPagina] = useState(1);
   const [porPagina, setPorPagina] = useState(5);
+
+  const [jogosSelecionados, setJogosSelecionados] = useState<string[]>([]);
+  const [modalBolao, setModalBolao] = useState(false);
+  const [formBolao, setFormBolao] = useState({
+    nome: "",
+    concursoNumero: 0,
+    dataSorteio: "",
+    horarioSorteio: "20:00",
+    prazoVendas: "",
+    totalCotas: 10,
+    valorCota: 10,
+    premioEstimado: 0,
+  });
+
+  useEffect(() => {
+    if (oficial) {
+      setFormBolao(prev => ({
+        ...prev,
+        concursoNumero: (oficial.numero || 0) + 1,
+        dataSorteio: oficial.proximoData || "",
+        prazoVendas: oficial.proximoData || "",
+        premioEstimado: oficial.estimativaProximo || 0,
+      }));
+    }
+  }, [oficial]);
 
 
   const jogosFiltrados = useMemo(() => {
@@ -117,12 +171,29 @@ function Jogos() {
 
   const renderJogo = (j: (typeof jogos)[number]) => {
     const c = j.score != null ? classificarScore(Number(j.score)) : null;
+    const isSelected = jogosSelecionados.includes(j.id);
+    const isAdmin = userProfile?.isAdmin;
+
     return (
       <li
         key={j.id}
-        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur"
+        className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 backdrop-blur transition-colors ${
+          isSelected ? "border-primary bg-primary/10" : "border-border/60 bg-card/60"
+        }`}
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+          {isAdmin && (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  setJogosSelecionados((prev) => [...prev, j.id]);
+                } else {
+                  setJogosSelecionados((prev) => prev.filter((id) => id !== j.id));
+                }
+              }}
+            />
+          )}
           <span className="text-xs text-muted-foreground">
             {new Date(j.created_at).toLocaleDateString("pt-BR")}
           </span>
@@ -156,6 +227,23 @@ function Jogos() {
         </div>
       </li>
     );
+  };
+
+  const handleCriarBolao = () => {
+    const gamesToInclude = vigentes
+      .filter((j) => jogosSelecionados.includes(j.id))
+      .map((j) => ({ dezenas: j.dezenas, score: j.score || undefined }));
+
+    if (gamesToInclude.length === 0) {
+      toast.error("Selecione pelo menos um jogo para criar o bolão.");
+      return;
+    }
+
+    mutationCriarBolao.mutate({
+      ...formBolao,
+      loteriaId: loteria,
+      jogos: gamesToInclude,
+    });
   };
 
 
@@ -258,9 +346,136 @@ function Jogos() {
               Limpar abertos
             </Button>
 
+            {userProfile?.isAdmin && (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="flex-1 border-primary/40 sm:flex-none"
+                disabled={jogosSelecionados.length === 0}
+                onClick={() => setModalBolao(true)}
+              >
+                <div className="mr-2 h-2 w-2 rounded-full bg-primary animate-pulse" />
+                Gerar Bolão ({jogosSelecionados.length})
+              </Button>
+            )}
           </div>
         )}
       </div>
+
+      <Dialog open={modalBolao} onOpenChange={setModalBolao}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Gerar Novo Bolão — {cfg.nome}</DialogTitle>
+            <DialogDescription>
+              Configurar detalhes do bolão para os {jogosSelecionados.length} jogos selecionados.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 gap-4 py-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="nome">Nome do Bolão</Label>
+              <Input
+                id="nome"
+                placeholder="Ex: Bolão da Virada"
+                value={formBolao.nome}
+                onChange={(e) => setFormBolao({ ...formBolao, nome: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="concurso">Concurso</Label>
+              <Input
+                id="concurso"
+                type="number"
+                value={formBolao.concursoNumero}
+                onChange={(e) => setFormBolao({ ...formBolao, concursoNumero: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="data">Data do Sorteio</Label>
+              <Input
+                id="data"
+                type="date"
+                value={formBolao.dataSorteio}
+                onChange={(e) => setFormBolao({ ...formBolao, dataSorteio: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="horario">Horário do Sorteio</Label>
+              <Input
+                id="horario"
+                type="time"
+                value={formBolao.horarioSorteio}
+                onChange={(e) => setFormBolao({ ...formBolao, horarioSorteio: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="prazo">Prazo para Vendas (Data)</Label>
+              <Input
+                id="prazo"
+                type="date"
+                value={formBolao.prazoVendas}
+                onChange={(e) => setFormBolao({ ...formBolao, prazoVendas: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="premio">Prêmio Estimado (R$)</Label>
+              <Input
+                id="premio"
+                type="number"
+                value={formBolao.premioEstimado}
+                onChange={(e) => setFormBolao({ ...formBolao, premioEstimado: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cotas">Total de Cotas</Label>
+              <Input
+                id="cotas"
+                type="number"
+                value={formBolao.totalCotas}
+                onChange={(e) => setFormBolao({ ...formBolao, totalCotas: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="valor">Valor por Cota (R$)</Label>
+              <Input
+                id="valor"
+                type="number"
+                step="0.01"
+                value={formBolao.valorCota}
+                onChange={(e) => setFormBolao({ ...formBolao, valorCota: Number(e.target.value) })}
+              />
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-secondary/30 p-4">
+            <h4 className="mb-2 text-sm font-medium">Jogos Incluídos</h4>
+            <ScrollArea className="h-[120px]">
+              <div className="space-y-1">
+                {vigentes
+                  .filter((j) => jogosSelecionados.includes(j.id))
+                  .map((j) => (
+                    <div key={j.id} className="flex gap-1">
+                      {j.dezenas.map((n) => (
+                        <div key={n} className="h-4 w-4 rounded-full bg-primary/20 text-[8px] flex items-center justify-center font-bold">
+                          {n}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+              </div>
+            </ScrollArea>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setModalBolao(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCriarBolao} disabled={mutationCriarBolao.isPending}>
+              {mutationCriarBolao.isPending ? "Criando..." : "Criar Bolão Público"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
 
 
