@@ -25,6 +25,7 @@ export type Database = {
           nome_completo: string
           payment_id: string | null
           payment_method: string | null
+          pix_data: Json | null
           quantidade_cotas: number
           status: string
           valor_total: number
@@ -39,6 +40,7 @@ export type Database = {
           nome_completo: string
           payment_id?: string | null
           payment_method?: string | null
+          pix_data?: Json | null
           quantidade_cotas: number
           status?: string
           valor_total: number
@@ -53,6 +55,7 @@ export type Database = {
           nome_completo?: string
           payment_id?: string | null
           payment_method?: string | null
+          pix_data?: Json | null
           quantidade_cotas?: number
           status?: string
           valor_total?: number

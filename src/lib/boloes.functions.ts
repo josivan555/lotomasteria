@@ -228,10 +228,13 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
             paymentId: mpResult.id,
           };
           
-          // Salvar o ID do pagamento no participante
+          // Salvar o ID do pagamento e os dados do PIX no participante
           await supabaseAdmin
             .from('bolao_participantes')
-            .update({ payment_id: mpResult.id.toString() })
+            .update({ 
+              payment_id: mpResult.id.toString(),
+              pix_data: pixData 
+            })
             .eq('id', participante.id);
         }
       }
