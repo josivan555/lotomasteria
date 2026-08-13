@@ -377,7 +377,7 @@ function Jogos() {
       </div>
 
       <Dialog open={modalBolao} onOpenChange={setModalBolao}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Gerar Novo Bolão — {cfg.nome}</DialogTitle>
             <DialogDescription>
@@ -400,7 +400,8 @@ function Jogos() {
               <Input
                 id="concurso"
                 type="number"
-                value={formBolao.concursoNumero}
+                placeholder={oficial ? `Atual: ${oficial.numero}` : "Número do concurso"}
+                value={formBolao.concursoNumero || ""}
                 onChange={(e) => setFormBolao({ ...formBolao, concursoNumero: Number(e.target.value) })}
               />
             </div>
