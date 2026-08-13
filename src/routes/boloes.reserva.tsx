@@ -61,7 +61,7 @@ function BuscaReserva() {
             </div>
             <h1 className="text-2xl font-black">Consultar Reserva</h1>
             <p className="text-muted-foreground mt-2">
-              Informe o código de referência que você recebeu ao reservar sua cota.
+              Informe o código de referência ou seu nome completo para localizar sua reserva.
             </p>
           </div>
 
