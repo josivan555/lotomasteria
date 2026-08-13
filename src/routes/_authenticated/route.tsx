@@ -1,11 +1,14 @@
 import { createFileRoute, Outlet, redirect, Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureBrowserSession } from "@/lib/session-guard";
-import { LogOut, Home } from "lucide-react";
+import { LogOut, Home, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
 import { isLoteriaId, LOTERIAS, LOTERIA_IDS, type LoteriaId } from "@/lib/loterias-config";
+import { meuPerfil } from "@/lib/loterias.functions";
+import { useServerFn } from "@tanstack/react-start";
+
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -28,8 +31,15 @@ function AuthedLayout() {
   const router = useRouter();
   const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const getPerfil = useServerFn(meuPerfil);
+
+  const { data: profile } = useQuery({
+    queryKey: ["meu-perfil"],
+    queryFn: () => getPerfil(),
+  });
 
   const loteriaAtual = extractLoteriaAtual(pathname);
+
 
   async function signOut() {
     await qc.cancelQueries();
@@ -110,6 +120,14 @@ function AuthedLayout() {
                   <Home className="mr-1.5 h-4 w-4" /> Loterias
                 </Link>
               </Button>
+              {profile?.isAdmin && (
+                <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex text-primary">
+                  <Link to="/admin">
+                    <ShieldCheck className="mr-1.5 h-4 w-4" /> Painel Admin
+                  </Link>
+                </Button>
+              )}
+
               <Button variant="ghost" size="sm" onClick={signOut} className="hidden md:inline-flex">
                 <LogOut className="mr-1.5 h-4 w-4" /> Sair
               </Button>
