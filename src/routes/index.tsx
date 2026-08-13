@@ -183,7 +183,7 @@ function Landing() {
                         </Button>
                         <Button variant="outline" className="font-bold border-primary/30 text-primary hover:bg-primary/5" asChild>
                           <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }}>
-                            Reservar
+                            Ver Jogos
                           </Link>
                         </Button>
                       </div>
