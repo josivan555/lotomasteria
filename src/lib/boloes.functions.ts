@@ -264,15 +264,19 @@ export const buscarReservaBolao = createServerFn({ method: "GET" })
 
     // 2. Se não encontrou por código, tentar por nome completo (busca aproximada)
     if (!reserva) {
-      const { data: reservasPorNome, error: nameError } = await supabase
-        .from("bolao_participantes")
-        .select("*, boloes(*)")
-        .ilike("nome_completo", `%${data.codigo}%`)
-        .order("created_at", { ascending: false })
-        .limit(1);
+      const query = data.codigo.trim();
+      // Apenas busca por nome se tiver pelo menos 3 caracteres para evitar resultados demais
+      if (query.length >= 3) {
+        const { data: reservasPorNome, error: nameError } = await supabase
+          .from("bolao_participantes")
+          .select("*, boloes(*)")
+          .ilike("nome_completo", `%${query}%`)
+          .order("created_at", { ascending: false })
+          .limit(1);
 
-      if (nameError) throw new Error(nameError.message);
-      reserva = reservasPorNome?.[0] || null;
+        if (nameError) throw new Error(nameError.message);
+        reserva = reservasPorNome?.[0] || null;
+      }
     }
 
     if (!reserva) {
