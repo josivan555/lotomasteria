@@ -49,7 +49,7 @@ function Landing() {
     <div className="min-h-screen">
       <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-6 md:py-6">
         <div className="flex items-center gap-2 text-lg font-bold tracking-tight">
-          <span className="ball ball-gold h-8! w-8! text-sm!">L</span>
+          <div className="ball h-8! w-8! text-sm! bg-primary text-primary-foreground font-black flex items-center justify-center rounded-full">L</div>
           LotoMaster <span className="text-primary">IA</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
