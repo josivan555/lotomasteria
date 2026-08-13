@@ -42,8 +42,10 @@ export const Route = createFileRoute('/api/public/webhook')({
 
             console.log(`Status do pagamento ${paymentId}: ${status} (Ref: ${externalReference})`);
 
-            if (externalReference && status === 'approved') {
-              // Atualizar o status da reserva no banco de dados
+            // Mapear status do Mercado Pago para os nossos
+            // Status possíveis no MP: pending, approved, authorized, in_process, in_mediation, rejected, cancelled, refunded, charged_back
+            if (externalReference && (status === 'approved' || status === 'authorized')) {
+              // Atualizar o status da reserva no banco de dados para 'pago'
               const { error } = await supabaseAdmin
                 .from('bolao_participantes')
                 .update({ 
@@ -51,15 +53,18 @@ export const Route = createFileRoute('/api/public/webhook')({
                   payment_id: paymentId.toString(),
                   payment_method: 'mercadopago_pix'
                 })
-                .eq('id', externalReference)
-                .eq('status', 'reservado');
+                .eq('id', externalReference);
 
               if (error) {
-                console.error('Erro ao atualizar status da reserva:', error);
+                console.error('Erro ao atualizar status da reserva (pago):', error);
                 return new Response('Database error', { status: 500 });
               }
               
               console.log(`Reserva ${externalReference} marcada como PAGA.`);
+            } else if (externalReference && (status === 'rejected' || status === 'cancelled' || status === 'refunded')) {
+              // Se o pagamento falhar ou for cancelado, podemos voltar para 'reservado' ou criar um novo status como 'cancelado'
+              // Por enquanto, vamos apenas logar, já que o usuário pode tentar pagar novamente o mesmo PIX se não expirou
+              console.log(`Pagamento da reserva ${externalReference} falhou ou foi cancelado: ${status}`);
             }
           }
 
