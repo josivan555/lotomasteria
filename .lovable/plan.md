@@ -1,42 +1,85 @@
-## Objetivo
+# Plan - Sistema de Bolões LotoMaster IA
 
-Vender créditos via Mercado Pago (PIX, cartão e boleto pelo Checkout Pro), creditar automaticamente após confirmação do pagamento e consumir créditos ao gerar jogos.
+Implementação do sistema completo de bolões, integrado à estrutura atual de geração de jogos, permitindo a criação, venda e conferência de cotas.
 
-## Regras de negócio definidas
+## Banco de Dados
 
-- 1 crédito = 10 jogos gerados (arredondado para cima por geração)
-- Novos usuários ganham 5 créditos grátis (50 jogos)
-- Pacotes: 10 créditos R$ 9,90 · 30 créditos R$ 24,90 · 100 créditos R$ 69,90
-- Sem créditos, o gerador bloqueia e leva para a página de compra
+Criação das tabelas para gestão de bolões, participantes e transações, com RLS e GRANTs apropriados.
 
-## Banco de dados
+```sql
+-- public.boloes: Armazena as informações principais do bolão
+CREATE TABLE public.boloes (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    loteria_id text REFERENCES public.loterias(id) NOT NULL,
+    criador_id uuid REFERENCES auth.users(id) NOT NULL,
+    nome text NOT NULL,
+    concurso_numero integer NOT NULL,
+    data_sorteio date NOT NULL,
+    horario_sorteio time NOT NULL,
+    prazo_vendas timestamp with time zone NOT NULL,
+    total_jogos integer NOT NULL,
+    total_cotas integer NOT NULL,
+    valor_cota numeric(10,2) NOT NULL,
+    valor_total numeric(12,2) NOT NULL,
+    premio_estimado numeric(15,2),
+    status text NOT NULL DEFAULT 'rascunho', -- rascunho, publicado, em_vendas, esgotado, encerrado, sorteado, conferido, cancelado
+    game_snapshot jsonb NOT NULL, -- Cópia congelada dos jogos no momento da criação
+    resultado_oficial integer[], -- Dezenas sorteadas (após o sorteio)
+    created_at timestamp with time zone DEFAULT now()
+);
 
-- `user_credits`: saldo por usuário. Leitura só do próprio usuário; alterações apenas pelo servidor.
-- `credit_transactions`: histórico (compra, bônus inicial, consumo) com quantidade, motivo e referência do pedido.
-- `credit_orders`: pedido de compra com pacote, valor, status (pendente/pago/expirado), id da preferência e do pagamento no Mercado Pago.
-- Gatilho no cadastro concede os 5 créditos iniciais e registra a transação de bônus.
-- Função no banco para debitar de forma atômica (impede saldo negativo em cliques simultâneos).
+-- public.bolao_participantes: Controle de reservas e compras de cotas
+CREATE TABLE public.bolao_participantes (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    bolao_id uuid REFERENCES public.boloes(id) ON DELETE CASCADE NOT NULL,
+    nome_completo text NOT NULL,
+    celular text NOT NULL,
+    quantidade_cotas integer NOT NULL,
+    valor_total numeric(12,2) NOT NULL,
+    status text NOT NULL DEFAULT 'reservado', -- reservado, pago, expirado, cancelado
+    codigo_referencia text UNIQUE NOT NULL, -- Ex: RES-YYYYMMDD-XXXX
+    created_at timestamp with time zone DEFAULT now(),
+    expires_at timestamp with time zone,
+    payment_id text, -- ID do Mercado Pago
+    payment_method text
+);
 
-## Backend
+-- Habilitar RLS
+ALTER TABLE public.boloes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bolao_participantes ENABLE ROW LEVEL SECURITY;
 
-- `src/lib/credits.functions.ts` — funções autenticadas: consultar saldo, listar histórico, criar pedido de pagamento (chama a API do Mercado Pago e devolve a URL do checkout), consultar status de um pedido.
-- `src/lib/mercadopago.server.ts` — chamadas à API do Mercado Pago (preferência de pagamento e consulta de pagamento) usando o Access Token guardado como segredo.
-- `src/routes/api/public/mercadopago-webhook.ts` — recebe a notificação, consulta o pagamento na API do Mercado Pago (nunca confia no corpo recebido), e, se aprovado, credita uma única vez (idempotente pelo id do pagamento).
-- Débito de créditos feito no servidor dentro da própria função de geração/salvamento, nunca só na interface.
+-- Políticas: Qualquer um lê bolões 'em_vendas' ou 'encerrados'. Apenas admin cria/edita.
+CREATE POLICY "Leitura pública de bolões ativos" ON public.boloes FOR SELECT USING (status IN ('publicado', 'em_vendas', 'esgotado', 'encerrado', 'sorteado', 'conferido'));
+CREATE POLICY "Admins gerenciam bolões" ON public.boloes FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+
+-- Políticas participantes: Usuário vê suas próprias reservas/compras (baseado no ID ou celular/sessão se não logado, mas aqui seguiremos a regra de privacidade).
+-- Admin vê tudo.
+CREATE POLICY "Admins gerenciam participantes" ON public.bolao_participantes FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+
+GRANT SELECT ON public.boloes TO anon, authenticated;
+GRANT ALL ON public.boloes TO service_role;
+GRANT SELECT, INSERT ON public.bolao_participantes TO anon, authenticated;
+GRANT ALL ON public.bolao_participantes TO service_role;
+```
+
+## Backend (Server Functions)
+
+- `criarBolao`: Função administrativa para converter jogos selecionados em um bolão (com snapshot).
+- `listarBoloesPublicos`: Lista bolões para a página inicial (filtrados por status).
+- `reservarCota`: Cria registro em `bolao_participantes` com prazo de expiração.
+- `confirmarPagamentoBolao`: Handler para webhook do Mercado Pago (atualiza status e cota).
+- `conferirBolaoIA`: Executa a lógica de comparação entre o snapshot e o resultado oficial.
 
 ## Frontend
 
-- Nova rota `/creditos`: saldo atual, os três pacotes, botão de compra que abre o checkout do Mercado Pago, e histórico de transações.
-- Página de retorno após pagamento com verificação de status (o PIX pode levar alguns segundos) e atualização automática do saldo.
-- Indicador de saldo no cabeçalho das telas da loteria, com link para comprar.
-- No Gerador: aviso de quantos créditos a quantidade escolhida vai consumir e bloqueio amigável quando o saldo for insuficiente.
+- **Aba Meus Jogos**: Adição de checkboxes e botão "🎟️ Gerar Bolão" (visível apenas para admin).
+- **Modal Gerar Bolão**: Formulário completo com cálculos automáticos de valor total.
+- **Área Pública (`/boloes`)**: Nova rota pública com cards coloridos (estilo Mega, Loto, Quina).
+- **Detalhe do Bolão (`/bolao/$slug`)**: Página com info do concurso, botão de reserva/compra e visualização dos jogos.
+- **Painel Administrativo de Bolões**: Dashboard para gerenciar vendas, participantes (com link WhatsApp) e registrar resultados.
 
-## Configuração necessária
+## Integrações
 
-Vou pedir com segurança dois valores: o **Access Token do Mercado Pago** e um **segredo de webhook** (assinatura), para validar as notificações recebidas.
-
-## Detalhes técnicos
-
-- Webhook em `/api/public/*` (sem autenticação de site), com validação da assinatura `x-signature` do Mercado Pago e reconsulta do pagamento pela API antes de creditar.
-- Crédito e mudança de status do pedido em uma função `SECURITY DEFINER` idempotente, chamada com service role apenas dentro do webhook.
-- RLS: usuário lê apenas o próprio saldo, transações e pedidos; nenhuma escrita direta pelo cliente.
+- **Mercado Pago**: Checkout transparente ou Pro para compra de cotas.
+- **PDF**: Geração de lista de jogos do bolão e relatório de conferência.
+- **WhatsApp**: Links dinâmicos para cobrança de reservas e compartilhamento de resultados.
