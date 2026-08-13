@@ -5,6 +5,7 @@ import { obterBolao, comprarCotasBolao } from "@/lib/boloes.functions";
 import { listarParticipantesBolao, atualizarParticipanteBolao, excluirParticipanteBolao } from "@/lib/admin.functions";
 import { meuPerfil } from "@/lib/loterias.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
+import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/credits-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -405,7 +406,17 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
 
   const { data: perfil } = useQuery({
     queryKey: ["perfil"],
-    queryFn: () => getPerfil(),
+    queryFn: async () => {
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session.session) return { isAdmin: false };
+        return await getPerfil();
+      } catch (e) {
+        console.warn("Failed to fetch profile (likely not authenticated):", e);
+        return { isAdmin: false };
+      }
+    },
+    staleTime: 1000 * 60 * 5,
   });
 
   const isAdmin = perfil?.isAdmin;

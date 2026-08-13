@@ -18,6 +18,7 @@ function AdminLayout() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ["meu-perfil"],
     queryFn: () => perfilFn(),
+    staleTime: 1000 * 60 * 5,
   });
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground text-sm font-medium">Verificando permissões...</div>;

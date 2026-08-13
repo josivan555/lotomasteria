@@ -36,6 +36,7 @@ function AuthedLayout() {
   const { data: profile } = useQuery({
     queryKey: ["meu-perfil"],
     queryFn: () => getPerfil(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const loteriaAtual = extractLoteriaAtual(pathname);
