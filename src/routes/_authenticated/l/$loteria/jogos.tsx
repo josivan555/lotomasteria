@@ -252,6 +252,19 @@ function Jogos() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
+            {userProfile?.isAdmin && (
+              <Checkbox
+                className="h-5 w-5"
+                checked={vigentes.length > 0 && jogosSelecionados.length === vigentes.length}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setJogosSelecionados(vigentes.map((j) => j.id));
+                  } else {
+                    setJogosSelecionados([]);
+                  }
+                }}
+              />
+            )}
             <h2 className="text-xl font-bold md:text-2xl">Meus Jogos · {cfg.nome}</h2>
             <InfoDot
               title="Meus jogos"
