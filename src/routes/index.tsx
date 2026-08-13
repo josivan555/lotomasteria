@@ -39,6 +39,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const listarBoloesFn = useServerFn(listarBoloesPublicos);
+  const { data: boloes = [], isLoading: isLoadingBoloes } = useQuery({
+    queryKey: ["boloes-publicos"],
+    queryFn: () => listarBoloesFn(),
+  });
+
   return (
     <div className="min-h-screen">
       <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-6 md:py-6">
