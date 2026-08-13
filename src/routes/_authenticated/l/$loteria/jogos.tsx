@@ -2,13 +2,25 @@ import { createFileRoute, useRouter, useParams, Link } from "@tanstack/react-rou
 import { InfoDot } from "@/components/info-label";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   listarJogosSalvos,
   excluirJogo,
   excluirJogosPorIds,
   ultimoResultadoCaixa,
+  meuPerfil,
 } from "@/lib/loterias.functions";
+import { criarBolao } from "@/lib/boloes.functions";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
