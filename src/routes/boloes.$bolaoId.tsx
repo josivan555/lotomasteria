@@ -409,7 +409,7 @@ function ParticipantesList({ bolaoId }: { bolaoId: string }) {
   const { data: participantes = [], isLoading } = useQuery({
     queryKey: ["bolao-participantes", bolaoId],
     queryFn: () => getParticipantes({ data: { bolaoId } }),
-    enabled: !!isAdmin, // Apenas admins podem ver a lista completa por enquanto via serverFn admin
+    enabled: true, // A lista agora é pública (versão limitada)
   });
 
   const mutationUpdate = useMutation({
