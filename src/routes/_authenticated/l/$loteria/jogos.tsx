@@ -51,6 +51,7 @@ function Jogos() {
   const { data: userProfile } = useQuery({
     queryKey: ["meu-perfil"],
     queryFn: () => meuPerfilFn(),
+    staleTime: 1000 * 60 * 5,
   });
 
   const { data: jogos = [], isLoading } = useQuery({
