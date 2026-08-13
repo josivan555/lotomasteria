@@ -377,7 +377,7 @@ function Jogos() {
       </div>
 
       <Dialog open={modalBolao} onOpenChange={setModalBolao}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Gerar Novo Bolão — {cfg.nome}</DialogTitle>
             <DialogDescription>
