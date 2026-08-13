@@ -172,7 +172,7 @@ function Landing() {
                       </div>
 
                       <Button className="w-full font-bold shadow-md shadow-primary/20" asChild>
-                        <Link to="/auth" search={{ mode: "signup" }}>
+                        <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }}>
                           <Users className="mr-2 h-4 w-4" /> Compre seu bolão
                         </Link>
                       </Button>
@@ -180,6 +180,7 @@ function Landing() {
                   </div>
                 );
               })}
+
             </div>
           )}
         </section>
