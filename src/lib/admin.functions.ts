@@ -114,13 +114,12 @@ export const listarParticipantesBolao = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => z.object({ bolaoId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
-    // Permitir se for admin OU se o usuário for o dono da reserva (neste caso simplificamos para admin apenas por enquanto para a visão geral)
-    // Mas a pedido do usuário, o admin precisa editar.
-    await checkAdmin(context);
+    // Permitir se for admin OU se houver um usuário autenticado (visão limitada para usuários comuns)
+    // O checkAdmin só é chamado se quisermos restringir a escrita ou dados sensíveis.
 
     const { data: participantes, error } = await context.supabase
       .from("bolao_participantes")
-      .select("*")
+      .select("id, nome_completo, quantidade_cotas, status, created_at")
       .eq("bolao_id", data.bolaoId)
       .order("created_at", { ascending: false });
 

@@ -433,11 +433,32 @@ function ParticipantesList({ bolaoId }: { bolaoId: string }) {
 
   if (!isAdmin) {
     return (
-      <div className="p-8 text-center border border-dashed border-border/60 rounded-2xl bg-muted/20">
-        <ShieldCheck className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-20" />
-        <p className="text-sm text-muted-foreground">
-          A lista detalhada de participantes é visível apenas para administradores por motivos de privacidade.
-        </p>
+      <div className="space-y-4">
+        {participantes.length === 0 ? (
+          <div className="p-8 text-center border border-dashed border-border/60 rounded-2xl bg-muted/20 text-muted-foreground">
+            Nenhum participante ainda.
+          </div>
+        ) : (
+          participantes.map((p: any) => (
+            <div key={p.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/40 bg-card/60 backdrop-blur">
+              <div className="flex-1 min-w-0 pr-4">
+                <p className="font-bold truncate">{p.nome_completo}</p>
+                <p className="text-[10px] text-muted-foreground">{p.quantidade_cotas} cota(s)</p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all ${
+                  p.status === 'pago' 
+                    ? 'bg-green-500/10 text-green-500 border-green-500/20' 
+                    : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                }`}>
+                  <div className={`h-1.5 w-1.5 rounded-full ${p.status === 'pago' ? 'bg-green-500' : 'bg-amber-500'}`} />
+                  {p.status === 'pago' ? 'PAGO' : 'RESERVADO'}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     );
   }
