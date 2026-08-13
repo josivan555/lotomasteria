@@ -471,7 +471,7 @@ function Jogos() {
             </div>
           </div>
 
-          <div className="rounded-lg bg-secondary/30 p-4">
+          <div className="rounded-lg bg-secondary/30 p-4 border border-border/40">
             <h4 className="mb-2 text-sm font-medium">Jogos Incluídos</h4>
             <ScrollArea className="h-[120px] pr-4">
               <div className="space-y-1">
