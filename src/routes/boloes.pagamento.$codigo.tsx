@@ -12,12 +12,11 @@ import {
   QrCode, 
   Clock, 
   Copy,
-  ExternalLink,
   RefreshCw,
   Info
 } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/boloes/pagamento/$codigo")({
   component: PagamentoReserva,
@@ -28,13 +27,13 @@ function PagamentoReserva() {
   const buscarReserva = useServerFn(buscarReservaBolao);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const { data: reserva, isLoading, error, refetch } = useQuery({
+  const { data: reserva, isLoading, error } = useQuery({
     queryKey: ["reserva-pagamento", codigo, refreshKey],
     queryFn: () => buscarReserva({ data: { codigo } }),
-    refetchInterval: (data) => (data?.status === 'reservado' ? 5000 : false), // Poll every 5s if still pending
+    refetchInterval: (query) => (query.state.data?.status === 'reservado' ? 5000 : false),
   });
 
-  const handleCopy = (text: string, label: string) => {
+  const handleCopy = (text: string | null | undefined, label: string) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
     toast.success(`${label} copiado!`);
@@ -69,6 +68,7 @@ function PagamentoReserva() {
   const bolao = reserva.boloes;
   const cfg = LOTERIAS[bolao.loteria_id as LoteriaId];
   const isPago = reserva.status === 'pago';
+  const pixData = reserva.pix_data as any;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 md:py-20">
@@ -109,9 +109,9 @@ function PagamentoReserva() {
           {!isPago ? (
             <div className="space-y-8">
               <div className="bg-white rounded-3xl p-6 mx-auto w-fit shadow-inner border-4 border-secondary/20">
-                {reserva.pix_data?.qrCodeBase64 ? (
+                {pixData?.qrCodeBase64 ? (
                   <img 
-                    src={`data:image/png;base64,${reserva.pix_data.qrCodeBase64}`} 
+                    src={`data:image/png;base64,${pixData.qrCodeBase64}`} 
                     alt="QR Code PIX" 
                     className="w-56 h-56"
                   />
@@ -127,12 +127,12 @@ function PagamentoReserva() {
                   <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold text-center">Código Copia e Cola</p>
                   <div className="flex gap-2">
                     <div className="flex-1 bg-secondary/30 rounded-xl p-3 text-[11px] font-mono break-all line-clamp-2 border border-border/40 text-muted-foreground">
-                      {reserva.pix_data?.qrCode || "Código PIX não disponível"}
+                      {pixData?.qrCode || "Código PIX não disponível"}
                     </div>
                     <Button 
                       size="icon" 
                       className="shrink-0 h-auto" 
-                      onClick={() => handleCopy(reserva.pix_data?.qrCode, "Código PIX")}
+                      onClick={() => handleCopy(pixData?.qrCode, "Código PIX")}
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -146,7 +146,7 @@ function PagamentoReserva() {
                   </div>
                   <div className="h-4 w-[1px] bg-border" />
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <RefreshCw className="h-4 w-4 text-primary animate-spin-slow" />
+                    <RefreshCw className="h-4 w-4 text-primary animate-spin" />
                     <span>Verificação automática</span>
                   </div>
                 </div>
@@ -163,7 +163,7 @@ function PagamentoReserva() {
               </p>
               <div className="grid gap-3">
                 <Button className="w-full font-black h-12" asChild>
-                  <Link to={`/boloes/${bolao.id}?tab=participantes`}>Ver Minha Reserva no Bolão</Link>
+                  <Link to="/boloes/reserva">Ver Minha Reserva</Link>
                 </Button>
                 <Button variant="ghost" asChild>
                   <Link to="/">Voltar para Início</Link>
@@ -196,3 +196,4 @@ function PagamentoReserva() {
     </div>
   );
 }
+
