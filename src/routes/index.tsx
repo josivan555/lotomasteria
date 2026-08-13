@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+
 import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
