@@ -187,7 +187,7 @@ function Jogos() {
               checked={isSelected}
               onCheckedChange={(checked) => {
                 if (checked) {
-                  setJogosSelecionados((prev) => [...prev, j.id]);
+                  setJogosSelecionados((prev) => Array.from(new Set([...prev, j.id])));
                 } else {
                   setJogosSelecionados((prev) => prev.filter((id) => id !== j.id));
                 }
