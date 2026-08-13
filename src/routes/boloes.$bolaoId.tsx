@@ -516,31 +516,33 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
             statusBadge
           )}
 
-          <div className="flex items-center gap-1">
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              className="h-7 w-7 text-muted-foreground"
-              onClick={() => {
-                setEditingId(p.id);
-                setEditName(p.nome_completo);
-              }}
-            >
-              <Edit2 className="h-3.5 w-3.5" />
-            </Button>
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => {
-                if (confirm(`Excluir a reserva de ${p.nome_completo}?`)) {
-                  mutationDelete.mutate(p.id);
-                }
-              }}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+          {isAdmin && (
+            <div className="flex items-center gap-1">
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                className="h-7 w-7 text-muted-foreground"
+                onClick={() => {
+                  setEditingId(p.id);
+                  setEditName(p.nome_completo);
+                }}
+              >
+                <Edit2 className="h-3.5 w-3.5" />
+              </Button>
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  if (confirm(`Excluir a reserva de ${p.nome_completo}?`)) {
+                    mutationDelete.mutate(p.id);
+                  }
+                }}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );
