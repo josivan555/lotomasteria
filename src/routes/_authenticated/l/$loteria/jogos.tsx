@@ -473,7 +473,7 @@ function Jogos() {
 
           <div className="rounded-lg bg-secondary/30 p-4">
             <h4 className="mb-2 text-sm font-medium">Jogos Incluídos</h4>
-            <ScrollArea className="h-[120px]">
+            <ScrollArea className="h-[120px] pr-4">
               <div className="space-y-1">
                 {vigentes
                   .filter((j) => jogosSelecionados.includes(j.id))
