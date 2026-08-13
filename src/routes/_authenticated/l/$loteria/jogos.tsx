@@ -171,12 +171,29 @@ function Jogos() {
 
   const renderJogo = (j: (typeof jogos)[number]) => {
     const c = j.score != null ? classificarScore(Number(j.score)) : null;
+    const isSelected = jogosSelecionados.includes(j.id);
+    const isAdmin = userProfile?.isAdmin;
+
     return (
       <li
         key={j.id}
-        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur"
+        className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 backdrop-blur transition-colors ${
+          isSelected ? "border-primary bg-primary/10" : "border-border/60 bg-card/60"
+        }`}
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+          {isAdmin && (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  setJogosSelecionados((prev) => [...prev, j.id]);
+                } else {
+                  setJogosSelecionados((prev) => prev.filter((id) => id !== j.id));
+                }
+              }}
+            />
+          )}
           <span className="text-xs text-muted-foreground">
             {new Date(j.created_at).toLocaleDateString("pt-BR")}
           </span>
@@ -210,6 +227,23 @@ function Jogos() {
         </div>
       </li>
     );
+  };
+
+  const handleCriarBolao = () => {
+    const gamesToInclude = vigentes
+      .filter((j) => jogosSelecionados.includes(j.id))
+      .map((j) => ({ dezenas: j.dezenas, score: j.score || undefined }));
+
+    if (gamesToInclude.length === 0) {
+      toast.error("Selecione pelo menos um jogo para criar o bolão.");
+      return;
+    }
+
+    mutationCriarBolao.mutate({
+      ...formBolao,
+      loteriaId: loteria,
+      jogos: gamesToInclude,
+    });
   };
 
 
