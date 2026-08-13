@@ -93,7 +93,25 @@ export const atualizarStatusBolao = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const excluirBolao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    await checkAdmin(context);
+
+    // RLS e constraints de banco (on delete cascade) devem lidar com participantes se configurado,
+    // caso contrário, removemos o bolão.
+    const { error } = await context.supabase
+      .from("boloes")
+      .delete()
+      .eq("id", data.id);
+
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const listarParticipantesBolao = createServerFn({ method: "GET" })
+
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => z.object({ bolaoId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {

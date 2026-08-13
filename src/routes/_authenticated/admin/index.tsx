@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarTodosBoloes, listarUsuarios, atualizarStatusBolao } from "@/lib/admin.functions";
+import { listarTodosBoloes, listarUsuarios, atualizarStatusBolao, excluirBolao } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Users, Ticket, Settings, ShieldCheck, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { Users, Ticket, Settings, ShieldCheck, Clock, CheckCircle2, AlertCircle, Trash2 } from "lucide-react";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { toast } from "sonner";
 import { useRouter } from "@tanstack/react-router";
@@ -20,6 +20,8 @@ function AdminDashboard() {
   const getBoloes = useServerFn(listarTodosBoloes);
   const getUsuarios = useServerFn(listarUsuarios);
   const updateStatus = useServerFn(atualizarStatusBolao);
+  const removeBolao = useServerFn(excluirBolao);
+
 
   const { data: boloes = [], isLoading: loadingBoloes } = useQuery({
     queryKey: ["admin-boloes"],
@@ -39,6 +41,16 @@ function AdminDashboard() {
     },
     onError: (e) => toast.error("Erro: " + e.message),
   });
+
+  const mutationExcluir = useMutation({
+    mutationFn: (id: string) => removeBolao({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Bolão excluído com sucesso");
+      router.invalidate();
+    },
+    onError: (e) => toast.error("Erro ao excluir: " + e.message),
+  });
+
 
   const statusMap: Record<string, { label: string; color: string; icon: any }> = {
     em_vendas: { label: "Em Vendas", color: "bg-green-500/10 text-green-500 border-green-500/20", icon: Clock },
@@ -134,16 +146,31 @@ function AdminDashboard() {
                           </Badge>
                         </td>
                         <td className="px-4 py-4 text-right space-x-2">
-                          <select 
-                            className="bg-background border border-border/60 rounded px-2 py-1 text-xs outline-none"
-                            value={b.status}
-                            onChange={(e) => mutationStatus.mutate({ id: b.id, status: e.target.value as any })}
-                          >
-                            {Object.keys(statusMap).map(s => (
-                              <option key={s} value={s}>{statusMap[s].label}</option>
-                            ))}
-                          </select>
+                          <div className="flex items-center justify-end gap-2">
+                            <select 
+                              className="bg-background border border-border/60 rounded px-2 py-1 text-xs outline-none"
+                              value={b.status}
+                              onChange={(e) => mutationStatus.mutate({ id: b.id, status: e.target.value as any })}
+                            >
+                              {Object.keys(statusMap).map(s => (
+                                <option key={s} value={s}>{statusMap[s].label}</option>
+                              ))}
+                            </select>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => {
+                                if (confirm(`Tem certeza que deseja excluir o bolão "${b.nome}"? Esta ação não pode ser desfeita.`)) {
+                                  mutationExcluir.mutate(b.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </td>
+
                       </tr>
                     );
                   })}
