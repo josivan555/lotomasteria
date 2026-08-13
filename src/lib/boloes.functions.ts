@@ -281,7 +281,7 @@ export const buscarReservaBolao = createServerFn({ method: "GET" })
 
     // 3. Verificar se o PIX está expirado (30 minutos) e reemitir se necessário
     const TRINTA_MINUTOS = 30 * 60 * 1000;
-    const criadoEm = new Date(reserva.created_at).getTime();
+    const criadoEm = new Date(reserva.created_at || new Date()).getTime();
     const agora = new Date().getTime();
     const isExpirado = (agora - criadoEm) > TRINTA_MINUTOS;
 
