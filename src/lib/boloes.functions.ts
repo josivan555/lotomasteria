@@ -148,17 +148,25 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
     
     // Verificar se o prazo de vendas expirou
     const agora = new Date();
-    const dataPrazo = new Date(`${bolao.prazo_vendas}T${bolao.horario_encerramento || '23:59:59'}`);
+    const horario = bolao.horario_encerramento || '23:59:59';
+    const dataPrazo = new Date(`${bolao.prazo_vendas}T${horario}`);
     
     // Buscar perfil para verificar se é admin
-    const { data: roleRow } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
-      .eq("role", "admin")
-      .maybeSingle();
+    const session = await supabase.auth.getSession();
+    const userId = session.data.session?.user.id;
+    
+    let isAdmin = false;
+    if (userId) {
+      const { data: roleRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      isAdmin = !!roleRow;
+    }
 
-    if (agora > dataPrazo && !roleRow) {
+    if (agora > dataPrazo && !isAdmin) {
       throw new Error("O prazo para compra deste bolão já se encerrou.");
     }
 
