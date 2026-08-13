@@ -40,7 +40,7 @@ function DetalheBolao() {
   const mutation = useMutation({
     mutationFn: (payload: any) => comprarCotas({ data: payload }),
     onSuccess: (res) => {
-      setSucesso({ ref: res.codigoReferencia, total: res.valorTotal });
+      setSucesso({ ref: res.codigoReferencia, total: res.valorTotal, pix: res.pix });
       toast.success("Reserva realizada! Siga as instruções para pagamento.");
     },
     onError: (e) => toast.error(e.message),
