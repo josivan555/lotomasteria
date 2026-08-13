@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarBoloesPublicos } from "@/lib/boloes.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
