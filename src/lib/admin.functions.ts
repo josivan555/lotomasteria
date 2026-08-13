@@ -111,26 +111,47 @@ export const excluirBolao = createServerFn({ method: "POST" })
   });
 
 export const listarParticipantesBolao = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+
   .inputValidator((raw: unknown) => z.object({ 
     bolaoId: z.string().uuid(),
     page: z.number().default(1),
     pageSize: z.number().default(20)
   }).parse(raw))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
+    const sb = (await import("@/integrations/supabase/client.server")).supabaseAdmin;
     const from = (data.page - 1) * data.pageSize;
     const to = from + data.pageSize - 1;
 
-    const { data: participantes, error, count } = await context.supabase
+    const { data: participantes, error, count } = await sb
       .from("bolao_participantes")
       .select("id, nome_completo, quantidade_cotas, status, created_at, celular", { count: 'exact' })
+
       .eq("bolao_id", data.bolaoId)
       .order("created_at", { ascending: false })
       .range(from, to);
 
-    if (error) throw new Error(error.message);
+    // Removendo celular para não-admins
+    const session = await (await import("@/integrations/supabase/client.server")).supabaseAdmin.auth.getSession();
+    const userId = session.data.session?.user.id;
+    
+    let isAdmin = false;
+    if (userId) {
+      const { data: roleRow } = await (await import("@/integrations/supabase/client.server")).supabaseAdmin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      isAdmin = !!roleRow;
+    }
+
+    const items = (participantes || []).map(p => ({
+      ...p,
+      celular: isAdmin ? p.celular : null
+    }));
+
     return { 
-      items: participantes || [], 
+      items, 
       total: count || 0,
       hasMore: (count || 0) > to + 1
     };
