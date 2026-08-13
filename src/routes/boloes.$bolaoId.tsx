@@ -199,14 +199,15 @@ function DetalheBolao() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+    <div className="mx-auto max-w-6xl px-4 py-6 md:py-12">
       <div className="flex justify-between items-center mb-6">
-        <Button asChild variant="ghost">
+        <Button asChild variant="ghost" size="sm">
           <Link to="/"><ChevronLeft className="mr-2 h-4 w-4" /> Voltar</Link>
         </Button>
       </div>
+ 
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
 
-      <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-8">
           <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl">
             <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: cfg.cor }} />
