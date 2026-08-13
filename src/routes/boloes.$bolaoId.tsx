@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ConferidorJogos } from "@/components/conferidor-jogos";
+
 import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, QrCode, Download, Copy, Share2, ShieldCheck, Trash2, Edit2, Check } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -276,10 +278,12 @@ function DetalheBolao() {
           </div>
 
           <Tabs defaultValue={tab} className="w-full">
-            <TabsList className="bg-background/40 border border-border/40 p-1 w-full grid grid-cols-2">
+            <TabsList className="bg-background/40 border border-border/40 p-1 w-full grid grid-cols-3">
               <TabsTrigger value="jogos">Jogos do Bolão</TabsTrigger>
+              <TabsTrigger value="conferir">Conferir</TabsTrigger>
               <TabsTrigger value="participantes">Participantes</TabsTrigger>
             </TabsList>
+
             
             <TabsContent value="jogos" className="mt-4 space-y-4">
               <div className="rounded-2xl border border-border/40 bg-card overflow-hidden">
@@ -310,10 +314,19 @@ function DetalheBolao() {
               </div>
             </TabsContent>
 
+            <TabsContent value="conferir" className="mt-4">
+              <ConferidorJogos
+                jogos={(bolao.game_snapshot as any[]) ?? []}
+                loteriaId={bolao.loteria_id as LoteriaId}
+                resultadoOficial={bolao.resultado_oficial as number[] | null}
+              />
+            </TabsContent>
+
             <TabsContent value="participantes" className="mt-4">
               <ParticipantesList bolaoId={bolao.id} bolao={bolao} />
             </TabsContent>
           </Tabs>
+
         </div>
 
         <div className="space-y-6">
