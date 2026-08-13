@@ -1,15 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarTodosBoloes, listarUsuarios, atualizarStatusBolao, excluirBolao } from "@/lib/admin.functions";
+import { listarTodosBoloes, listarUsuarios, atualizarStatusBolao, excluirBolao, atualizarBolao } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Users, Ticket, Settings, ShieldCheck, Clock, CheckCircle2, AlertCircle, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Users, Ticket, Settings, ShieldCheck, Clock, CheckCircle2, AlertCircle, Trash2, Edit2, Check, X, Search, UserCircle2 } from "lucide-react";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { toast } from "sonner";
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, Link } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
+import { formatBRL } from "@/lib/credits-config";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
