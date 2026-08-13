@@ -279,6 +279,70 @@ export const buscarReservaBolao = createServerFn({ method: "GET" })
       throw new Error("Reserva não encontrada. Verifique o código ou nome informado.");
     }
 
+    // 3. Verificar se o PIX está expirado (30 minutos) e reemitir se necessário
+    const TRINTA_MINUTOS = 30 * 60 * 1000;
+    const criadoEm = new Date(reserva.created_at || new Date()).getTime();
+    const agora = new Date().getTime();
+    const isExpirado = (agora - criadoEm) > TRINTA_MINUTOS;
+
+    if (reserva.status === 'reservado' && isExpirado) {
+      console.log(`PIX da reserva ${reserva.id} expirado. Reemitindo...`);
+      
+      try {
+        const accessToken = process.env['MERCADOPAGO_ACCESS_TOKEN'];
+        if (accessToken) {
+          const response = await fetch('https://api.mercadopago.com/v1/payments', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+              'X-Idempotency-Key': `${reserva.id}-${Math.floor(agora / TRINTA_MINUTOS)}`,
+            },
+            body: JSON.stringify({
+              transaction_amount: reserva.valor_total,
+              description: `Bolão LotoMaster (Reemissão) - ${reserva.boloes?.nome}`,
+              payment_method_id: 'pix',
+              external_reference: reserva.id,
+              notification_url: `${process.env['SITE_URL'] || 'https://lotomasteria.lovable.app'}/api/public/webhook`,
+              date_of_expiration: new Date(agora + TRINTA_MINUTOS).toISOString(),
+              payer: {
+                email: `${reserva.id.substring(0, 8)}@lotomasteria.app`,
+                first_name: reserva.nome_completo.split(' ')[0],
+                last_name: reserva.nome_completo.split(' ').slice(1).join(' ') || 'Cliente',
+              },
+            }),
+          });
+
+          if (response.ok) {
+            const mpResult = await response.json();
+            const newPixData = {
+              qrCode: mpResult.point_of_interaction.transaction_data.qr_code,
+              qrCodeBase64: mpResult.point_of_interaction.transaction_data.qr_code_base64,
+              paymentId: mpResult.id,
+            };
+            
+            // Atualizar no banco e na memória
+            const { data: updatedReserva, error: updateError } = await supabaseAdmin
+              .from('bolao_participantes')
+              .update({ 
+                payment_id: mpResult.id.toString(),
+                pix_data: newPixData,
+                created_at: new Date().toISOString() // Resetar o contador de expiração
+              })
+              .eq('id', reserva.id)
+              .select("*, boloes(*)")
+              .single();
+
+            if (!updateError && updatedReserva) {
+              return updatedReserva;
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Erro ao reemitir PIX:', e);
+      }
+    }
+
     return reserva;
   });
 
