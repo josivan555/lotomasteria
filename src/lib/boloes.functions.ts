@@ -64,10 +64,8 @@ export const criarBolao = createServerFn({ method: "POST" })
   });
 
 export const listarBoloesPublicos = createServerFn({ method: "GET" })
-  .handler(async ({ context }) => {
-    if (!context) throw new Error("Contexto não encontrado");
-    
-    const { data, error } = await context.supabase
+  .handler(async () => {
+    const { data, error } = await supabase
       .from("boloes")
       .select("*")
       .in("status", ["publicado", "em_vendas", "esgotado", "encerrado", "sorteado", "conferido"])
@@ -75,9 +73,8 @@ export const listarBoloesPublicos = createServerFn({ method: "GET" })
 
     if (error) throw new Error(error.message);
     
-    // Adicionar contagem de cotas vendidas/reservadas
     const boloesComInfo = await Promise.all((data ?? []).map(async (b: any) => {
-      const { data: p } = await context.supabase
+      const { data: p } = await supabase
         .from("bolao_participantes")
         .select("quantidade_cotas, status")
         .eq("bolao_id", b.id);
