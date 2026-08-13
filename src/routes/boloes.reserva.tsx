@@ -72,10 +72,10 @@ function BuscaReserva() {
               </Label>
               <Input
                 id="codigo"
-                placeholder="Ex: BOL-XXXXXXX"
+                placeholder="Código ou Seu Nome Completo"
                 value={codigo}
                 onChange={(e) => setCodigo(e.target.value)}
-                className="h-14 text-center text-xl font-mono font-bold uppercase"
+                className="h-14 text-center text-xl font-bold uppercase"
                 required
               />
             </div>
