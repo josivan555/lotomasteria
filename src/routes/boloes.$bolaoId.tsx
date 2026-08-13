@@ -1,4 +1,4 @@
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link, useSearch } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { obterBolao, comprarCotasBolao } from "@/lib/boloes.functions";
@@ -16,11 +16,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/boloes/$bolaoId")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: (search.tab as string) || "jogos",
+  }),
   component: DetalheBolao,
 });
 
 function DetalheBolao() {
   const { bolaoId } = useParams({ from: "/boloes/$bolaoId" });
+  const { tab } = useSearch({ from: "/boloes/$bolaoId" });
   const getBolao = useServerFn(obterBolao);
   const comprarCotas = useServerFn(comprarCotasBolao);
 
@@ -238,7 +242,7 @@ function DetalheBolao() {
             </p>
           </div>
 
-          <Tabs defaultValue="jogos" className="w-full">
+          <Tabs defaultValue={tab} className="w-full">
             <TabsList className="bg-background/40 border border-border/40 p-1 w-full grid grid-cols-2">
               <TabsTrigger value="jogos">Jogos do Bolão</TabsTrigger>
               <TabsTrigger value="participantes">Participantes</TabsTrigger>
