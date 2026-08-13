@@ -276,10 +276,12 @@ function DetalheBolao() {
           </div>
 
           <Tabs defaultValue={tab} className="w-full">
-            <TabsList className="bg-background/40 border border-border/40 p-1 w-full grid grid-cols-2">
+            <TabsList className="bg-background/40 border border-border/40 p-1 w-full grid grid-cols-3">
               <TabsTrigger value="jogos">Jogos do Bolão</TabsTrigger>
+              <TabsTrigger value="conferir">Conferir</TabsTrigger>
               <TabsTrigger value="participantes">Participantes</TabsTrigger>
             </TabsList>
+
             
             <TabsContent value="jogos" className="mt-4 space-y-4">
               <div className="rounded-2xl border border-border/40 bg-card overflow-hidden">
