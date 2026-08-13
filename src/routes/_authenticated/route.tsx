@@ -31,6 +31,8 @@ function AuthedLayout() {
   const router = useRouter();
   const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const getPerfil = useServerFn(meuPerfil);
+
   const { data: profile } = useQuery({
     queryKey: ["meu-perfil"],
     queryFn: () => getPerfil(),

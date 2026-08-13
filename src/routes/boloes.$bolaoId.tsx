@@ -405,7 +405,17 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
 
   const { data: perfil } = useQuery({
     queryKey: ["perfil"],
-    queryFn: () => getPerfil(),
+    queryFn: async () => {
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session.session) return { isAdmin: false };
+        return await getPerfil();
+      } catch (e) {
+        console.warn("Failed to fetch profile (likely not authenticated):", e);
+        return { isAdmin: false };
+      }
+    },
+    staleTime: 1000 * 60 * 5,
   });
 
   const isAdmin = perfil?.isAdmin;
