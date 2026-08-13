@@ -142,7 +142,7 @@ function PagamentoReserva() {
                 <div className="flex items-center justify-center gap-4 py-4 border-t border-b border-border/40">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Clock className="h-4 w-4 text-amber-500" />
-                    <span>O PIX expira em 30 minutos</span>
+                    <span>O PIX expira em 30 min (reemissão automática)</span>
                   </div>
                   <div className="h-4 w-[1px] bg-border" />
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
