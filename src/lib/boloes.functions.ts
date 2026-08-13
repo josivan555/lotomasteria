@@ -64,6 +64,8 @@ export const criarBolao = createServerFn({ method: "POST" })
 
 export const listarBoloesPublicos = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
+    if (!context) throw new Error("Contexto não encontrado");
+    
     const { data, error } = await context.supabase
       .from("boloes")
       .select("*")
@@ -73,14 +75,18 @@ export const listarBoloesPublicos = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     
     // Adicionar contagem de cotas vendidas/reservadas
-    const boloesComInfo = await Promise.all((data ?? []).map(async (b) => {
+    const boloesComInfo = await Promise.all((data ?? []).map(async (b: any) => {
       const { data: p } = await context.supabase
         .from("bolao_participantes")
         .select("quantidade_cotas, status")
         .eq("bolao_id", b.id);
       
-      const compradas = p?.filter(x => x.status === 'pago').reduce((acc, curr) => acc + curr.quantidade_cotas, 0) ?? 0;
-      const reservadas = p?.filter(x => x.status === 'reservado').reduce((acc, curr) => acc + curr.quantidade_cotas, 0) ?? 0;
+      const compradas = (p ?? [])
+        .filter((x: any) => x.status === 'pago')
+        .reduce((acc: number, curr: any) => acc + curr.quantidade_cotas, 0);
+      const reservadas = (p ?? [])
+        .filter((x: any) => x.status === 'reservado')
+        .reduce((acc: number, curr: any) => acc + curr.quantidade_cotas, 0);
       
       return {
         ...b,
