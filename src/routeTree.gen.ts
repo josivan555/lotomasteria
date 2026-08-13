@@ -21,6 +21,7 @@ import { Route as AuthenticatedLoteriasRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticated/creditos'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as BoloesPagamentoCodigoRouteImport } from './routes/boloes.pagamento.$codigo'
 import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
 import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as AuthenticatedLLoteriaRouteRouteImport } from './routes/_authenticated/l/$loteria/route'
@@ -91,6 +92,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const BoloesPagamentoCodigoRoute = BoloesPagamentoCodigoRouteImport.update({
+  id: '/boloes/pagamento/$codigo',
+  path: '/boloes/pagamento/$codigo',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicWebhookRoute = ApiPublicWebhookRouteImport.update({
   id: '/api/public/webhook',
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
+  '/boloes/pagamento/$codigo': typeof BoloesPagamentoCodigoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/l/$loteria/ajuda': typeof AuthenticatedLLoteriaAjudaRoute
   '/l/$loteria/dashboard': typeof AuthenticatedLLoteriaDashboardRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/boloes/reserva': typeof BoloesReservaRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
+  '/boloes/pagamento/$codigo': typeof BoloesPagamentoCodigoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/l/$loteria/ajuda': typeof AuthenticatedLLoteriaAjudaRoute
   '/l/$loteria/dashboard': typeof AuthenticatedLLoteriaDashboardRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/_authenticated/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
+  '/boloes/pagamento/$codigo': typeof BoloesPagamentoCodigoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/l/$loteria/ajuda': typeof AuthenticatedLLoteriaAjudaRoute
   '/_authenticated/l/$loteria/dashboard': typeof AuthenticatedLLoteriaDashboardRoute
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/l/$loteria'
     | '/api/public/mercadopago-webhook'
     | '/api/public/webhook'
+    | '/boloes/pagamento/$codigo'
     | '/admin/'
     | '/l/$loteria/ajuda'
     | '/l/$loteria/dashboard'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/boloes/reserva'
     | '/api/public/mercadopago-webhook'
     | '/api/public/webhook'
+    | '/boloes/pagamento/$codigo'
     | '/admin'
     | '/l/$loteria/ajuda'
     | '/l/$loteria/dashboard'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/_authenticated/l/$loteria'
     | '/api/public/mercadopago-webhook'
     | '/api/public/webhook'
+    | '/boloes/pagamento/$codigo'
     | '/_authenticated/admin/'
     | '/_authenticated/l/$loteria/ajuda'
     | '/_authenticated/l/$loteria/dashboard'
@@ -315,6 +327,7 @@ export interface RootRouteChildren {
   BoloesReservaRoute: typeof BoloesReservaRoute
   ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
   ApiPublicWebhookRoute: typeof ApiPublicWebhookRoute
+  BoloesPagamentoCodigoRoute: typeof BoloesPagamentoCodigoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/boloes/pagamento/$codigo': {
+      id: '/boloes/pagamento/$codigo'
+      path: '/boloes/pagamento/$codigo'
+      fullPath: '/boloes/pagamento/$codigo'
+      preLoaderRoute: typeof BoloesPagamentoCodigoRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/webhook': {
       id: '/api/public/webhook'
@@ -553,6 +573,7 @@ const rootRouteChildren: RootRouteChildren = {
   BoloesReservaRoute: BoloesReservaRoute,
   ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
   ApiPublicWebhookRoute: ApiPublicWebhookRoute,
+  BoloesPagamentoCodigoRoute: BoloesPagamentoCodigoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

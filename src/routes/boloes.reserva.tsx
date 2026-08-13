@@ -14,7 +14,8 @@ import {
   CheckCircle2, 
   QrCode, 
   Clock, 
-  AlertCircle 
+  AlertCircle,
+  ExternalLink 
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -137,36 +138,19 @@ function BuscaReserva() {
 
             {reserva.status !== 'pago' && (
               <div className="bg-secondary/30 rounded-2xl p-6 text-center space-y-6 border border-border/60">
-                <div className="space-y-2">
-                  <p className="text-sm font-bold flex items-center justify-center gap-2">
-                    <QrCode className="h-4 w-4 text-primary" /> Pagar via PIX
-                  </p>
-                  <p className="text-xs text-muted-foreground">Escaneie o QR Code abaixo no seu aplicativo do banco</p>
-                </div>
-                
-                <div className="mx-auto w-48 h-48 bg-white rounded-2xl flex items-center justify-center p-3 shadow-inner">
-                  {reserva.pix_data?.qrCodeBase64 ? (
-                    <img src={`data:image/png;base64,${reserva.pix_data.qrCodeBase64}`} alt="QR Code PIX" className="w-full h-full" />
-                  ) : (
-                    <QrCode className="w-full h-full text-slate-900" />
-                  )}
-                </div>
-                
-                <div className="space-y-3">
-                  <Button className="w-full font-bold h-12" variant="outline" onClick={() => {
-                    const code = reserva.pix_data?.qrCode || "";
-                    if (code) {
-                      navigator.clipboard.writeText(code);
-                      toast.success("Código PIX copiado!");
-                    } else {
-                      toast.error("Código PIX não disponível.");
-                    }
-                  }}>
-                    Copiar Código PIX
-                  </Button>
-                  <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
-                    <Clock className="h-3 w-3" /> Prazo de compensação: 30 min
+                <div className="space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                    <QrCode className="h-8 w-8 text-primary" />
                   </div>
+                  <div className="space-y-2">
+                    <p className="text-lg font-black">Pagamento Pendente</p>
+                    <p className="text-sm text-muted-foreground">Sua reserva está garantida, mas precisa de pagamento para ser confirmada.</p>
+                  </div>
+                  <Button className="w-full font-black h-14 text-lg" asChild>
+                    <Link to="/boloes/pagamento/$codigo" params={{ codigo: reserva.codigo_referencia }}>
+                      Acessar Tela de Pagamento <ExternalLink className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
                 </div>
               </div>
             )}
