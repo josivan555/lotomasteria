@@ -505,12 +505,16 @@ function ParticipantesList({ bolaoId }: { bolaoId: string }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <button 
-            onClick={() => mutationUpdate.mutate({ id: p.id, status: p.status === 'pago' ? 'reservado' : 'pago' })}
-            className="transition-transform active:scale-95"
-          >
-            {statusBadge}
-          </button>
+          {isAdmin ? (
+            <button 
+              onClick={() => mutationUpdate.mutate({ id: p.id, status: p.status === 'pago' ? 'reservado' : 'pago' })}
+              className="transition-transform active:scale-95"
+            >
+              {statusBadge}
+            </button>
+          ) : (
+            statusBadge
+          )}
 
           <div className="flex items-center gap-1">
             <Button 
@@ -543,7 +547,21 @@ function ParticipantesList({ bolaoId }: { bolaoId: string }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-border/40 bg-card p-6 text-center">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-black mb-1">Total de Cotas</p>
+            <p className="text-2xl font-black">{bolao?.total_cotas || 0}</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-primary font-black mb-1">Cotas Faltantes</p>
+            <p className="text-2xl font-black text-primary">{bolao?.cotas_disponiveis || 0}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
       {allParticipantes.length === 0 && !isLoading ? (
         <div className="p-8 text-center border border-dashed border-border/60 rounded-2xl bg-muted/20 text-muted-foreground">
           Nenhum participante ainda.
