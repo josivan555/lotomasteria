@@ -188,7 +188,7 @@ function DetalheBolao() {
 
         <div className="space-y-4">
           <Button className="w-full h-14 text-lg font-black" asChild>
-            <Link to={`/boloes/pagamento/${sucesso.ref}`}>Ir para Pagamento</Link>
+            <Link to="/boloes/pagamento/$codigo" params={{ codigo: sucesso.ref }}>Ir para Pagamento</Link>
           </Button>
           <Button asChild variant="ghost" className="w-full">
             <Link to="/">Voltar para a página inicial</Link>

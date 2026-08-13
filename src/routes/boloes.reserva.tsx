@@ -147,7 +147,7 @@ function BuscaReserva() {
                     <p className="text-sm text-muted-foreground">Sua reserva está garantida, mas precisa de pagamento para ser confirmada.</p>
                   </div>
                   <Button className="w-full font-black h-14 text-lg" asChild>
-                    <Link to={`/boloes/pagamento/${reserva.codigo_referencia}`}>
+                    <Link to="/boloes/pagamento/$codigo" params={{ codigo: reserva.codigo_referencia }}>
                       Acessar Tela de Pagamento <ExternalLink className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
