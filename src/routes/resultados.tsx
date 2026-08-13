@@ -4,7 +4,7 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { resumoOficialTodas } from "@/lib/loterias.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Trophy, Users, Coins, CalendarClock, MapPin } from "lucide-react";
+import { Sparkles, Trophy, Users, Coins, CalendarClock, MapPin, ChevronRight } from "lucide-react";
 import { formatBRL } from "@/lib/credits-config";
 
 type Resumo = Awaited<ReturnType<typeof resumoOficialTodas>>;
@@ -183,6 +183,20 @@ function ResumoCard({ r }: { r: ResumoOficialDto }) {
           </p>
         )}
       </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <Button className="w-full font-bold bg-primary hover:bg-primary/90" asChild>
+          <Link to="/">
+            Comprar Bolão
+          </Link>
+        </Button>
+        <Button variant="outline" className="w-full font-bold border-primary/30 text-primary hover:bg-primary/5" asChild>
+          <Link to="/auth" search={{ mode: "login" }}>
+            Apostar
+          </Link>
+        </Button>
+      </div>
+
 
       {r.faixas.length > 0 && (
         <div className="mt-4 overflow-hidden rounded-xl border border-border/50">

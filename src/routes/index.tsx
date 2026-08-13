@@ -124,13 +124,13 @@ function Landing() {
                 const progresso = (b.cotas_compradas / b.total_cotas) * 100;
                 
                 return (
-                  <div key={b.id} className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/60 backdrop-blur hover:border-primary/50 transition-all hover:shadow-lg">
+                  <div key={b.id} className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/60 backdrop-blur hover:border-primary/50 transition-all hover:shadow-lg">
                     <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: cfg.cor }} />
                     
-                    <div className="p-5">
+                    <div className="p-5 flex-1 flex flex-col">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-2">
-                          <div className="ball h-7 w-7 text-[10px]" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
+                          <img src={cfg.logo} alt={cfg.nome} className="h-6 w-auto" />
                           <span className="font-bold text-sm">{cfg.nome}</span>
                         </div>
                         <div className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -144,40 +144,47 @@ function Landing() {
                         <span>Sorteio: {new Date(b.data_sorteio).toLocaleDateString('pt-BR')} às {b.horario_sorteio}</span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 mb-4 rounded-lg bg-secondary/30 p-3 border border-border/40">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Prêmio Estimado</p>
-                          <p className="text-sm font-bold text-foreground">
-                            {b.premio_estimado ? `R$ ${b.premio_estimado.toLocaleString('pt-BR')}` : 'Não informado'}
-                          </p>
+                      <div className="bg-primary/5 rounded-xl p-4 mb-4 text-center border border-primary/10">
+                        <p className="text-[10px] uppercase tracking-widest text-primary font-black mb-1">Prêmio Estimado</p>
+                        <p className="text-2xl font-black text-foreground">{b.premio_estimado ? `R$ ${b.premio_estimado.toLocaleString('pt-BR')}` : '---'}</p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 mb-6">
+                        <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
+                          <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Valor Cota</p>
+                          <p className="text-sm font-black text-primary">R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Valor da Cota</p>
-                          <p className="text-lg font-black text-primary">R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
+                        <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
+                          <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Disponível</p>
+                          <p className="text-sm font-black text-foreground">{b.cotas_disponiveis} / {b.total_cotas}</p>
                         </div>
                       </div>
 
-                      <div className="space-y-2 mb-6">
-                        <div className="flex justify-between text-xs font-medium">
-                          <span className="text-muted-foreground">Progresso</span>
-                          <span className="text-foreground">{b.cotas_compradas} de {b.total_cotas} cotas</span>
-                        </div>
-                        <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                      <div className="space-y-2 mb-6 mt-auto">
+                        <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
                           <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progresso}%` }} />
                         </div>
-                        <div className="flex justify-between text-[10px] text-muted-foreground">
-                          <span>{b.total_jogos} jogos incluídos</span>
-                          <span className="font-bold text-primary">{b.cotas_disponiveis} disponíveis</span>
+                        <div className="flex justify-between text-[10px] text-muted-foreground font-medium">
+                          <span>{b.total_jogos} jogos IA</span>
+                          <span>{progresso.toFixed(0)}% preenchido</span>
                         </div>
                       </div>
 
-                      <Button className="w-full font-bold shadow-md shadow-primary/20" asChild>
-                        <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }}>
-                          <Users className="mr-2 h-4 w-4" /> Compre seu bolão
-                        </Link>
-                      </Button>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button className="font-bold shadow-md shadow-primary/20 bg-primary hover:bg-primary/90" asChild>
+                          <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }}>
+                            Comprar
+                          </Link>
+                        </Button>
+                        <Button variant="outline" className="font-bold border-primary/30 text-primary hover:bg-primary/5" asChild>
+                          <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }}>
+                            Reservar
+                          </Link>
+                        </Button>
+                      </div>
                     </div>
                   </div>
+
                 );
               })}
 
