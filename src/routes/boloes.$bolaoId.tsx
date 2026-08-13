@@ -1,14 +1,17 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { obterBolao, comprarCotasBolao } from "@/lib/boloes.functions";
+import { listarParticipantesBolao, atualizarParticipanteBolao, excluirParticipanteBolao } from "@/lib/admin.functions";
+import { meuPerfil } from "@/lib/loterias.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { formatBRL } from "@/lib/credits-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, QrCode, Download, Copy, Share2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, QrCode, Download, Copy, Share2, ShieldCheck, Trash2, Edit2, Check } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -161,13 +164,15 @@ function DetalheBolao() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
-      <Button asChild variant="ghost" className="mb-6">
-        <Link to="/"><ChevronLeft className="mr-2 h-4 w-4" /> Voltar</Link>
-      </Button>
+    <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+      <div className="flex justify-between items-center mb-6">
+        <Button asChild variant="ghost">
+          <Link to="/"><ChevronLeft className="mr-2 h-4 w-4" /> Voltar</Link>
+        </Button>
+      </div>
 
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="space-y-6">
+      <div className="grid gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-8">
           <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl">
             <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: cfg.cor }} />
             <div className="p-8">
@@ -232,6 +237,46 @@ function DetalheBolao() {
               equilibrando dezenas quentes, frias e padrões de sorteio reais para maximizar suas chances.
             </p>
           </div>
+
+          <Tabs defaultValue="jogos" className="w-full">
+            <TabsList className="bg-background/40 border border-border/40 p-1 w-full grid grid-cols-2">
+              <TabsTrigger value="jogos">Jogos do Bolão</TabsTrigger>
+              <TabsTrigger value="participantes">Participantes</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="jogos" className="mt-4 space-y-4">
+              <div className="rounded-2xl border border-border/40 bg-card overflow-hidden">
+                <div className="bg-muted/50 px-4 py-2 border-b border-border/40 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  Jogos Gerados por IA
+                </div>
+                <div className="p-4 space-y-3">
+                  {(bolao.game_snapshot as any[])?.map((jogo, i) => (
+                    <div key={i} className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-secondary/20 border border-border/20">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 text-primary text-[10px] flex items-center justify-center font-bold">
+                        {i+1}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 flex-1">
+                        {jogo.dezenas.map((n: number) => (
+                          <div key={n} className="w-7 h-7 rounded-full bg-background border border-border/60 flex items-center justify-center text-[11px] font-bold">
+                            {n.toString().padStart(2, '0')}
+                          </div>
+                        ))}
+                      </div>
+                      {jogo.score && (
+                        <div className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                          SCORE {jogo.score}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="participantes" className="mt-4">
+              <ParticipantesList bolaoId={bolao.id} />
+            </TabsContent>
+          </Tabs>
         </div>
 
         <div className="space-y-6">
@@ -340,6 +385,149 @@ function DetalheBolao() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ParticipantesList({ bolaoId }: { bolaoId: string }) {
+  const queryClient = useQueryClient();
+  const getParticipantes = useServerFn(listarParticipantesBolao);
+  const getPerfil = useServerFn(meuPerfil);
+  const updatePart = useServerFn(atualizarParticipanteBolao);
+  const removePart = useServerFn(excluirParticipanteBolao);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+
+  const { data: perfil } = useQuery({
+    queryKey: ["perfil"],
+    queryFn: () => getPerfil(),
+  });
+
+  const isAdmin = perfil?.isAdmin;
+
+  const { data: participantes = [], isLoading } = useQuery({
+    queryKey: ["bolao-participantes", bolaoId],
+    queryFn: () => getParticipantes({ data: { bolaoId } }),
+    enabled: !!isAdmin, // Apenas admins podem ver a lista completa por enquanto via serverFn admin
+  });
+
+  const mutationUpdate = useMutation({
+    mutationFn: (payload: any) => updatePart({ data: payload }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bolao-participantes", bolaoId] });
+      setEditingId(null);
+      toast.success("Participante atualizado");
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const mutationDelete = useMutation({
+    mutationFn: (id: string) => removePart({ data: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bolao-participantes", bolaoId] });
+      toast.success("Participante removido");
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  if (!isAdmin) {
+    return (
+      <div className="p-8 text-center border border-dashed border-border/60 rounded-2xl bg-muted/20">
+        <ShieldCheck className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-20" />
+        <p className="text-sm text-muted-foreground">
+          A lista detalhada de participantes é visível apenas para administradores por motivos de privacidade.
+        </p>
+      </div>
+    );
+  }
+
+  if (isLoading) return <div className="text-center py-10 text-muted-foreground">Carregando participantes...</div>;
+
+  return (
+    <div className="space-y-4">
+      {participantes.length === 0 ? (
+        <div className="p-8 text-center border border-dashed border-border/60 rounded-2xl bg-muted/20 text-muted-foreground">
+          Nenhum participante ainda.
+        </div>
+      ) : (
+        participantes.map((p: any) => (
+          <div key={p.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/40 bg-card/60 backdrop-blur">
+            <div className="flex-1 min-w-0 pr-4">
+              {editingId === p.id ? (
+                <div className="flex items-center gap-2">
+                  <Input 
+                    size={20}
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    className="h-8 text-sm"
+                    autoFocus
+                  />
+                  <Button 
+                    size="icon" 
+                    variant="ghost" 
+                    className="h-8 w-8 text-green-500"
+                    onClick={() => mutationUpdate.mutate({ id: p.id, nome_completo: editName })}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <p className="font-bold truncate">{p.nome_completo}</p>
+                  <p className="text-[10px] text-muted-foreground">{p.celular} · {p.quantidade_cotas} cota(s)</p>
+                </>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => {
+                  if (isAdmin) {
+                    mutationUpdate.mutate({ id: p.id, status: p.status === 'pago' ? 'reservado' : 'pago' });
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all ${
+                p.status === 'pago' 
+                  ? 'bg-green-500/10 text-green-500 border-green-500/20' 
+                  : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+              }`}
+              >
+                <div className={`h-1.5 w-1.5 rounded-full ${p.status === 'pago' ? 'bg-green-500' : 'bg-amber-500'}`} />
+                {p.status === 'pago' ? 'PAGO' : 'RESERVADO'}
+              </button>
+
+              {isAdmin && (
+                <div className="flex items-center gap-1">
+                  <Button 
+                    size="icon" 
+                    variant="ghost" 
+                    className="h-7 w-7 text-muted-foreground"
+                    onClick={() => {
+                      setEditingId(p.id);
+                      setEditName(p.nome_completo);
+                    }}
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button 
+                    size="icon" 
+                    variant="ghost" 
+                    className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={() => {
+                      if (confirm(`Excluir a reserva de ${p.nome_completo}?`)) {
+                        mutationDelete.mutate(p.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 }

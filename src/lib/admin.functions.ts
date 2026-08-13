@@ -111,17 +111,59 @@ export const excluirBolao = createServerFn({ method: "POST" })
   });
 
 export const listarParticipantesBolao = createServerFn({ method: "GET" })
-
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => z.object({ bolaoId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
+    // Permitir se for admin OU se o usuário for o dono da reserva (neste caso simplificamos para admin apenas por enquanto para a visão geral)
+    // Mas a pedido do usuário, o admin precisa editar.
     await checkAdmin(context);
 
     const { data: participantes, error } = await context.supabase
       .from("bolao_participantes")
-      .select("*, profiles(username, full_name)")
-      .eq("bolao_id", data.bolaoId);
+      .select("*")
+      .eq("bolao_id", data.bolaoId)
+      .order("created_at", { ascending: false });
 
     if (error) throw new Error(error.message);
     return participantes;
+  });
+
+export const atualizarParticipanteBolao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => 
+    z.object({ 
+      id: z.string().uuid(),
+      nome_completo: z.string().optional(),
+      status: z.enum(["reservado", "pago"]).optional(),
+    }).parse(raw)
+  )
+  .handler(async ({ data, context }) => {
+    await checkAdmin(context);
+
+    const updateData: any = {};
+    if (data.nome_completo !== undefined) updateData.nome_completo = data.nome_completo;
+    if (data.status !== undefined) updateData.status = data.status;
+
+    const { error } = await context.supabase
+      .from("bolao_participantes")
+      .update(updateData)
+      .eq("id", data.id);
+
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const excluirParticipanteBolao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    await checkAdmin(context);
+
+    const { error } = await context.supabase
+      .from("bolao_participantes")
+      .delete()
+      .eq("id", data.id);
+
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
