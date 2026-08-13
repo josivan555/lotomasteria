@@ -31,11 +31,10 @@ function AuthedLayout() {
   const router = useRouter();
   const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const getPerfil = useServerFn(meuPerfil);
-
   const { data: profile } = useQuery({
     queryKey: ["meu-perfil"],
     queryFn: () => getPerfil(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const loteriaAtual = extractLoteriaAtual(pathname);
