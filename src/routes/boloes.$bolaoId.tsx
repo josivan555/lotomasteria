@@ -591,6 +591,7 @@ function ParticipantesList({ bolaoId }: { bolaoId: string }) {
           )}
         </>
       )}
+      </div>
     </div>
   );
 }
