@@ -108,18 +108,20 @@ function PagamentoReserva() {
 
           {!isPago ? (
             <div className="space-y-8">
-              <div className="bg-white rounded-3xl p-6 mx-auto w-fit shadow-inner border-4 border-secondary/20">
+              <div className="bg-white rounded-3xl p-4 sm:p-6 mx-auto w-fit shadow-inner border-4 border-secondary/20">
                 {pixData?.qrCodeBase64 ? (
                   <img 
                     src={`data:image/png;base64,${pixData.qrCodeBase64}`} 
                     alt="QR Code PIX" 
-                    className="w-56 h-56"
+                    className="w-48 h-48 sm:w-56 sm:h-56"
                   />
                 ) : (
-                  <div className="w-56 h-56 flex items-center justify-center text-slate-300">
-                    <QrCode className="w-20 h-20 opacity-20" />
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center text-slate-300">
+                    <QrCode className="w-16 h-16 sm:w-20 sm:h-20 opacity-20" />
                   </div>
                 )}
+
+
               </div>
 
               <div className="space-y-4">
@@ -139,12 +141,12 @@ function PagamentoReserva() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-4 py-4 border-t border-b border-border/40">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 py-4 border-t border-b border-border/40">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Clock className="h-4 w-4 text-amber-500" />
                     <span>O PIX expira em 30 min (reemissão automática)</span>
                   </div>
-                  <div className="h-4 w-[1px] bg-border" />
+                  <div className="hidden sm:block h-4 w-[1px] bg-border" />
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <RefreshCw className="h-4 w-4 text-primary animate-spin" />
                     <span>Verificação automática</span>

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+
 import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,53 +67,54 @@ function Landing() {
 
   return (
     <div className="min-h-screen">
-      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-6 md:py-6">
+      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-5 md:px-6 md:py-6">
         <Link to={isLoggedIn ? "/loterias" : "/"} className="flex items-center gap-2 text-lg font-bold tracking-tight">
           <div className="ball h-8! w-8! text-sm! bg-primary text-primary-foreground font-black flex items-center justify-center rounded-full">L</div>
-          LotoMaster <span className="text-primary">IA</span>
+          <span>LotoMaster <span className="text-primary">IA</span></span>
         </Link>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button asChild variant="ghost" size="sm">
+        <nav className="flex flex-wrap items-center gap-2 sm:gap-4">
+          <Button asChild variant="ghost" size="sm" className="px-2 sm:px-4">
             <Link to="/resultados">Resultados</Link>
           </Button>
           {!isLoggedIn ? (
-            <>
-              <Button asChild variant="ghost" size="sm">
+            <div className="flex items-center gap-2">
+              <Button asChild variant="ghost" size="sm" className="px-2 sm:px-4 hidden sm:inline-flex">
                 <Link to="/auth" search={{ mode: "login" }}>Entrar</Link>
               </Button>
-              <Button asChild size="sm">
+              <Button asChild size="sm" className="px-3 sm:px-6">
                 <Link to="/auth" search={{ mode: "signup" }}>Criar conta</Link>
               </Button>
-            </>
+            </div>
           ) : (
-            <Button asChild size="sm">
+            <Button asChild size="sm" className="px-3 sm:px-6">
               <Link to="/loterias">Minha Área</Link>
             </Button>
           )}
-        </div>
+        </nav>
       </header>
 
+
       <main className="mx-auto max-w-6xl px-4 md:px-6">
-        <section className="py-12 text-center md:py-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary">
+        <section className="py-10 text-center md:py-20 overflow-hidden">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] sm:text-xs text-primary animate-in fade-in slide-in-from-bottom-4 duration-1000">
             <Sparkles className="h-3 w-3" /> Análise estatística inteligente
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-4 text-xs sm:text-sm text-muted-foreground">
             Veja também os{" "}
             <Link to="/resultados" className="text-primary hover:underline">
               últimos resultados oficiais da Lotofácil
             </Link>
             .
           </p>
-          <h1 className="mt-6 text-3xl font-black tracking-tight sm:text-5xl md:text-6xl">
+          <h1 className="mt-6 text-2xl font-black tracking-tight sm:text-5xl md:text-6xl px-2 leading-[1.1]">
             Domine a{" "}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent block sm:inline">
               Lotofácil, Mega-Sena e Quina
             </span>
-            <br />
-            com IA estatística
+            <span className="block sm:inline mt-1 sm:mt-0"> com IA estatística</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground md:text-lg">
+          <p className="mx-auto mt-6 max-w-2xl text-sm sm:text-base text-muted-foreground md:text-lg px-4 leading-relaxed">
+
             O LotoMaster IA analisa todo o histórico oficial das três loterias, calcula um{" "}
             <strong className="text-foreground">Score IA</strong> para cada dezena e gera jogos
             equilibrados com dezenas de filtros estatísticos — dashboards e geradores dedicados
@@ -173,7 +175,8 @@ function Landing() {
                 : "Nenhum bolão disponível no momento. Volte em breve!"}
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+
               {filteredBoloes.slice(0, 6).map((b: any) => {
                 const cfg = LOTERIAS[b.loteria_id as LoteriaId];
                 const progresso = (b.cotas_compradas / b.total_cotas) * 100;
@@ -225,18 +228,19 @@ function Landing() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button className="font-bold shadow-md shadow-primary/20 bg-primary hover:bg-primary/90" asChild>
+                      <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 mt-auto">
+                        <Button className="w-full font-bold shadow-md shadow-primary/20 bg-primary hover:bg-primary/90 order-1 sm:order-none" asChild>
                           <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                             Ver Reservas
                           </Link>
                         </Button>
-                        <Button variant="outline" className="font-bold border-primary/30 text-primary hover:bg-primary/5" asChild>
+                        <Button variant="outline" className="w-full font-bold border-primary/30 text-primary hover:bg-primary/5 order-2 sm:order-none" asChild>
                           <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
                             Ver Jogos
                           </Link>
                         </Button>
                       </div>
+
                     </div>
                   </div>
 
