@@ -55,7 +55,11 @@ function DetalheBolao() {
 
   const cfg = LOTERIAS[bolao.loteria_id as LoteriaId];
   const progresso = (bolao.cotas_compradas / bolao.total_cotas) * 100;
-  const esgotado = bolao.cotas_disponiveis <= 0;
+  const agora = new Date();
+  const horario = bolao.horario_encerramento || '23:59:59';
+  const dataPrazo = new Date(`${bolao.prazo_vendas}T${horario}`);
+  const prazoEncerrado = agora > dataPrazo;
+  const esgotado = bolao.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status);
 
   if (sucesso) {
     const handleDownloadImage = async () => {
@@ -332,8 +336,12 @@ function DetalheBolao() {
               
               {esgotado ? (
                 <div className="bg-destructive/10 text-destructive rounded-xl p-6 text-center">
-                  <p className="font-bold">Bolão Esgotado</p>
-                  <p className="text-sm mt-1">Todas as cotas já foram vendidas. Fique atento para os próximos lançamentos!</p>
+                  <p className="font-bold">{prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) ? "Bolão Encerrado" : "Bolão Esgotado"}</p>
+                  <p className="text-sm mt-1">
+                    {prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) 
+                      ? "Este bolão não aceita mais novas participações." 
+                      : "Todas as cotas já foram vendidas. Fique atento para os próximos lançamentos!"}
+                  </p>
                 </div>
               ) : (
                 <form 
