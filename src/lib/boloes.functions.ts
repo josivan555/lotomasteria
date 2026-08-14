@@ -131,7 +131,7 @@ export const obterBolao = createServerFn({ method: "GET" })
       .maybeSingle();
 
     if (error) throw new Error(error.message);
-    if (!bolao) throw new Error("Bolão não encontrado");
+    if (!bolao) return null;
 
     // Conferência automática: se o sorteio já ocorreu e ainda não há resultado,
     // busca o resultado oficial na Caixa e persiste no bolão.
