@@ -286,25 +286,49 @@ function DetalheBolao() {
                   Jogos Gerados por IA
                 </div>
                 <div className="p-4 space-y-3">
-                  {(bolao.game_snapshot as any[])?.map((jogo, i) => (
-                    <div key={i} className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-secondary/20 border border-border/20">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfg.cor}20`, color: cfg.cor }}>
-                        {i+1}
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 flex-1">
-                        {jogo.dezenas.map((n: number) => (
-                          <div key={n} className="w-7 h-7 rounded-full bg-background border border-border/60 flex items-center justify-center text-[11px] font-bold">
-                            {n.toString().padStart(2, '0')}
-                          </div>
-                        ))}
-                      </div>
-                      {jogo.score && (
-                        <div className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ backgroundColor: `${cfg.cor}15`, color: cfg.cor }}>
-                          SCORE {jogo.score}
+                  {(bolao.game_snapshot as any[])?.map((jogo, i) => {
+                    const acertos = bolao.resultado_oficial 
+                      ? jogo.dezenas.filter((n: number) => (bolao.resultado_oficial as number[]).includes(n)).length
+                      : null;
+
+                    return (
+                      <div key={i} className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-secondary/20 border border-border/20">
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfg.cor}20`, color: cfg.cor }}>
+                          {i+1}
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        <div className="flex flex-wrap gap-1.5 flex-1">
+                          {jogo.dezenas.map((n: number) => {
+                            const isSorteada = bolao.resultado_oficial && (bolao.resultado_oficial as number[]).includes(n);
+                            return (
+                              <div 
+                                key={n} 
+                                className={`w-7 h-7 rounded-full border flex items-center justify-center text-[11px] font-bold transition-all ${
+                                  isSorteada 
+                                    ? "text-white scale-110 shadow-lg" 
+                                    : "bg-background border-border/60"
+                                }`}
+                                style={isSorteada ? { backgroundColor: cfg.cor, borderColor: cfg.cor } : {}}
+                              >
+                                {n.toString().padStart(2, '0')}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {acertos !== null && (
+                            <div className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 border border-green-500/20">
+                              {acertos} ACERTOS
+                            </div>
+                          )}
+                          {jogo.score && (
+                            <div className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ backgroundColor: `${cfg.cor}15`, color: cfg.cor }}>
+                              SCORE {jogo.score}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </TabsContent>
