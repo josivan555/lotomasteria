@@ -174,7 +174,7 @@ export const obterBolao = createServerFn({ method: "GET" })
       }
     }
     const jaSorteou = new Date(`${bolao.data_sorteio}T23:59:59`) < new Date();
-    if (jaSorteou && (!bolao.resultado_oficial || (bolao.resultado_oficial as number[]).length === 0)) {
+    if (!(bolao as any).is_combo && jaSorteou && (!bolao.resultado_oficial || (bolao.resultado_oficial as number[]).length === 0)) {
       const { buscarConcursoOficial } = await import("./caixa.server");
       const oficial = await buscarConcursoOficial(
         bolao.loteria_id as LoteriaId,
