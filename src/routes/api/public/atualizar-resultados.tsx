@@ -1,6 +1,8 @@
 import { supabaseAdmin } from '@/integrations/supabase/client.server';
 import { buscarResumoOficial } from '@/lib/caixa.server';
+import { notifyBolaoSorteado } from '@/lib/notifications.server';
 import { createFileRoute } from '@tanstack/react-router';
+
 
 export const Route = createFileRoute('/api/public/atualizar-resultados')({
   server: {
@@ -13,7 +15,7 @@ export const Route = createFileRoute('/api/public/atualizar-resultados')({
           // Busca bolões pendentes de sorteio
           const { data: boloes, error } = await supabaseAdmin
             .from('boloes')
-            .select('id, loteria_id, concurso_numero, data_sorteio, horario_sorteio')
+            .select('id, nome, loteria_id, concurso_numero, data_sorteio, horario_sorteio')
             .is('resultado_oficial', null)
             .lte('data_sorteio', hojeIso);
 
@@ -48,7 +50,11 @@ export const Route = createFileRoute('/api/public/atualizar-resultados')({
                   })
                   .eq('id', bolao.id);
                 
-                if (!updErr) atualizados++;
+                if (!updErr) {
+                  atualizados++;
+                  // Disparar notificações para os participantes
+                  await notifyBolaoSorteado(bolao.id, bolao.nome);
+                }
               }
             }
           }
