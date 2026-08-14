@@ -28,6 +28,7 @@ export type Database = {
           pix_data: Json | null
           quantidade_cotas: number
           status: string
+          user_id: string | null
           valor_total: number
         }
         Insert: {
@@ -43,6 +44,7 @@ export type Database = {
           pix_data?: Json | null
           quantidade_cotas: number
           status?: string
+          user_id?: string | null
           valor_total: number
         }
         Update: {
@@ -58,6 +60,7 @@ export type Database = {
           pix_data?: Json | null
           quantidade_cotas?: number
           status?: string
+          user_id?: string | null
           valor_total?: number
         }
         Relationships: [
@@ -319,6 +322,39 @@ export type Database = {
           ordem?: number
           tamanho_jogo?: number
           total_numeros?: number
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          link: string | null
+          message: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          link?: string | null
+          message: string
+          read?: boolean
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          link?: string | null
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }
