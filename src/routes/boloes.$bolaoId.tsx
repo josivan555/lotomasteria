@@ -249,6 +249,22 @@ function DetalheBolao() {
                   <Clock className="h-4 w-4" style={{ color: cfg.cor }} />
                   <span>Sorteio: <strong>{new Date(bolao.data_sorteio).toLocaleDateString('pt-BR')} às {bolao.horario_sorteio}</strong></span>
                 </div>
+
+                {bolao.resultado_oficial && (
+                  <div className="p-4 rounded-2xl bg-secondary/20 border border-border/40 space-y-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-2">
+                      <Trophy className="h-3 w-3" style={{ color: cfg.cor }} /> Resultado Oficial
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {(bolao.resultado_oficial as number[]).map(n => (
+                        <div key={n} className="w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs shadow-md" style={{ backgroundColor: cfg.cor }}>
+                          {n.toString().padStart(2, '0')}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Users className="h-4 w-4" style={{ color: cfg.cor }} />
                   <span>Bolão com <strong>{bolao.total_jogos} jogos</strong> otimizados por IA</span>
