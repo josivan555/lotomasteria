@@ -48,6 +48,10 @@ function Landing() {
   const listarHistoricoFn = useServerFn(listarHistoricoBoloes);
   const [searchTerm, setSearchTerm] = useState("");
   const [view, setView] = useState<"ativos" | "historico">("ativos");
+  const [displayMode, setDisplayMode] = useState<"grid" | "list">("grid");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
   
   const { data: boloes = [], isLoading: isLoadingBoloes } = useQuery({
     queryKey: ["boloes-publicos", view],
@@ -64,9 +68,22 @@ function Landing() {
 
   const isLoggedIn = !!userSession;
 
-  const filteredBoloes = (boloes ?? []).filter((b: any) => 
-    b.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBoloes = (boloes ?? []).filter((b: any) => {
+    const matchesSearch = b.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         b.concurso_numero.toString().includes(searchTerm);
+    const matchesStatus = statusFilter === "all" || b.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPages = Math.ceil(filteredBoloes.length / itemsPerPage);
+  const paginatedBoloes = filteredBoloes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, view]);
 
   return (
     <div className="min-h-screen">
@@ -150,7 +167,7 @@ function Landing() {
               <p className="text-muted-foreground mt-1">Participe de apostas coletivas geradas com nossa inteligência</p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            <div className="flex flex-col lg:flex-row items-center gap-3 w-full lg:w-auto">
               <div className="flex p-1 bg-secondary/50 rounded-lg w-full sm:w-auto">
                 <button
                   onClick={() => setView("ativos")}
@@ -166,10 +183,40 @@ function Landing() {
                 </button>
               </div>
 
+              {view === "historico" && (
+                <select 
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="bg-card/50 border border-border/40 rounded-lg px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 w-full sm:w-auto"
+                >
+                  <option value="all">Todos os Status</option>
+                  <option value="encerrado">Encerrado</option>
+                  <option value="sorteado">Sorteado</option>
+                  <option value="conferido">Conferido</option>
+                </select>
+              )}
+
+              <div className="flex p-1 bg-secondary/50 rounded-lg w-full sm:w-auto">
+                <button
+                  onClick={() => setDisplayMode("grid")}
+                  className={`flex-1 sm:flex-none p-1.5 rounded-md transition-all ${displayMode === "grid" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+                  title="Grade"
+                >
+                  <Sparkles className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setDisplayMode("list")}
+                  className={`flex-1 sm:flex-none p-1.5 rounded-md transition-all ${displayMode === "list" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+                  title="Lista"
+                >
+                  <Users className="h-4 w-4" />
+                </button>
+              </div>
+
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Pesquisar bolão..."
+                  placeholder={view === "ativos" ? "Pesquisar bolão..." : "Concurso ou nome..."}
                   className="pl-9 bg-card/50 border-border/40"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -196,9 +243,10 @@ function Landing() {
                 : "Nenhum bolão disponível no momento. Volte em breve!"}
             </div>
           ) : (
+            <>
+              {displayMode === "grid" ? (
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-
-              {filteredBoloes.map((b: any) => {
+              {paginatedBoloes.map((b: any) => {
                 const cfg = LOTERIAS[b.loteria_id as LoteriaId];
                 const progresso = (b.cotas_compradas / b.total_cotas) * 100;
                 
@@ -273,11 +321,82 @@ function Landing() {
 
                     </div>
                   </div>
-
                 );
               })}
-
             </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-border/60 bg-card/60">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="border-b border-border/40 bg-secondary/30">
+                    <tr>
+                      <th className="px-4 py-3 font-bold">Bolão</th>
+                      <th className="px-4 py-3 font-bold">Loteria</th>
+                      <th className="px-4 py-3 font-bold">Concurso</th>
+                      <th className="px-4 py-3 font-bold">Data</th>
+                      <th className="px-4 py-3 font-bold">Status</th>
+                      <th className="px-4 py-3 text-right font-bold">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/40">
+                    {paginatedBoloes.map((b: any) => {
+                      const cfg = LOTERIAS[b.loteria_id as LoteriaId];
+                      return (
+                        <tr key={b.id} className="hover:bg-secondary/10 transition-colors">
+                          <td className="px-4 py-3 font-semibold">{b.nome}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <img src={cfg.logo} alt={cfg.nome} className="h-4 w-auto" />
+                              <span className="text-xs">{cfg.nome}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-xs font-mono">{b.concurso_numero}</td>
+                          <td className="px-4 py-3 text-xs">
+                            {new Date(b.data_sorteio).toLocaleDateString('pt-BR')}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${b.status === 'encerrado' ? 'bg-red-500/10 text-red-500' : 'bg-secondary text-muted-foreground'}`}>
+                              {b.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Button variant="ghost" size="sm" asChild>
+                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>Ver</Link>
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Anterior
+              </Button>
+              <span className="text-xs font-medium text-muted-foreground px-4">
+                Página {currentPage} de {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Próxima
+              </Button>
+            </div>
+              )}
+            </>
           )}
         </section>
 
