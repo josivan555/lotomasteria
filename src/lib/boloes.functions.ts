@@ -182,7 +182,7 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
       .from("bolao_participantes")
       .insert({
         bolao_id: data.bolaoId,
-        user_id: userId, // Vincular ao usuário logado se existir
+        user_id: userId as any,
         nome_completo: data.nome,
         celular: data.celular,
         quantidade_cotas: data.cotas,
