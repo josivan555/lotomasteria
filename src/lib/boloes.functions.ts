@@ -136,6 +136,43 @@ export const obterBolao = createServerFn({ method: "GET" })
     // Conferência automática: se o sorteio já ocorreu e ainda não há resultado,
     // busca o resultado oficial na Caixa e persiste no bolão.
     let bolaoAtual: any = bolao;
+
+    // Combo: confere cada loteria do combo separadamente
+    if ((bolao as any).is_combo) {
+      const partes: any[] = Array.isArray((bolao as any).combo_loterias)
+        ? ((bolao as any).combo_loterias as any[])
+        : [];
+      const { buscarConcursoOficial } = await import("./caixa.server");
+      let mudou = false;
+      const atualizadas = await Promise.all(
+        partes.map(async (parte) => {
+          const temResultado = Array.isArray(parte.resultado_oficial) && parte.resultado_oficial.length > 0;
+          const passou = new Date(`${parte.data_sorteio}T23:59:59`) < new Date();
+          if (temResultado || !passou) return parte;
+          const oficial = await buscarConcursoOficial(parte.loteria_id as LoteriaId, parte.concurso_numero);
+          if (!oficial) return parte;
+          mudou = true;
+          return { ...parte, resultado_oficial: oficial.dezenas };
+        }),
+      );
+
+      const todasConferidas =
+        atualizadas.length > 0 &&
+        atualizadas.every((p: any) => Array.isArray(p.resultado_oficial) && p.resultado_oficial.length > 0);
+
+      if (mudou) {
+        const { data: atualizado } = await supabaseAdmin
+          .from("boloes")
+          .update({
+            combo_loterias: atualizadas as any,
+            ...(todasConferidas ? { status: "conferido" } : { status: "encerrado" }),
+          })
+          .eq("id", bolao.id)
+          .select("*")
+          .maybeSingle();
+        bolaoAtual = atualizado ?? { ...bolao, combo_loterias: atualizadas };
+      }
+    }
     const jaSorteou = new Date(`${bolao.data_sorteio}T23:59:59`) < new Date();
     if (jaSorteou && (!bolao.resultado_oficial || (bolao.resultado_oficial as number[]).length === 0)) {
       const { buscarConcursoOficial } = await import("./caixa.server");
