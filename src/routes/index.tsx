@@ -45,11 +45,13 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   const listarBoloesFn = useServerFn(listarBoloesPublicos);
+  const listarHistoricoFn = useServerFn(listarHistoricoBoloes);
   const [searchTerm, setSearchTerm] = useState("");
+  const [view, setView] = useState<"ativos" | "historico">("ativos");
   
   const { data: boloes = [], isLoading: isLoadingBoloes } = useQuery({
-    queryKey: ["boloes-publicos"],
-    queryFn: () => listarBoloesFn(),
+    queryKey: ["boloes-publicos", view],
+    queryFn: () => view === "ativos" ? listarBoloesFn() : listarHistoricoFn(),
   });
 
   const { data: userSession } = useQuery({
@@ -148,11 +150,26 @@ function Landing() {
               <p className="text-muted-foreground mt-1">Participe de apostas coletivas geradas com nossa inteligência</p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+              <div className="flex p-1 bg-secondary/50 rounded-lg w-full sm:w-auto">
+                <button
+                  onClick={() => setView("ativos")}
+                  className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold rounded-md transition-all ${view === "ativos" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Ativos
+                </button>
+                <button
+                  onClick={() => setView("historico")}
+                  className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold rounded-md transition-all ${view === "historico" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Histórico
+                </button>
+              </div>
+
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Pesquisar bolão pelo nome..."
+                  placeholder="Pesquisar bolão..."
                   className="pl-9 bg-card/50 border-border/40"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -195,8 +212,15 @@ function Landing() {
                           <img src={cfg.logo} alt={cfg.nome} className="h-6 w-auto" />
                           <span className="font-bold text-sm">{cfg.nome}</span>
                         </div>
-                        <div className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Concurso {b.concurso_numero}
+                        <div className="flex flex-col items-end gap-1">
+                          <div className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            Concurso {b.concurso_numero}
+                          </div>
+                          {b.status === 'encerrado' && (
+                            <span className="text-[10px] font-black uppercase text-red-500 animate-pulse">
+                              Encerrado
+                            </span>
+                          )}
                         </div>
                       </div>
 
