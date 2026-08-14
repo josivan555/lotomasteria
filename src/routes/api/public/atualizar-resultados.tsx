@@ -1,6 +1,8 @@
 import { supabaseAdmin } from '@/integrations/supabase/client.server';
 import { buscarResumoOficial } from '@/lib/caixa.server';
+import { notifyBolaoSorteado } from '@/lib/notifications.server';
 import { createFileRoute } from '@tanstack/react-router';
+
 
 export const Route = createFileRoute('/api/public/atualizar-resultados')({
   server: {
