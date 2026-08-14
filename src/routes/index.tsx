@@ -222,7 +222,6 @@ function Landing() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-            </div>
               
               <div className="flex gap-2 w-full sm:w-auto">
                 <Button variant="ghost" size="sm" asChild className="flex-1 sm:flex-none">
