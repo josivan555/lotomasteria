@@ -87,7 +87,6 @@ function Landing() {
               </Button>
             </div>
           ) : (
-              <NotificationBell />
             <div className="flex items-center gap-2">
               <NotificationBell />
               <Button asChild size="sm" className="px-3 sm:px-6">
