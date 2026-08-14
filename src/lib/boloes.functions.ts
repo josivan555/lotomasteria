@@ -192,6 +192,10 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
       throw new Error("O prazo para compra deste bolão já se encerrou.");
     }
 
+    if (bolao.cotas_disponiveis <= 0 || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status)) {
+      throw new Error("Este bolão já está esgotado ou encerrado.");
+    }
+
     if (data.cotas > bolao.cotas_disponiveis) {
       throw new Error(`Apenas ${bolao.cotas_disponiveis} cotas disponíveis.`);
     }
