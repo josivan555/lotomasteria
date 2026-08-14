@@ -58,8 +58,10 @@ function DetalheBolao() {
   const agora = new Date();
   const horario = bolao.horario_encerramento || '23:59:59';
   const dataPrazo = new Date(`${bolao.prazo_vendas}T${horario}`);
+  const dataSorteioObj = new Date(bolao.data_sorteio);
+  const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
   const prazoEncerrado = agora > dataPrazo;
-  const esgotado = bolao.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status);
+  const esgotado = bolao.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada;
 
   if (sucesso) {
     const handleDownloadImage = async () => {
@@ -376,9 +378,9 @@ function DetalheBolao() {
               
               {esgotado ? (
                 <div className="bg-destructive/10 text-destructive rounded-xl p-6 text-center">
-                  <p className="font-bold">{prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) ? "Bolão Encerrado" : "Bolão Esgotado"}</p>
+                  <p className="font-bold">{prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada ? "Bolão Encerrado" : "Bolão Esgotado"}</p>
                   <p className="text-sm mt-1">
-                    {prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) 
+                    {prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada
                       ? "Este bolão não aceita mais novas participações." 
                       : "Todas as cotas já foram vendidas. Fique atento para os próximos lançamentos!"}
                   </p>
