@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/integrations/supabase/client.server';
 
 export async function createNotification(userId: string, title: string, message: string, type = 'info', link?: string) {
+  // @ts-ignore - a tabela será criada via migração
   const { error } = await supabaseAdmin
     .from('notifications')
     .insert({
@@ -18,7 +19,7 @@ export async function notifyBolaoSorteado(bolaoId: string, bolaoNome: string) {
   // Buscar todos os participantes pagos do bolão
   const { data: participantes, error } = await supabaseAdmin
     .from('bolao_participantes')
-    .select('celular, nome_completo, user_id') // Assumindo que pode haver user_id se logado
+    .select('celular, nome_completo, user_id') 
     .eq('bolao_id', bolaoId)
     .eq('status', 'pago');
 
@@ -27,12 +28,12 @@ export async function notifyBolaoSorteado(bolaoId: string, bolaoNome: string) {
     return;
   }
 
-  // Se houver sistema de envio de WhatsApp/SMS, seria aqui.
-  // Como temos uma tabela de notificações interna:
+  // Notificar usuários que possuem conta no sistema
   for (const p of (participantes || [])) {
-    // Se o participante tiver um user_id (vinculado a uma conta)
+    // @ts-ignore - user_id adicionado via migração
     if (p.user_id) {
       await createNotification(
+        // @ts-ignore
         p.user_id,
         'Resultado Disponível! 🎉',
         `O bolão "${bolaoNome}" foi sorteado. Confira os acertos agora!`,
