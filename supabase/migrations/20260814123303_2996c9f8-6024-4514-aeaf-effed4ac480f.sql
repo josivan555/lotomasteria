@@ -1,0 +1,1 @@
+UPDATE public.boloes SET premio_estimado = 4600000 WHERE concurso_numero = 7091 AND loteria_id = 'quina';
