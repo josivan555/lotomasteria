@@ -39,6 +39,7 @@ function DetalheBolao() {
   const { data: bolao, isLoading, error } = useQuery({
     queryKey: ["bolao", bolaoId],
     queryFn: () => getBolao({ data: { id: bolaoId } }),
+    retry: false,
   });
 
   const mutation = useMutation({
