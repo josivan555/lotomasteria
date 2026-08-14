@@ -305,8 +305,11 @@ function DetalheBolao() {
                 </div>
                 <div className="p-4 space-y-3">
                   {(bolao.game_snapshot as any[])?.map((jogo, i) => {
-                    const acertos = bolao.resultado_oficial 
-                      ? jogo.dezenas.filter((n: number) => (bolao.resultado_oficial as number[]).includes(n)).length
+                    const dezenasJogo = Array.isArray(jogo.dezenas) ? jogo.dezenas : [];
+                    const resultado = Array.isArray(bolao.resultado_oficial) ? (bolao.resultado_oficial as number[]) : [];
+                    
+                    const acertos = resultado.length > 0 
+                      ? dezenasJogo.filter((n: number) => resultado.includes(n)).length
                       : null;
 
                     return (
@@ -315,8 +318,8 @@ function DetalheBolao() {
                           {i+1}
                         </div>
                         <div className="flex flex-wrap gap-1.5 flex-1">
-                          {jogo.dezenas.map((n: number) => {
-                            const isSorteada = bolao.resultado_oficial && (bolao.resultado_oficial as number[]).includes(n);
+                          {dezenasJogo.map((n: number) => {
+                            const isSorteada = resultado.includes(n);
                             return (
                               <div 
                                 key={n} 
@@ -333,8 +336,8 @@ function DetalheBolao() {
                           })}
                         </div>
                         <div className="flex items-center gap-2">
-                          {acertos !== null && (
-                            <div className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 border border-green-500/20">
+                          {acertos !== null && resultado.length > 0 && (
+                            <div className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 border border-green-500/20 animate-in zoom-in duration-500">
                               {acertos} ACERTOS
                             </div>
                           )}
@@ -355,7 +358,7 @@ function DetalheBolao() {
               <ConferidorJogos
                 jogos={(bolao.game_snapshot as any[]) ?? []}
                 loteriaId={bolao.loteria_id as LoteriaId}
-                resultadoOficial={bolao.resultado_oficial as number[] | null}
+                resultadoOficial={Array.isArray(bolao.resultado_oficial) ? (bolao.resultado_oficial as number[]) : null}
               />
             </TabsContent>
 

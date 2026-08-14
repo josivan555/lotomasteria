@@ -24,7 +24,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
 
   // Sync with official result if it arrives after initial mount
   useEffect(() => {
-    if (resultadoOficial && resultadoOficial.length > 0) {
+    if (Array.isArray(resultadoOficial) && resultadoOficial.length > 0) {
       setSelected(new Set(resultadoOficial));
     }
   }, [resultadoOficial]);
