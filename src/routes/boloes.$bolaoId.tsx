@@ -14,8 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConferidorJogos } from "@/components/conferidor-jogos";
 
-import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, QrCode, Download, Copy, Share2, ShieldCheck, Trash2, Edit2, Check } from "lucide-react";
-import { useState } from "react";
+import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, QrCode, Download, Copy, Share2, ShieldCheck, Trash2, Edit2, Check, ExternalLink } from "lucide-react";
+import { useState, useRef } from "react";
+import { toPng } from 'html-to-image';
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/boloes/$bolaoId")({
@@ -33,6 +34,7 @@ function DetalheBolao() {
 
   const [form, setForm] = useState({ nome: "", celular: "", cotas: 1 });
   const [sucesso, setSucesso] = useState<{ ref: string; total: number; pix?: any } | null>(null);
+  const comprovanteRef = useRef<HTMLDivElement>(null);
 
   const { data: bolao, isLoading, error } = useQuery({
     queryKey: ["bolao", bolaoId],
@@ -56,6 +58,23 @@ function DetalheBolao() {
   const esgotado = bolao.cotas_disponiveis <= 0;
 
   if (sucesso) {
+    const handleDownloadImage = async () => {
+      if (comprovanteRef.current === null) return;
+      
+      const toastId = toast.loading("Gerando imagem do comprovante...");
+      try {
+        const dataUrl = await toPng(comprovanteRef.current, { cacheBust: true, backgroundColor: '#020817' });
+        const link = document.createElement('a');
+        link.download = `comprovante-${sucesso.ref}.png`;
+        link.href = dataUrl;
+        link.click();
+        toast.success("Comprovante salvo com sucesso!", { id: toastId });
+      } catch (err) {
+        console.error('Erro ao gerar imagem:', err);
+        toast.error("Erro ao gerar imagem. Tente tirar um print.", { id: toastId });
+      }
+    };
+
     return (
       <div className="mx-auto max-w-xl px-4 py-12 md:py-20">
         <div className="text-center mb-8">
@@ -68,7 +87,11 @@ function DetalheBolao() {
           </p>
         </div>
 
-        <div id="comprovante-reserva" className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl mb-8">
+        <div 
+          id="comprovante-reserva" 
+          ref={comprovanteRef}
+          className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl mb-8"
+        >
           <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: cfg.cor }} />
           
           <div className="p-8">
@@ -113,37 +136,8 @@ function DetalheBolao() {
                   </Button>
                 </div>
 
-                {sucesso.pix && (
-                  <div className="mt-6 space-y-4 border-t border-border pt-6">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Pagar agora via PIX</p>
-                    <div className="mx-auto w-40 h-40 bg-white rounded-2xl flex items-center justify-center p-3 shadow-inner">
-                      {sucesso.pix.qrCodeBase64 ? (
-                        <img src={`data:image/png;base64,${sucesso.pix.qrCodeBase64}`} alt="QR Code PIX" className="w-full h-full" />
-                      ) : (
-                        <QrCode className="w-full h-full text-slate-900" />
-                      )}
-                    </div>
-                    <Button 
-                      className="w-full font-bold h-10" 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        const code = sucesso.pix?.qrCode || "";
-                        if (code) {
-                          navigator.clipboard.writeText(code);
-                          toast.success("Código PIX copiado!");
-                        }
-                      }}
-                    >
-                      Copiar Código PIX
-                    </Button>
-                  </div>
-                )}
-
                 <p className="text-[10px] text-muted-foreground leading-tight uppercase tracking-widest mt-4">
-                  {sucesso.pix 
-                    ? "Após o pagamento, sua reserva será confirmada automaticamente."
-                    : "Utilize este código para confirmar seu pagamento na área de \"Minhas Reservas\""}
+                  Utilize este código para confirmar seu pagamento na área de "Minhas Reservas" ou clicando no botão abaixo.
                 </p>
               </div>
           </div>
@@ -159,14 +153,9 @@ function DetalheBolao() {
           <Button 
             variant="outline" 
             className="h-12 font-bold"
-            onClick={() => {
-              const element = document.getElementById('comprovante-reserva');
-              if (element) {
-                toast.info("Função de salvar imagem disponível em breve. Por enquanto, tire um print da tela.");
-              }
-            }}
+            onClick={handleDownloadImage}
           >
-            <Download className="mr-2 h-4 w-4" /> Salvar
+            <Download className="mr-2 h-4 w-4" /> Salvar Foto
           </Button>
           <Button 
             variant="outline" 
@@ -189,8 +178,10 @@ function DetalheBolao() {
         </div>
 
         <div className="space-y-4">
-          <Button className="w-full h-14 text-lg font-black" asChild>
-            <Link to="/boloes/pagamento/$codigo" params={{ codigo: sucesso.ref }}>Ir para Pagamento</Link>
+          <Button className="w-full h-14 text-lg font-black bg-green-600 hover:bg-green-700 text-white" asChild>
+            <Link to="/boloes/pagamento/$codigo" params={{ codigo: sucesso.ref }}>
+              Ir para Pagamento <ExternalLink className="ml-2 h-5 w-5" />
+            </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full">
             <Link to="/">Voltar para a página inicial</Link>
