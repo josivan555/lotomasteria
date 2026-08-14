@@ -407,12 +407,13 @@ function DetalheBolao() {
                     </div>
                     <div className="flex justify-between text-lg font-black border-t border-border pt-3">
                       <span>Total a pagar</span>
-                      <span className="text-primary">{formatBRL(form.cotas * bolao.valor_cota)}</span>
+                      <span style={{ color: cfg.cor }}>{formatBRL(form.cotas * bolao.valor_cota)}</span>
                     </div>
                   </div>
 
                   <Button 
-                    className="w-full h-14 text-lg font-black shadow-xl shadow-primary/20" 
+                    className="w-full h-14 text-lg font-black shadow-xl text-white" 
+                    style={{ backgroundColor: cfg.cor }}
                     disabled={mutation.isPending}
                   >
                     {mutation.isPending ? "Processando..." : "Confirmar e Pagar"}
