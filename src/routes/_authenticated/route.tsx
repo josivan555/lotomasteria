@@ -102,6 +102,7 @@ function AuthedLayout() {
                 </div>
               )}
 
+              <NotificationBell />
               <Button asChild variant="ghost" size="icon" className="md:hidden" aria-label="Loterias">
                 <Link to="/loterias">
                   <Home className="h-5 w-5" />
@@ -117,6 +118,9 @@ function AuthedLayout() {
                 <LogOut className="h-5 w-5" />
               </Button>
 
+              <div className="hidden md:block">
+                <NotificationBell />
+              </div>
               <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
                 <Link to="/loterias">
                   <Home className="mr-1.5 h-4 w-4" /> Loterias
