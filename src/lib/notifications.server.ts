@@ -1,9 +1,9 @@
 import { supabaseAdmin } from '@/integrations/supabase/client.server';
 
 export async function createNotification(userId: string, title: string, message: string, type = 'info', link?: string) {
-  // @ts-ignore - a tabela será criada via migração
-  const { error } = await supabaseAdmin
-    .from('notifications')
+  // Usando cast para any para contornar a falta dos tipos gerados no momento
+  const { error } = await (supabaseAdmin
+    .from('notifications' as any) as any)
     .insert({
       user_id: userId,
       title,
@@ -17,11 +17,9 @@ export async function createNotification(userId: string, title: string, message:
 
 export async function notifyBolaoSorteado(bolaoId: string, bolaoNome: string) {
   // Buscar todos os participantes pagos do bolão
-  const { data: participantes, error } = await supabaseAdmin
-    .from('bolao_participantes')
-    .select('celular, nome_completo, user_id') 
-    .eq('bolao_id', bolaoId)
-    .eq('status', 'pago');
+  const { data: participantes, error } = await (supabaseAdmin
+    .from('bolao_participantes' as any) as any)
+    .select('celular, nome_completo, user_id');
 
   if (error) {
     console.error('Error fetching participants for notification:', error);
@@ -29,11 +27,11 @@ export async function notifyBolaoSorteado(bolaoId: string, bolaoNome: string) {
   }
 
   // Notificar usuários que possuem conta no sistema
-  for (const p of (participantes || [])) {
-    // @ts-ignore - user_id adicionado via migração
+  const filtered = (participantes || []).filter((p: any) => p.bolao_id === bolaoId && p.status === 'pago');
+
+  for (const p of filtered) {
     if (p.user_id) {
       await createNotification(
-        // @ts-ignore
         p.user_id,
         'Resultado Disponível! 🎉',
         `O bolão "${bolaoNome}" foi sorteado. Confira os acertos agora!`,
