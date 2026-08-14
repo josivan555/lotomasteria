@@ -250,11 +250,11 @@ function Landing() {
 
                       <div className="space-y-2 mb-6 mt-auto">
                         <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                          <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progresso}%` }} />
+                          <div className="h-full bg-primary transition-all duration-500" style={{ width: `${Math.min(progresso || 0, 100)}%` }} />
                         </div>
                         <div className="flex justify-between text-[10px] text-muted-foreground font-medium">
                           <span>{b.total_jogos} jogos IA</span>
-                          <span>{progresso.toFixed(0)}% preenchido</span>
+                          <span>{(progresso || 0).toFixed(0)}% preenchido</span>
                         </div>
                       </div>
 
