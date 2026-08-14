@@ -325,8 +325,22 @@ function Landing() {
 
                       <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 mt-auto">
                         {esgotado ? (
-                          <div className="col-span-2 text-center py-2 px-4 rounded-lg bg-destructive/10 text-destructive text-[10px] font-bold uppercase tracking-wider">
-                            Participações Encerradas
+                          <div className="flex flex-col gap-2 w-full mt-auto">
+                            <div className="text-center py-2 px-4 rounded-lg bg-destructive/10 text-destructive text-[10px] font-bold uppercase tracking-wider">
+                              Participações Encerradas
+                            </div>
+                            <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
+                              <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: cfg.cor }} asChild>
+                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
+                                  Participantes
+                                </Link>
+                              </Button>
+                              <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: `${cfg.cor}50`, color: cfg.cor }} asChild>
+                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
+                                  Ver Jogos
+                                </Link>
+                              </Button>
+                            </div>
                           </div>
                         ) : (
                           <>
