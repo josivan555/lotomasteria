@@ -198,7 +198,7 @@ function Landing() {
           ) : (
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 
-              {filteredBoloes.slice(0, 6).map((b: any) => {
+              {filteredBoloes.map((b: any) => {
                 const cfg = LOTERIAS[b.loteria_id as LoteriaId];
                 const progresso = (b.cotas_compradas / b.total_cotas) * 100;
                 
