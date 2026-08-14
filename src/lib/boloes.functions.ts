@@ -66,6 +66,88 @@ export const criarBolao = createServerFn({ method: "POST" })
     return bolao;
   });
 
+export const criarBolaoCombo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z
+      .object({
+        nome: z.string().min(3).max(100),
+        prazoVendas: z.string(),
+        horarioEncerramento: z.string().optional(),
+        totalCotas: z.number().int().positive(),
+        valorCota: z.number().positive(),
+        loterias: z
+          .array(
+            z.object({
+              loteriaId: loteriaEnum,
+              concursoNumero: z.number().int().positive(),
+              dataSorteio: z.string(),
+              horarioSorteio: z.string(),
+              premioEstimado: z.number().optional(),
+              jogos: z
+                .array(z.object({ dezenas: z.array(z.number()), score: z.number().optional() }))
+                .min(1),
+            }),
+          )
+          .min(2)
+          .max(5),
+      })
+      .parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: roleRow } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!roleRow) throw new Error("Apenas administradores podem criar bolões.");
+
+    const partes = data.loterias.map((l) => ({
+      loteria_id: l.loteriaId,
+      concurso_numero: l.concursoNumero,
+      data_sorteio: l.dataSorteio,
+      horario_sorteio: l.horarioSorteio,
+      premio_estimado: l.premioEstimado ?? 0,
+      jogos: l.jogos,
+      resultado_oficial: [] as number[],
+    }));
+
+    const totalJogos = partes.reduce((acc, p) => acc + p.jogos.length, 0);
+    const premioTotal = partes.reduce((acc, p) => acc + (p.premio_estimado || 0), 0);
+    const datas = partes.map((p) => p.data_sorteio).sort();
+    const ultimaData = datas[datas.length - 1]!;
+    const primeira = partes[0]!;
+
+    const { data: bolao, error } = await context.supabase
+      .from("boloes")
+      .insert({
+        nome: data.nome,
+        loteria_id: primeira.loteria_id,
+        criador_id: context.userId,
+        concurso_numero: primeira.concurso_numero,
+        data_sorteio: ultimaData,
+        horario_sorteio: primeira.horario_sorteio,
+        prazo_vendas: data.prazoVendas,
+        horario_encerramento: data.horarioEncerramento,
+        total_jogos: totalJogos,
+        total_cotas: data.totalCotas,
+        valor_cota: data.valorCota,
+        valor_total: data.totalCotas * data.valorCota,
+        premio_estimado: premioTotal,
+        status: "em_vendas",
+        game_snapshot: partes.flatMap((p) => p.jogos) as any,
+        is_combo: true,
+        combo_loterias: partes as any,
+      })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+    return bolao;
+  });
+
 export const listarBoloesPublicos = createServerFn({ method: "GET" })
   .handler(async () => {
     const hoje = new Date().toISOString().split('T')[0];
