@@ -264,7 +264,7 @@ function Landing() {
                           <div className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                             Concurso {b.concurso_numero}
                           </div>
-                          {b.status === 'encerrado' && (
+                          {(b.status === 'encerrado' || new Date(b.data_sorteio) < new Date(new Date().setHours(0,0,0,0))) && (
                             <span className="text-[10px] font-black uppercase text-red-500 animate-pulse">
                               Encerrado
                             </span>
