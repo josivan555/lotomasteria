@@ -68,11 +68,16 @@ export const criarBolao = createServerFn({ method: "POST" })
 
 export const listarBoloesPublicos = createServerFn({ method: "GET" })
   .handler(async () => {
+    const hoje = new Date().toISOString().split('T')[0];
+    
+    // Boloes ativos: publicados, em vendas, esgotados e que ainda NÃO passaram da data de sorteio
+    // (A data_sorteio >= hoje garante que eles apareçam até o dia do sorteio)
     const { data, error } = await supabase
       .from("boloes")
       .select("*")
-      .in("status", ["publicado", "em_vendas", "esgotado", "encerrado", "sorteado", "conferido"])
-      .order("created_at", { ascending: false });
+      .in("status", ["publicado", "em_vendas", "esgotado"])
+      .gte("data_sorteio", hoje)
+      .order("data_sorteio", { ascending: true });
 
     if (error) throw new Error(error.message);
     
@@ -98,6 +103,22 @@ export const listarBoloesPublicos = createServerFn({ method: "GET" })
     }));
 
     return boloesComInfo;
+  });
+
+export const listarHistoricoBoloes = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const hoje = new Date().toISOString().split('T')[0];
+    
+    // Histórico: bolões já sorteados, encerrados ou que a data de sorteio já passou
+    const { data, error } = await supabase
+      .from("boloes")
+      .select("*")
+      .or(`status.in.("encerrado","sorteado","conferido"),data_sorteio.lt.${hoje}`)
+      .order("data_sorteio", { ascending: false });
+
+    if (error) throw new Error(error.message);
+
+    return data ?? [];
   });
 
 export const obterBolao = createServerFn({ method: "GET" })
