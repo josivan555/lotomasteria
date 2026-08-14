@@ -124,7 +124,7 @@ function AdminDashboard() {
         </TabsList>
 
         <TabsContent value="boloes" className="mt-6">
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4 mb-6 items-end">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
@@ -134,6 +134,31 @@ function AdminDashboard() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 text-[10px] font-black uppercase tracking-wider border-primary/40 hover:bg-primary/10"
+              onClick={async () => {
+                const loadingToast = toast.loading("Atualizando resultados oficiais...");
+                try {
+                  const res = await fetch('/api/public/atualizar-resultados');
+                  const data = await res.json();
+                  if (res.ok) {
+                    toast.success(data.message || "Resultados atualizados!");
+                    router.invalidate();
+                  } else {
+                    toast.error(data.error || "Erro ao atualizar resultados.");
+                  }
+                } catch (err) {
+                  toast.error("Erro na requisição.");
+                } finally {
+                  toast.dismiss(loadingToast);
+                }
+              }}
+            >
+              <CheckCircle2 className="h-3 w-3" />
+              Sincronizar Resultados
+            </Button>
           </div>
 
           <div className="rounded-xl border border-border/60 bg-card/40 backdrop-blur overflow-hidden">

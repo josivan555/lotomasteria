@@ -24,6 +24,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as BoloesPagamentoCodigoRouteImport } from './routes/boloes.pagamento.$codigo'
 import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
 import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
+import { Route as ApiPublicAtualizarResultadosRouteImport } from './routes/api/public/atualizar-resultados'
 import { Route as AuthenticatedLLoteriaRouteRouteImport } from './routes/_authenticated/l/$loteria/route'
 import { Route as AuthenticatedLLoteriaIndexRouteImport } from './routes/_authenticated/l/$loteria/index'
 import { Route as AuthenticatedLLoteriaVolanteRouteImport } from './routes/_authenticated/l/$loteria/volante'
@@ -109,6 +110,12 @@ const ApiPublicMercadopagoWebhookRoute =
     path: '/api/public/mercadopago-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAtualizarResultadosRoute =
+  ApiPublicAtualizarResultadosRouteImport.update({
+    id: '/api/public/atualizar-resultados',
+    path: '/api/public/atualizar-resultados',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedLLoteriaRouteRoute =
   AuthenticatedLLoteriaRouteRouteImport.update({
     id: '/l/$loteria',
@@ -176,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/boloes/$bolaoId': typeof BoloesBolaoIdRoute
   '/boloes/reserva': typeof BoloesReservaRoute
   '/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
+  '/api/public/atualizar-resultados': typeof ApiPublicAtualizarResultadosRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
   '/boloes/pagamento/$codigo': typeof BoloesPagamentoCodigoRoute
@@ -199,6 +207,7 @@ export interface FileRoutesByTo {
   '/loterias': typeof AuthenticatedLoteriasRoute
   '/boloes/$bolaoId': typeof BoloesBolaoIdRoute
   '/boloes/reserva': typeof BoloesReservaRoute
+  '/api/public/atualizar-resultados': typeof ApiPublicAtualizarResultadosRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
   '/boloes/pagamento/$codigo': typeof BoloesPagamentoCodigoRoute
@@ -226,6 +235,7 @@ export interface FileRoutesById {
   '/boloes/$bolaoId': typeof BoloesBolaoIdRoute
   '/boloes/reserva': typeof BoloesReservaRoute
   '/_authenticated/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
+  '/api/public/atualizar-resultados': typeof ApiPublicAtualizarResultadosRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
   '/boloes/pagamento/$codigo': typeof BoloesPagamentoCodigoRoute
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/boloes/$bolaoId'
     | '/boloes/reserva'
     | '/l/$loteria'
+    | '/api/public/atualizar-resultados'
     | '/api/public/mercadopago-webhook'
     | '/api/public/webhook'
     | '/boloes/pagamento/$codigo'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/loterias'
     | '/boloes/$bolaoId'
     | '/boloes/reserva'
+    | '/api/public/atualizar-resultados'
     | '/api/public/mercadopago-webhook'
     | '/api/public/webhook'
     | '/boloes/pagamento/$codigo'
@@ -302,6 +314,7 @@ export interface FileRouteTypes {
     | '/boloes/$bolaoId'
     | '/boloes/reserva'
     | '/_authenticated/l/$loteria'
+    | '/api/public/atualizar-resultados'
     | '/api/public/mercadopago-webhook'
     | '/api/public/webhook'
     | '/boloes/pagamento/$codigo'
@@ -325,6 +338,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   BoloesBolaoIdRoute: typeof BoloesBolaoIdRoute
   BoloesReservaRoute: typeof BoloesReservaRoute
+  ApiPublicAtualizarResultadosRoute: typeof ApiPublicAtualizarResultadosRoute
   ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
   ApiPublicWebhookRoute: typeof ApiPublicWebhookRoute
   BoloesPagamentoCodigoRoute: typeof BoloesPagamentoCodigoRoute
@@ -435,6 +449,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/mercadopago-webhook'
       fullPath: '/api/public/mercadopago-webhook'
       preLoaderRoute: typeof ApiPublicMercadopagoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/atualizar-resultados': {
+      id: '/api/public/atualizar-resultados'
+      path: '/api/public/atualizar-resultados'
+      fullPath: '/api/public/atualizar-resultados'
+      preLoaderRoute: typeof ApiPublicAtualizarResultadosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/l/$loteria': {
@@ -571,6 +592,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   BoloesBolaoIdRoute: BoloesBolaoIdRoute,
   BoloesReservaRoute: BoloesReservaRoute,
+  ApiPublicAtualizarResultadosRoute: ApiPublicAtualizarResultadosRoute,
   ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
   ApiPublicWebhookRoute: ApiPublicWebhookRoute,
   BoloesPagamentoCodigoRoute: BoloesPagamentoCodigoRoute,
