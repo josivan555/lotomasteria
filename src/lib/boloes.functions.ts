@@ -133,6 +133,36 @@ export const obterBolao = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!bolao) throw new Error("Bolão não encontrado");
 
+    // Conferência automática: se o sorteio já ocorreu e ainda não há resultado,
+    // busca o resultado oficial na Caixa e persiste no bolão.
+    let bolaoAtual: any = bolao;
+    const jaSorteou = new Date(`${bolao.data_sorteio}T23:59:59`) < new Date();
+    if (jaSorteou && (!bolao.resultado_oficial || (bolao.resultado_oficial as number[]).length === 0)) {
+      const { buscarConcursoOficial } = await import("./caixa.server");
+      const oficial = await buscarConcursoOficial(
+        bolao.loteria_id as LoteriaId,
+        bolao.concurso_numero,
+      );
+      if (oficial) {
+        const { data: atualizado } = await supabaseAdmin
+          .from("boloes")
+          .update({ resultado_oficial: oficial.dezenas, status: "conferido" })
+          .eq("id", bolao.id)
+          .select("*")
+          .maybeSingle();
+        bolaoAtual = atualizado ?? { ...bolao, resultado_oficial: oficial.dezenas, status: "conferido" };
+      } else if (bolao.status === "em_vendas" || bolao.status === "publicado") {
+        const { data: atualizado } = await supabaseAdmin
+          .from("boloes")
+          .update({ status: "encerrado" })
+          .eq("id", bolao.id)
+          .select("*")
+          .maybeSingle();
+        bolaoAtual = atualizado ?? { ...bolao, status: "encerrado" };
+      }
+    }
+
+
     const { data: p } = await supabase
       .from("bolao_participantes")
       .select("quantidade_cotas, status")
@@ -146,10 +176,10 @@ export const obterBolao = createServerFn({ method: "GET" })
       .reduce((acc: number, curr: any) => acc + curr.quantidade_cotas, 0);
 
     return {
-      ...bolao,
+      ...bolaoAtual,
       cotas_compradas: compradas,
       cotas_reservadas: reservadas,
-      cotas_disponiveis: bolao.total_cotas - compradas - reservadas,
+      cotas_disponiveis: bolaoAtual.total_cotas - compradas - reservadas,
     };
   });
 
