@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight, Search } from "lucide-react";
+import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight, Search, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +8,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { listarBoloesPublicos } from "@/lib/boloes.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { NotificationBell } from "@/components/notification-bell";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -86,9 +87,10 @@ function Landing() {
               </Button>
             </div>
           ) : (
-            <Button asChild size="sm" className="px-3 sm:px-6">
-              <Link to="/loterias">Minha Área</Link>
-            </Button>
+              <NotificationBell />
+              <Button asChild size="sm" className="px-3 sm:px-6">
+                <Link to="/loterias">Minha Área</Link>
+              </Button>
           )}
         </nav>
       </header>
