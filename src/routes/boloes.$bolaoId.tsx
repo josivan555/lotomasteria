@@ -358,7 +358,7 @@ function DetalheBolao() {
               <ConferidorJogos
                 jogos={(bolao.game_snapshot as any[]) ?? []}
                 loteriaId={bolao.loteria_id as LoteriaId}
-                resultadoOficial={bolao.resultado_oficial as number[] | null}
+                resultadoOficial={Array.isArray(bolao.resultado_oficial) ? (bolao.resultado_oficial as number[]) : null}
               />
             </TabsContent>
 
