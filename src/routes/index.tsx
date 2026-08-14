@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarBoloesPublicos } from "@/lib/boloes.functions";
+import { listarBoloesPublicos, listarHistoricoBoloes } from "@/lib/boloes.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
