@@ -395,7 +395,6 @@ function Landing() {
               </Button>
             </div>
           )}
-          )}
         </section>
 
 
