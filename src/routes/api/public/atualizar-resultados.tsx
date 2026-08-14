@@ -12,7 +12,16 @@ export const Route = createFileRoute('/api/public/atualizar-resultados')({
           const agora = new Date();
           const hojeIso = agora.toISOString().split('T')[0];
 
-          // Busca bolões pendentes de sorteio
+          // 1. Encerrar bolões que passaram do prazo de vendas
+          const { error: encErr } = await supabaseAdmin
+            .from('boloes')
+            .update({ status: 'encerrado' })
+            .eq('status', 'em_vendas')
+            .lt('prazo_vendas', hojeIso);
+
+          if (encErr) console.error('Erro ao encerrar bolões expirados:', encErr);
+
+          // 2. Busca bolões pendentes de sorteio
           const { data: boloes, error } = await supabaseAdmin
             .from('boloes')
             .select('id, nome, loteria_id, concurso_numero, data_sorteio, horario_sorteio')
