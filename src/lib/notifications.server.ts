@@ -2,8 +2,8 @@ import { supabaseAdmin } from '@/integrations/supabase/client.server';
 
 export async function createNotification(userId: string, title: string, message: string, type = 'info', link?: string) {
   // Usando cast para any para contornar a falta dos tipos gerados no momento
-  const { error } = await (supabaseAdmin
-    .from('notifications' as any) as any)
+  const { error } = await supabaseAdmin
+    .from('notifications')
     .insert({
       user_id: userId,
       title,
@@ -17,8 +17,8 @@ export async function createNotification(userId: string, title: string, message:
 
 export async function notifyBolaoSorteado(bolaoId: string, bolaoNome: string) {
   // Buscar todos os participantes pagos do bolão
-  const { data: participantes, error } = await (supabaseAdmin
-    .from('bolao_participantes' as any) as any)
+  const { data: participantes, error } = await supabaseAdmin
+    .from('bolao_participantes')
     .select('user_id, status')
     .eq('bolao_id', bolaoId)
     .eq('status', 'pago');
