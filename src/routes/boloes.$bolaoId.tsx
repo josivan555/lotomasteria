@@ -115,7 +115,7 @@ function DetalheBolao() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Total:</span>
-                <span className="text-lg font-black text-primary">{formatBRL(sucesso.total)}</span>
+                <span className="text-lg font-black" style={{ color: cfg.cor }}>{formatBRL(sucesso.total)}</span>
               </div>
             </div>
 
