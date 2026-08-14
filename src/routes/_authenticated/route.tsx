@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ensureBrowserSession } from "@/lib/session-guard";
 import { LogOut, Home, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/notification-bell";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
 import { isLoteriaId, LOTERIAS, LOTERIA_IDS, type LoteriaId } from "@/lib/loterias-config";
