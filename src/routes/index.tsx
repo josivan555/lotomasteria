@@ -243,7 +243,8 @@ function Landing() {
                 : "Nenhum bolão disponível no momento. Volte em breve!"}
             </div>
           ) : (
-          {displayMode === "grid" ? (
+            <>
+              {displayMode === "grid" ? (
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {paginatedBoloes.map((b: any) => {
                 const cfg = LOTERIAS[b.loteria_id as LoteriaId];
