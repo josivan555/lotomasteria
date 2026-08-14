@@ -395,6 +395,7 @@ function Landing() {
                 Próxima
               </Button>
             </div>
+            </>
           )}
         </section>
 
