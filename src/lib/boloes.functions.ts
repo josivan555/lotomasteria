@@ -176,10 +176,10 @@ export const obterBolao = createServerFn({ method: "GET" })
       .reduce((acc: number, curr: any) => acc + curr.quantidade_cotas, 0);
 
     return {
-      ...bolao,
+      ...bolaoAtual,
       cotas_compradas: compradas,
       cotas_reservadas: reservadas,
-      cotas_disponiveis: bolao.total_cotas - compradas - reservadas,
+      cotas_disponiveis: bolaoAtual.total_cotas - compradas - reservadas,
     };
   });
 
