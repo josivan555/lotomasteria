@@ -253,8 +253,10 @@ function Landing() {
                 const agora = new Date();
                 const horario = b.horario_encerramento || '23:59:59';
                 const dataPrazo = new Date(`${b.prazo_vendas}T${horario}`);
+                const dataSorteioObj = new Date(b.data_sorteio);
+                const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
                 const prazoEncerrado = agora > dataPrazo;
-                const esgotado = b.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(b.status);
+                const esgotado = b.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(b.status) || dataSorteioPassada;
                 
                 return (
                   <div key={b.id} className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/60 backdrop-blur hover:border-primary/50 transition-all hover:shadow-lg">
@@ -272,8 +274,8 @@ function Landing() {
                           <div className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                             Concurso {b.concurso_numero}
                           </div>
-                          {(b.status === 'encerrado' || new Date(b.data_sorteio) < new Date(new Date().setHours(0,0,0,0))) && (
-                            <span className="text-[10px] font-black uppercase text-red-500 animate-pulse">
+                          {(b.status === 'encerrado' || b.status === 'sorteado' || b.status === 'conferido' || dataSorteioPassada) && (
+                            <span className="text-[10px] font-black uppercase text-red-500 animate-pulse bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
                               Encerrado
                             </span>
                           )}
