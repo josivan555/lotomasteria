@@ -131,7 +131,7 @@ export const obterBolao = createServerFn({ method: "GET" })
       .maybeSingle();
 
     if (error) throw new Error(error.message);
-    if (!bolao) throw new Error("Bolão não encontrado");
+    if (!bolao) return null;
 
     // Conferência automática: se o sorteio já ocorreu e ainda não há resultado,
     // busca o resultado oficial na Caixa e persiste no bolão.
@@ -197,6 +197,7 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     // 1. Verificar disponibilidade
     const bolao = await obterBolao({ data: { id: data.bolaoId } });
+    if (!bolao) throw new Error("Bolão não encontrado.");
     
     // Verificar se o prazo de vendas expirou
     const agora = new Date();
