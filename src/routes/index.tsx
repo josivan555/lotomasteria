@@ -361,7 +361,7 @@ function Landing() {
                           </td>
                           <td className="px-4 py-3 text-right">
                             <Button variant="ghost" size="sm" asChild>
-                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }}>Ver</Link>
+                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>Ver</Link>
                             </Button>
                           </td>
                         </tr>
