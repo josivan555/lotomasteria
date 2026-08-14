@@ -208,7 +208,7 @@ function DetalheBolao() {
 
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="ball h-10 w-10 text-sm font-bold" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
+                  <div className="ball h-10 w-10 text-sm font-bold text-white" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
                   <div>
                     <h1 className="text-2xl font-black leading-tight">{bolao.nome}</h1>
                     <Badge variant="secondary" className="mt-1">Concurso {bolao.concurso_numero}</Badge>
@@ -221,9 +221,9 @@ function DetalheBolao() {
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">Estimativa de Prêmio</p>
                   <p className="text-lg font-black text-foreground">{formatBRL(bolao.premio_estimado || 0)}</p>
                 </div>
-                <div className="rounded-2xl bg-primary/10 p-4 border border-primary/20">
-                  <p className="text-[10px] uppercase tracking-wider text-primary font-bold mb-1">Valor da Cota</p>
-                  <p className="text-lg sm:text-xl font-black text-primary">{formatBRL(bolao.valor_cota)}</p>
+                <div className="rounded-2xl p-4 border" style={{ backgroundColor: `${cfg.cor}10`, borderColor: `${cfg.cor}20` }}>
+                  <p className="text-[10px] uppercase tracking-wider font-bold mb-1" style={{ color: cfg.cor }}>Valor da Cota</p>
+                  <p className="text-lg sm:text-xl font-black" style={{ color: cfg.cor }}>{formatBRL(bolao.valor_cota)}</p>
                 </div>
               </div>
 
@@ -233,7 +233,7 @@ function DetalheBolao() {
                   <span className="font-bold">{bolao.cotas_compradas} de {bolao.total_cotas} cotas</span>
                 </div>
                 <div className="h-3 w-full bg-secondary rounded-full overflow-hidden">
-                  <div className="h-full bg-primary transition-all duration-700" style={{ width: `${progresso}%` }} />
+                  <div className="h-full transition-all duration-700" style={{ width: `${progresso}%`, backgroundColor: cfg.cor }} />
                 </div>
                 <p className="text-center text-xs text-muted-foreground font-medium">
                   {bolao.cotas_disponiveis} cotas ainda disponíveis para compra
@@ -242,15 +242,15 @@ function DetalheBolao() {
 
               <div className="grid gap-3 text-sm border-t border-border pt-6">
                 <div className="flex items-center gap-3 text-muted-foreground">
-                  <Clock className="h-4 w-4 text-primary" />
+                  <Clock className="h-4 w-4" style={{ color: cfg.cor }} />
                   <span>Sorteio: <strong>{new Date(bolao.data_sorteio).toLocaleDateString('pt-BR')} às {bolao.horario_sorteio}</strong></span>
                 </div>
                 <div className="flex items-center gap-3 text-muted-foreground">
-                  <Users className="h-4 w-4 text-primary" />
+                  <Users className="h-4 w-4" style={{ color: cfg.cor }} />
                   <span>Bolão com <strong>{bolao.total_jogos} jogos</strong> otimizados por IA</span>
                 </div>
                 <div className="flex items-center gap-3 text-muted-foreground">
-                  <Trophy className="h-4 w-4 text-primary" />
+                  <Trophy className="h-4 w-4" style={{ color: cfg.cor }} />
                   <span>Participação proporcional por cota</span>
                 </div>
               </div>
@@ -259,7 +259,7 @@ function DetalheBolao() {
 
           <div className="rounded-2xl border border-dashed border-border/60 p-6 bg-muted/20">
             <h3 className="font-bold mb-4 flex items-center gap-2">
-              <Users className="h-4 w-4 text-primary" /> Por que participar?
+              <Users className="h-4 w-4" style={{ color: cfg.cor }} /> Por que participar?
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Nossos bolões são gerados utilizando o motor de inteligência do LotoMaster IA. 
@@ -284,7 +284,7 @@ function DetalheBolao() {
                 <div className="p-4 space-y-3">
                   {(bolao.game_snapshot as any[])?.map((jogo, i) => (
                     <div key={i} className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-secondary/20 border border-border/20">
-                      <div className="w-6 h-6 rounded-full bg-primary/20 text-primary text-[10px] flex items-center justify-center font-bold">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfg.cor}20`, color: cfg.cor }}>
                         {i+1}
                       </div>
                       <div className="flex flex-wrap gap-1.5 flex-1">
@@ -295,7 +295,7 @@ function DetalheBolao() {
                         ))}
                       </div>
                       {jogo.score && (
-                        <div className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                        <div className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ backgroundColor: `${cfg.cor}15`, color: cfg.cor }}>
                           SCORE {jogo.score}
                         </div>
                       )}
@@ -325,7 +325,7 @@ function DetalheBolao() {
             <div className="rounded-3xl border border-border/60 bg-card p-5 sm:p-8 shadow-xl">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-black">Comprar Cotas</h2>
-                <Button variant="link" size="sm" asChild className="text-primary font-bold p-0 h-auto">
+                <Button variant="link" size="sm" asChild className="font-bold p-0 h-auto" style={{ color: cfg.cor }}>
                   <Link to="/boloes/reserva">Já tenho uma reserva</Link>
                 </Button>
               </div>
