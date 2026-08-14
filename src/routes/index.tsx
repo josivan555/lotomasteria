@@ -48,6 +48,10 @@ function Landing() {
   const listarHistoricoFn = useServerFn(listarHistoricoBoloes);
   const [searchTerm, setSearchTerm] = useState("");
   const [view, setView] = useState<"ativos" | "historico">("ativos");
+  const [displayMode, setDisplayMode] = useState<"grid" | "list">("grid");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
   
   const { data: boloes = [], isLoading: isLoadingBoloes } = useQuery({
     queryKey: ["boloes-publicos", view],
@@ -64,9 +68,22 @@ function Landing() {
 
   const isLoggedIn = !!userSession;
 
-  const filteredBoloes = (boloes ?? []).filter((b: any) => 
-    b.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBoloes = (boloes ?? []).filter((b: any) => {
+    const matchesSearch = b.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         b.concurso_numero.toString().includes(searchTerm);
+    const matchesStatus = statusFilter === "all" || b.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPages = Math.ceil(filteredBoloes.length / itemsPerPage);
+  const paginatedBoloes = filteredBoloes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, view]);
 
   return (
     <div className="min-h-screen">
@@ -150,7 +167,7 @@ function Landing() {
               <p className="text-muted-foreground mt-1">Participe de apostas coletivas geradas com nossa inteligência</p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            <div className="flex flex-col lg:flex-row items-center gap-3 w-full lg:w-auto">
               <div className="flex p-1 bg-secondary/50 rounded-lg w-full sm:w-auto">
                 <button
                   onClick={() => setView("ativos")}
@@ -166,15 +183,46 @@ function Landing() {
                 </button>
               </div>
 
+              {view === "historico" && (
+                <select 
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="bg-card/50 border border-border/40 rounded-lg px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 w-full sm:w-auto"
+                >
+                  <option value="all">Todos os Status</option>
+                  <option value="encerrado">Encerrado</option>
+                  <option value="sorteado">Sorteado</option>
+                  <option value="conferido">Conferido</option>
+                </select>
+              )}
+
+              <div className="flex p-1 bg-secondary/50 rounded-lg w-full sm:w-auto">
+                <button
+                  onClick={() => setDisplayMode("grid")}
+                  className={`flex-1 sm:flex-none p-1.5 rounded-md transition-all ${displayMode === "grid" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+                  title="Grade"
+                >
+                  <Sparkles className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setDisplayMode("list")}
+                  className={`flex-1 sm:flex-none p-1.5 rounded-md transition-all ${displayMode === "list" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+                  title="Lista"
+                >
+                  <Users className="h-4 w-4" />
+                </button>
+              </div>
+
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Pesquisar bolão..."
+                  placeholder={view === "ativos" ? "Pesquisar bolão..." : "Concurso ou nome..."}
                   className="pl-9 bg-card/50 border-border/40"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
+            </div>
               
               <div className="flex gap-2 w-full sm:w-auto">
                 <Button variant="ghost" size="sm" asChild className="flex-1 sm:flex-none">
