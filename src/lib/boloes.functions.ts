@@ -182,14 +182,14 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
       .from("bolao_participantes")
       .insert({
         bolao_id: data.bolaoId,
-        user_id: userId as any,
         nome_completo: data.nome,
         celular: data.celular,
         quantidade_cotas: data.cotas,
         valor_total: valorTotal,
         status: "reservado",
         codigo_referencia: `BOL-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
-      })
+        ...({ user_id: userId } as any) // Workaround para tipos não atualizados
+      } as any)
       .select("id, codigo_referencia")
       .single();
 
