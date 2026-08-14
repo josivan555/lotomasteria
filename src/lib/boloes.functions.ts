@@ -66,6 +66,88 @@ export const criarBolao = createServerFn({ method: "POST" })
     return bolao;
   });
 
+export const criarBolaoCombo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z
+      .object({
+        nome: z.string().min(3).max(100),
+        prazoVendas: z.string(),
+        horarioEncerramento: z.string().optional(),
+        totalCotas: z.number().int().positive(),
+        valorCota: z.number().positive(),
+        loterias: z
+          .array(
+            z.object({
+              loteriaId: loteriaEnum,
+              concursoNumero: z.number().int().positive(),
+              dataSorteio: z.string(),
+              horarioSorteio: z.string(),
+              premioEstimado: z.number().optional(),
+              jogos: z
+                .array(z.object({ dezenas: z.array(z.number()), score: z.number().optional() }))
+                .min(1),
+            }),
+          )
+          .min(2)
+          .max(5),
+      })
+      .parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: roleRow } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!roleRow) throw new Error("Apenas administradores podem criar bolões.");
+
+    const partes = data.loterias.map((l) => ({
+      loteria_id: l.loteriaId,
+      concurso_numero: l.concursoNumero,
+      data_sorteio: l.dataSorteio,
+      horario_sorteio: l.horarioSorteio,
+      premio_estimado: l.premioEstimado ?? 0,
+      jogos: l.jogos,
+      resultado_oficial: [] as number[],
+    }));
+
+    const totalJogos = partes.reduce((acc, p) => acc + p.jogos.length, 0);
+    const premioTotal = partes.reduce((acc, p) => acc + (p.premio_estimado || 0), 0);
+    const datas = partes.map((p) => p.data_sorteio).sort();
+    const ultimaData = datas[datas.length - 1]!;
+    const primeira = partes[0]!;
+
+    const { data: bolao, error } = await context.supabase
+      .from("boloes")
+      .insert({
+        nome: data.nome,
+        loteria_id: primeira.loteria_id,
+        criador_id: context.userId,
+        concurso_numero: primeira.concurso_numero,
+        data_sorteio: ultimaData,
+        horario_sorteio: primeira.horario_sorteio,
+        prazo_vendas: data.prazoVendas,
+        horario_encerramento: data.horarioEncerramento,
+        total_jogos: totalJogos,
+        total_cotas: data.totalCotas,
+        valor_cota: data.valorCota,
+        valor_total: data.totalCotas * data.valorCota,
+        premio_estimado: premioTotal,
+        status: "em_vendas",
+        game_snapshot: partes.flatMap((p) => p.jogos) as any,
+        is_combo: true,
+        combo_loterias: partes as any,
+      })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+    return bolao;
+  });
+
 export const listarBoloesPublicos = createServerFn({ method: "GET" })
   .handler(async () => {
     const hoje = new Date().toISOString().split('T')[0];
@@ -136,8 +218,45 @@ export const obterBolao = createServerFn({ method: "GET" })
     // Conferência automática: se o sorteio já ocorreu e ainda não há resultado,
     // busca o resultado oficial na Caixa e persiste no bolão.
     let bolaoAtual: any = bolao;
+
+    // Combo: confere cada loteria do combo separadamente
+    if ((bolao as any).is_combo) {
+      const partes: any[] = Array.isArray((bolao as any).combo_loterias)
+        ? ((bolao as any).combo_loterias as any[])
+        : [];
+      const { buscarConcursoOficial } = await import("./caixa.server");
+      let mudou = false;
+      const atualizadas = await Promise.all(
+        partes.map(async (parte) => {
+          const temResultado = Array.isArray(parte.resultado_oficial) && parte.resultado_oficial.length > 0;
+          const passou = new Date(`${parte.data_sorteio}T23:59:59`) < new Date();
+          if (temResultado || !passou) return parte;
+          const oficial = await buscarConcursoOficial(parte.loteria_id as LoteriaId, parte.concurso_numero);
+          if (!oficial) return parte;
+          mudou = true;
+          return { ...parte, resultado_oficial: oficial.dezenas };
+        }),
+      );
+
+      const todasConferidas =
+        atualizadas.length > 0 &&
+        atualizadas.every((p: any) => Array.isArray(p.resultado_oficial) && p.resultado_oficial.length > 0);
+
+      if (mudou) {
+        const { data: atualizado } = await supabaseAdmin
+          .from("boloes")
+          .update({
+            combo_loterias: atualizadas as any,
+            ...(todasConferidas ? { status: "conferido" } : { status: "encerrado" }),
+          })
+          .eq("id", bolao.id)
+          .select("*")
+          .maybeSingle();
+        bolaoAtual = atualizado ?? { ...bolao, combo_loterias: atualizadas };
+      }
+    }
     const jaSorteou = new Date(`${bolao.data_sorteio}T23:59:59`) < new Date();
-    if (jaSorteou && (!bolao.resultado_oficial || (bolao.resultado_oficial as number[]).length === 0)) {
+    if (!(bolao as any).is_combo && jaSorteou && (!bolao.resultado_oficial || (bolao.resultado_oficial as number[]).length === 0)) {
       const { buscarConcursoOficial } = await import("./caixa.server");
       const oficial = await buscarConcursoOficial(
         bolao.loteria_id as LoteriaId,

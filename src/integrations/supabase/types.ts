@@ -75,6 +75,7 @@ export type Database = {
       }
       boloes: {
         Row: {
+          combo_loterias: Json
           concurso_numero: number
           created_at: string | null
           criador_id: string
@@ -83,6 +84,7 @@ export type Database = {
           horario_encerramento: string | null
           horario_sorteio: string
           id: string
+          is_combo: boolean
           loteria_id: string
           nome: string
           prazo_vendas: string
@@ -95,6 +97,7 @@ export type Database = {
           valor_total: number
         }
         Insert: {
+          combo_loterias?: Json
           concurso_numero: number
           created_at?: string | null
           criador_id: string
@@ -103,6 +106,7 @@ export type Database = {
           horario_encerramento?: string | null
           horario_sorteio: string
           id?: string
+          is_combo?: boolean
           loteria_id: string
           nome: string
           prazo_vendas: string
@@ -115,6 +119,7 @@ export type Database = {
           valor_total: number
         }
         Update: {
+          combo_loterias?: Json
           concurso_numero?: number
           created_at?: string | null
           criador_id?: string
@@ -123,6 +128,7 @@ export type Database = {
           horario_encerramento?: string | null
           horario_sorteio?: string
           id?: string
+          is_combo?: boolean
           loteria_id?: string
           nome?: string
           prazo_vendas?: string
