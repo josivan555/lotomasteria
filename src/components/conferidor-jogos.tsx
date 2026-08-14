@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
@@ -21,6 +21,13 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
     () => new Set(resultadoOficial ?? []),
   );
   const [ordem, setOrdem] = useState<Ordem>("order");
+
+  // Sync with official result if it arrives after initial mount
+  useEffect(() => {
+    if (resultadoOficial && resultadoOficial.length > 0) {
+      setSelected(new Set(resultadoOficial));
+    }
+  }, [resultadoOficial]);
 
   const toggle = (n: number) => {
     setSelected((prev) => {

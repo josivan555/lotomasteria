@@ -253,13 +253,13 @@ function DetalheBolao() {
                 </div>
 
                 {bolao.resultado_oficial && (
-                  <div className="p-4 rounded-2xl bg-secondary/20 border border-border/40 space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-2">
-                      <Trophy className="h-3 w-3" style={{ color: cfg.cor }} /> Resultado Oficial
+                  <div className="p-4 rounded-2xl bg-secondary/30 border border-border/60 shadow-inner space-y-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                      <Trophy className="h-3 w-3" style={{ color: cfg.cor }} /> Resultado Oficial Concurso {bolao.concurso_numero}
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                       {(bolao.resultado_oficial as number[]).map(n => (
-                        <div key={n} className="w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs shadow-md" style={{ backgroundColor: cfg.cor }}>
+                        <div key={n} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center font-black text-sm sm:text-base shadow-lg animate-in zoom-in duration-300" style={{ backgroundColor: cfg.cor }}>
                           {n.toString().padStart(2, '0')}
                         </div>
                       ))}
