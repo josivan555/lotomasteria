@@ -110,6 +110,8 @@ function BuscaReserva() {
               className="absolute top-0 left-0 w-full h-2" 
               style={{ backgroundColor: LOTERIAS[reserva.boloes.loteria_id as LoteriaId].cor }} 
             />
+            <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: LOTERIAS[reserva.boloes.loteria_id as LoteriaId].cor }} />
+
             
             <div className="flex justify-between items-start mb-8 pb-6 border-b border-border">
               <div>
@@ -130,9 +132,9 @@ function BuscaReserva() {
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">Cotas Reservadas</p>
                 <p className="text-xl font-black">{reserva.quantidade_cotas}</p>
               </div>
-              <div className="rounded-2xl bg-primary/10 p-4 border border-primary/20">
-                <p className="text-[10px] uppercase tracking-wider text-primary font-bold mb-1">Valor Total</p>
-                <p className="text-xl font-black text-primary">{formatBRL(reserva.valor_total)}</p>
+              <div className="rounded-2xl p-4 border" style={{ backgroundColor: `${LOTERIAS[reserva.boloes.loteria_id as LoteriaId].cor}10`, borderColor: `${LOTERIAS[reserva.boloes.loteria_id as LoteriaId].cor}20` }}>
+                <p className="text-[10px] uppercase tracking-wider font-bold mb-1" style={{ color: LOTERIAS[reserva.boloes.loteria_id as LoteriaId].cor }}>Valor Total</p>
+                <p className="text-xl font-black" style={{ color: LOTERIAS[reserva.boloes.loteria_id as LoteriaId].cor }}>{formatBRL(reserva.valor_total)}</p>
               </div>
             </div>
 
@@ -146,7 +148,7 @@ function BuscaReserva() {
                     <p className="text-lg font-black">Pagamento Pendente</p>
                     <p className="text-sm text-muted-foreground">Sua reserva está garantida, mas precisa de pagamento para ser confirmada.</p>
                   </div>
-                  <Button className="w-full font-black h-14 text-lg" asChild>
+                  <Button className="w-full font-black h-14 text-lg text-white" style={{ backgroundColor: LOTERIAS[reserva.boloes.loteria_id as LoteriaId].cor }} asChild>
                     <Link to="/boloes/pagamento/$codigo" params={{ codigo: reserva.codigo_referencia }}>
                       Acessar Tela de Pagamento <ExternalLink className="ml-2 h-5 w-5" />
                     </Link>

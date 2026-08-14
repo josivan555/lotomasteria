@@ -310,12 +310,12 @@ function Landing() {
                       </div>
 
                       <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 mt-auto">
-                        <Button className="w-full font-bold shadow-md order-1 sm:order-none" style={{ backgroundColor: cfg.cor }} asChild>
+                        <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: cfg.cor }} asChild>
                           <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                             Ver Reservas
                           </Link>
                         </Button>
-                        <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10" style={{ borderColor: `${cfg.cor}50`, color: cfg.cor }} asChild>
+                        <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: `${cfg.cor}50`, color: cfg.cor }} asChild>
                           <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
                             Ver Jogos
                           </Link>

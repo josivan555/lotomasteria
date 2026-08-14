@@ -96,10 +96,12 @@ function PagamentoReserva() {
             className="absolute top-0 left-0 w-full h-2" 
             style={{ backgroundColor: cfg.cor }} 
           />
+          <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: cfg.cor }} />
+
           
           <div className="mb-8 text-center space-y-2">
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-black">Valor Total</p>
-            <p className="text-4xl font-black text-primary">{formatBRL(reserva.valor_total)}</p>
+            <p className="text-4xl font-black" style={{ color: cfg.cor }}>{formatBRL(reserva.valor_total)}</p>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/50 text-[11px] font-bold">
               <Badge variant="secondary" className="h-5">{reserva.quantidade_cotas} cotas</Badge>
               <span>{bolao.nome}</span>
@@ -133,7 +135,8 @@ function PagamentoReserva() {
                     </div>
                     <Button 
                       size="icon" 
-                      className="shrink-0 h-auto" 
+                      className="shrink-0 h-auto text-white" 
+                      style={{ backgroundColor: cfg.cor }}
                       onClick={() => handleCopy(pixData?.qrCode, "Código PIX")}
                     >
                       <Copy className="h-4 w-4" />
@@ -148,7 +151,7 @@ function PagamentoReserva() {
                   </div>
                   <div className="hidden sm:block h-4 w-[1px] bg-border" />
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <RefreshCw className="h-4 w-4 text-primary animate-spin" />
+                    <RefreshCw className="h-4 w-4 animate-spin" style={{ color: cfg.cor }} />
                     <span>Verificação automática</span>
                   </div>
                 </div>
@@ -164,7 +167,7 @@ function PagamentoReserva() {
                 Sua participação no bolão foi confirmada com sucesso. Boa sorte!
               </p>
               <div className="grid gap-3">
-                <Button className="w-full font-black h-12" asChild>
+                <Button className="w-full font-black h-12 text-white" style={{ backgroundColor: cfg.cor }} asChild>
                   <Link to="/boloes/reserva">Ver Minha Reserva</Link>
                 </Button>
                 <Button variant="ghost" asChild>
@@ -184,8 +187,8 @@ function PagamentoReserva() {
         </div>
 
         {!isPago && (
-          <div className="rounded-2xl bg-primary/5 p-6 border border-primary/10 flex gap-4">
-            <Info className="h-6 w-6 text-primary shrink-0" />
+          <div className="rounded-2xl p-6 border flex gap-4" style={{ backgroundColor: `${cfg.cor}08`, borderColor: `${cfg.cor}15` }}>
+            <Info className="h-6 w-6 shrink-0" style={{ color: cfg.cor }} />
             <div className="space-y-1">
               <p className="text-sm font-bold">Dica importante</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
