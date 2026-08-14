@@ -88,9 +88,12 @@ function Landing() {
             </div>
           ) : (
               <NotificationBell />
+            <div className="flex items-center gap-2">
+              <NotificationBell />
               <Button asChild size="sm" className="px-3 sm:px-6">
                 <Link to="/loterias">Minha Área</Link>
               </Button>
+            </div>
           )}
         </nav>
       </header>
