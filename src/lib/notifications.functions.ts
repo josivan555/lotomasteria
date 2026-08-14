@@ -6,8 +6,8 @@ export const listarMinhasNotificacoes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     // Usamos context.supabase que já vem do middleware requireSupabaseAuth
-    const { data, error } = await (context.supabase
-      .from("notifications" as any) as any)
+    const { data, error } = await context.supabase
+      .from("notifications")
       .select("*")
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false })
@@ -21,8 +21,8 @@ export const marcarComoLida = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
-    const { error } = await (context.supabase
-      .from("notifications" as any) as any)
+    const { error } = await context.supabase
+      .from("notifications")
       .update({ read: true })
       .eq("id", data.id)
       .eq("user_id", context.userId);
