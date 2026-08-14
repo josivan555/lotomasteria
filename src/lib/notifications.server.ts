@@ -19,15 +19,16 @@ export async function notifyBolaoSorteado(bolaoId: string, bolaoNome: string) {
   // Buscar todos os participantes pagos do bolão
   const { data: participantes, error } = await (supabaseAdmin
     .from('bolao_participantes' as any) as any)
-    .select('celular, nome_completo, user_id');
+    .select('user_id, status')
+    .eq('bolao_id', bolaoId)
+    .eq('status', 'pago');
 
   if (error) {
     console.error('Error fetching participants for notification:', error);
     return;
   }
 
-  // Notificar usuários que possuem conta no sistema
-  const filtered = (participantes || []).filter((p: any) => p.bolao_id === bolaoId && p.status === 'pago');
+  const filtered = participantes || [];
 
   for (const p of filtered) {
     if (p.user_id) {
