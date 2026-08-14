@@ -242,7 +242,9 @@ function Landing() {
                         </div>
                         <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
                           <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Disponível</p>
-                          <p className="text-sm font-black text-foreground">{b.cotas_disponiveis} / {b.total_cotas}</p>
+                          <p className="text-sm font-black text-foreground">
+                            {b.cotas_disponiveis !== undefined ? `${b.cotas_disponiveis} / ${b.total_cotas}` : b.total_cotas}
+                          </p>
                         </div>
                       </div>
 
