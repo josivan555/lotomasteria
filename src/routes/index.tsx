@@ -385,9 +385,14 @@ function Landing() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>Ver</Link>
-                            </Button>
+                            <div className="flex justify-end gap-2">
+                              <Button variant="ghost" size="sm" asChild>
+                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>Participantes</Link>
+                              </Button>
+                              <Button variant="outline" size="sm" asChild className="font-bold">
+                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>Ver Jogos</Link>
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       );
