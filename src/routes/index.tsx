@@ -250,6 +250,12 @@ function Landing() {
                 const cfg = LOTERIAS[b.loteria_id as LoteriaId];
                 const progresso = (b.cotas_compradas / b.total_cotas) * 100;
                 
+                const agora = new Date();
+                const horario = b.horario_encerramento || '23:59:59';
+                const dataPrazo = new Date(`${b.prazo_vendas}T${horario}`);
+                const prazoEncerrado = agora > dataPrazo;
+                const esgotado = b.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(b.status);
+                
                 return (
                   <div key={b.id} className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/60 backdrop-blur hover:border-primary/50 transition-all hover:shadow-lg">
                     <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: cfg.cor }} />
@@ -310,16 +316,24 @@ function Landing() {
                       </div>
 
                       <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 mt-auto">
-                        <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: cfg.cor }} asChild>
-                          <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
-                            Ver Reservas
-                          </Link>
-                        </Button>
-                        <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: `${cfg.cor}50`, color: cfg.cor }} asChild>
-                          <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
-                            Ver Jogos
-                          </Link>
-                        </Button>
+                        {esgotado ? (
+                          <div className="col-span-2 text-center py-2 px-4 rounded-lg bg-destructive/10 text-destructive text-[10px] font-bold uppercase tracking-wider">
+                            Participações Encerradas
+                          </div>
+                        ) : (
+                          <>
+                            <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: cfg.cor }} asChild>
+                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
+                                Ver Reservas
+                              </Link>
+                            </Button>
+                            <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: `${cfg.cor}50`, color: cfg.cor }} asChild>
+                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
+                                Ver Jogos
+                              </Link>
+                            </Button>
+                          </>
+                        )}
                       </div>
 
                     </div>
