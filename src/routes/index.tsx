@@ -1,5 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
+/**
+ * Se por acaso eu ou os participantes quiserem ver os jogos dos bolões que já estão encerrado,
+ * para ver se acertaram os jogos.
+ */
+
+
 import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight, Search, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
