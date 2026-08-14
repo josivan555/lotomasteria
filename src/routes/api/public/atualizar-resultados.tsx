@@ -50,7 +50,7 @@ export const Route = createFileRoute('/api/public/atualizar-resultados')({
                   })
                   .eq('id', bolao.id);
                 
-                if (!updateError) {
+                if (!updErr) {
                   atualizados++;
                   // Disparar notificações para os participantes
                   await notifyBolaoSorteado(bolao.id, bolao.nome);
