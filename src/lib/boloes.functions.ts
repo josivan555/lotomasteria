@@ -111,7 +111,7 @@ export const criarBolaoCombo = createServerFn({ method: "POST" })
       resultado_oficial: b.resultado_oficial || [],
     }));
 
-    const totalJogos = partes.reduce((acc, p) => acc + p.jogos.length, 0);
+    const totalJogos = partes.reduce((acc, p) => acc + (Array.isArray(p.jogos) ? p.jogos.length : 0), 0);
     const premioTotal = partes.reduce((acc, p) => acc + (p.premio_estimado || 0), 0);
     const datas = partes.map((p) => p.data_sorteio).sort();
     const ultimaData = datas[datas.length - 1]!;
