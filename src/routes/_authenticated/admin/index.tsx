@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Users, Ticket, ShieldCheck, Clock, CheckCircle2, AlertCircle, Trash2, Edit2, Check, X, Search, UserCircle2 } from "lucide-react";
+import { Users, Ticket, ShieldCheck, Clock, CheckCircle2, AlertCircle, Trash2, Edit2, Check, X, Search, UserCircle2, Layers } from "lucide-react";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { toast } from "sonner";
 import { useRouter, Link } from "@tanstack/react-router";
@@ -125,7 +125,16 @@ function AdminDashboard() {
 
         <TabsContent value="boloes" className="mt-6">
           <div className="flex flex-col sm:flex-row gap-4 mb-6 items-end">
+            <div className="flex gap-2">
+              <Button asChild size="sm" className="gap-2 text-[10px] font-black uppercase tracking-wider">
+                <Link to="/_authenticated/admin/combo">
+                  <Layers className="h-3.5 w-3.5" />
+                  Criar Combo
+                </Link>
+              </Button>
+            </div>
             <div className="relative flex-1">
+
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Buscar bolão por nome ou concurso..." 

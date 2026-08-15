@@ -308,16 +308,17 @@ function Landing() {
                         <span>Sorteio: {new Date(b.data_sorteio).toLocaleDateString('pt-BR')} às {b.horario_sorteio}</span>
                       </div>
 
-                      <div className="rounded-xl p-4 mb-4 text-center border" style={{ backgroundColor: `${cfg.cor}10`, borderColor: `${cfg.cor}20` }}>
-                        <p className="text-[10px] uppercase tracking-widest font-black mb-1" style={{ color: cfg.cor }}>Prêmio Estimado</p>
+                      <div className="rounded-xl p-4 mb-4 text-center border" style={{ backgroundColor: b.is_combo ? '#FFD70010' : `${cfg.cor}10`, borderColor: b.is_combo ? '#FFD70020' : `${cfg.cor}20` }}>
+                        <p className="text-[10px] uppercase tracking-widest font-black mb-1" style={{ color: b.is_combo ? '#B8860B' : cfg.cor }}>Prêmio Estimado Total</p>
 
                         <p className="text-2xl font-black text-foreground">{b.premio_estimado ? `R$ ${b.premio_estimado.toLocaleString('pt-BR')}` : '---'}</p>
                       </div>
 
+
                       <div className="grid grid-cols-2 gap-3 mb-6">
                         <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
                           <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Valor Cota</p>
-                          <p className="text-sm font-black" style={{ color: cfg.cor }}>R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
+                          <p className="text-sm font-black" style={{ color: b.is_combo ? '#B8860B' : cfg.cor }}>R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
                         </div>
                         <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
                           <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Disponível</p>
@@ -329,10 +330,11 @@ function Landing() {
 
                       <div className="space-y-2 mb-6 mt-auto">
                         <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                          <div className="h-full transition-all duration-500" style={{ width: `${Math.min(progresso || 0, 100)}%`, backgroundColor: cfg.cor }} />
+                          <div className="h-full transition-all duration-500" style={{ width: `${Math.min(progresso || 0, 100)}%`, backgroundColor: b.is_combo ? '#FFD700' : cfg.cor }} />
                         </div>
                         <div className="flex justify-between text-[10px] text-muted-foreground font-medium">
-                          <span>{b.total_jogos} jogos IA</span>
+                          <span>{b.total_jogos} jogos IA {b.is_combo ? '(Combo)' : ''}</span>
+
                           <span>{(progresso || 0).toFixed(0)}% preenchido</span>
                         </div>
                       </div>
@@ -344,12 +346,14 @@ function Landing() {
                               Participações Encerradas
                             </div>
                             <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
-                              <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: cfg.cor }} asChild>
+                              <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                                   Participantes
                                 </Link>
                               </Button>
-                              <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: `${cfg.cor}50`, color: cfg.cor }} asChild>
+                              <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
                                   Ver Jogos
                                 </Link>
