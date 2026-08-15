@@ -128,6 +128,7 @@ function AdminDashboard() {
             <div className="flex gap-2">
               <Button asChild size="sm" className="gap-2 text-[10px] font-black uppercase tracking-wider">
                 <Link to="/_authenticated/admin/combo">
+
                   <Layers className="h-3.5 w-3.5" />
                   Criar Combo
                 </Link>
