@@ -9,6 +9,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight, Search, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarBoloesPublicos, listarHistoricoBoloes } from "@/lib/boloes.functions";
