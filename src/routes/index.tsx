@@ -9,6 +9,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, BarChart3, Filter, Trophy, Clock, Users, ChevronRight, Search, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarBoloesPublicos, listarHistoricoBoloes } from "@/lib/boloes.functions";
@@ -266,19 +268,32 @@ function Landing() {
                 
                 return (
                   <div key={b.id} className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/60 backdrop-blur hover:border-primary/50 transition-all hover:shadow-lg">
-                    <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: cfg.cor }} />
-                    <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: cfg.cor }} />
-
+                    <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: b.is_combo ? '#FFD700' : cfg.cor }} />
+                    <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: b.is_combo ? '#FFD700' : cfg.cor }} />
+                    
+                    {b.is_combo && (
+                      <div className="absolute -right-12 top-6 rotate-45 bg-gradient-to-r from-yellow-400 to-amber-600 text-black text-[9px] font-black py-1 px-12 shadow-sm z-10 border-y border-white/20">
+                        COMBO {Array.isArray(b.combo_loterias) ? b.combo_loterias.length : ''}x
+                      </div>
+                    )}
                     
                     <div className="p-5 flex-1 flex flex-col">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-2">
-                          <img src={cfg.logo} alt={cfg.nome} className="h-6 w-auto" />
-                          <span className="font-bold text-sm">{cfg.nome}</span>
+                          {b.is_combo ? (
+                            <div className="flex -space-x-2">
+                              {(b.combo_loterias as any[])?.slice(0, 3).map((p: any, i: number) => (
+                                <img key={i} src={LOTERIAS[p.loteria_id as LoteriaId].logo} alt="logo" className="h-6 w-auto border-2 border-background rounded-full bg-background" />
+                              ))}
+                            </div>
+                          ) : (
+                            <img src={cfg.logo} alt={cfg.nome} className="h-6 w-auto" />
+                          )}
+                          <span className="font-bold text-sm">{b.is_combo ? 'COMBO ESPECIAL' : cfg.nome}</span>
                         </div>
                         <div className="flex flex-col items-end gap-1">
                           <div className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                            Concurso {b.concurso_numero}
+                            {b.is_combo ? 'Múltiplos Concursos' : `Concurso ${b.concurso_numero}`}
                           </div>
                           {(b.status === 'encerrado' || b.status === 'sorteado' || b.status === 'conferido' || dataSorteioPassada) && (
                             <span className="text-[10px] font-black uppercase text-red-500 animate-pulse bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
@@ -288,22 +303,30 @@ function Landing() {
                         </div>
                       </div>
 
+
                       <h3 className="text-lg font-bold mb-1 group-hover:text-primary transition-colors">{b.nome}</h3>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
                         <Clock className="h-3 w-3" />
                         <span>Sorteio: {new Date(b.data_sorteio).toLocaleDateString('pt-BR')} às {b.horario_sorteio}</span>
                       </div>
 
-                      <div className="rounded-xl p-4 mb-4 text-center border" style={{ backgroundColor: `${cfg.cor}10`, borderColor: `${cfg.cor}20` }}>
-                        <p className="text-[10px] uppercase tracking-widest font-black mb-1" style={{ color: cfg.cor }}>Prêmio Estimado</p>
+                      <div className="rounded-xl p-4 mb-4 text-center border" style={{ backgroundColor: b.is_combo ? '#FFD70010' : `${cfg.cor}10`, borderColor: b.is_combo ? '#FFD70020' : `${cfg.cor}20` }}>
+                        <p className="text-[10px] uppercase tracking-widest font-black mb-1" style={{ color: b.is_combo ? '#B8860B' : cfg.cor }}>Prêmio Estimado Total</p>
 
-                        <p className="text-2xl font-black text-foreground">{b.premio_estimado ? `R$ ${b.premio_estimado.toLocaleString('pt-BR')}` : '---'}</p>
+                        <p className="text-2xl font-black text-foreground">
+                          {b.is_combo 
+                            ? `R$ ${(b.combo_loterias as any[])?.reduce((acc, p) => acc + (p.premio_estimado || 0), 0).toLocaleString('pt-BR')}`
+                            : b.premio_estimado ? `R$ ${b.premio_estimado.toLocaleString('pt-BR')}` : '---'
+                          }
+                        </p>
                       </div>
+
+
 
                       <div className="grid grid-cols-2 gap-3 mb-6">
                         <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
                           <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Valor Cota</p>
-                          <p className="text-sm font-black" style={{ color: cfg.cor }}>R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
+                          <p className="text-sm font-black" style={{ color: b.is_combo ? '#B8860B' : cfg.cor }}>R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
                         </div>
                         <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
                           <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Disponível</p>
@@ -315,10 +338,11 @@ function Landing() {
 
                       <div className="space-y-2 mb-6 mt-auto">
                         <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                          <div className="h-full transition-all duration-500" style={{ width: `${Math.min(progresso || 0, 100)}%`, backgroundColor: cfg.cor }} />
+                          <div className="h-full transition-all duration-500" style={{ width: `${Math.min(progresso || 0, 100)}%`, backgroundColor: b.is_combo ? '#FFD700' : cfg.cor }} />
                         </div>
                         <div className="flex justify-between text-[10px] text-muted-foreground font-medium">
-                          <span>{b.total_jogos} jogos IA</span>
+                          <span>{b.total_jogos} jogos IA {b.is_combo ? '(Combo)' : ''}</span>
+
                           <span>{(progresso || 0).toFixed(0)}% preenchido</span>
                         </div>
                       </div>
@@ -330,12 +354,14 @@ function Landing() {
                               Participações Encerradas
                             </div>
                             <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
-                              <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: cfg.cor }} asChild>
+                              <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                                   Participantes
                                 </Link>
                               </Button>
-                              <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: `${cfg.cor}50`, color: cfg.cor }} asChild>
+                              <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
                                   Ver Jogos
                                 </Link>
@@ -344,16 +370,17 @@ function Landing() {
                           </div>
                         ) : (
                           <>
-                            <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: cfg.cor }} asChild>
+                            <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                                 Ver Reservas
                               </Link>
                             </Button>
-                            <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: `${cfg.cor}50`, color: cfg.cor }} asChild>
+                            <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
                                 Ver Jogos
                               </Link>
                             </Button>
+
                           </>
                         )}
                       </div>
@@ -378,26 +405,38 @@ function Landing() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/40">
-                    {paginatedBoloes.map((b: any) => {
-                      const cfg = LOTERIAS[b.loteria_id as LoteriaId];
-                      return (
-                        <tr key={b.id} className="hover:bg-secondary/10 transition-colors">
-                          <td className="px-4 py-3 font-semibold">{b.nome}</td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <img src={cfg.logo} alt={cfg.nome} className="h-4 w-auto" />
-                              <span className="text-xs">{cfg.nome}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-xs font-mono">{b.concurso_numero}</td>
-                          <td className="px-4 py-3 text-xs">
-                            {new Date(b.data_sorteio).toLocaleDateString('pt-BR')}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${b.status === 'encerrado' ? 'bg-red-500/10 text-red-500' : 'bg-secondary text-muted-foreground'}`}>
-                              {b.status}
-                            </span>
-                          </td>
+                      {paginatedBoloes.map((b: any) => {
+                        const cfg = LOTERIAS[b.loteria_id as LoteriaId];
+                        return (
+                          <tr key={b.id} className="hover:bg-secondary/10 transition-colors">
+                            <td className="px-4 py-3 font-semibold">
+                              {b.nome}
+                              {b.is_combo && <Badge variant="secondary" className="ml-2 scale-75 bg-amber-500/10 text-amber-500 border-amber-500/20">COMBO</Badge>}
+                            </td>
+                            <td className="px-4 py-3">
+                              {b.is_combo ? (
+                                <div className="flex -space-x-1">
+                                  {(b.combo_loterias as any[])?.slice(0, 3).map((p: any, i: number) => (
+                                    <img key={i} src={LOTERIAS[p.loteria_id as LoteriaId].logo} alt="logo" className="h-4 w-auto border border-background rounded-full bg-background" />
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <img src={cfg.logo} alt={cfg.nome} className="h-4 w-auto" />
+                                  <span className="text-xs">{cfg.nome}</span>
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-xs font-mono">{b.is_combo ? 'Múltiplos' : b.concurso_numero}</td>
+                            <td className="px-4 py-3 text-xs">
+                              {new Date(b.data_sorteio).toLocaleDateString('pt-BR')}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${b.status === 'encerrado' ? 'bg-red-500/10 text-red-500' : 'bg-secondary text-muted-foreground'}`}>
+                                {b.status}
+                              </span>
+                            </td>
+
                           <td className="px-4 py-3 text-right">
                             <div className="flex justify-end gap-2">
                               <Button variant="ghost" size="sm" asChild>

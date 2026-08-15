@@ -215,12 +215,24 @@ function DetalheBolao() {
 
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="ball h-10 w-10 text-sm font-bold text-white" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
+                  {bolao.is_combo ? (
+                    <div className="flex -space-x-3">
+                      {(bolao.combo_loterias as any[])?.map((parte, i) => (
+                        <div key={i} className="ball h-10 w-10 text-sm font-bold text-white border-2 border-background shadow-lg" style={{ backgroundColor: LOTERIAS[parte.loteria_id as LoteriaId].cor, zIndex: 10 - i }}>{LOTERIAS[parte.loteria_id as LoteriaId].nome[0]}</div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="ball h-10 w-10 text-sm font-bold text-white" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
+                  )}
                   <div>
-                    <h1 className="text-2xl font-black leading-tight">{bolao.nome}</h1>
-                    <Badge variant="secondary" className="mt-1">Concurso {bolao.concurso_numero}</Badge>
+                    <h1 className="text-2xl font-black leading-tight">
+                      {bolao.nome}
+                      {bolao.is_combo && <Badge variant="secondary" className="ml-2 bg-amber-500/10 text-amber-500 border-amber-500/20">COMBO</Badge>}
+                    </h1>
+                    <Badge variant="secondary" className="mt-1">{bolao.is_combo ? 'Bolão Multi-Loteria' : `Concurso ${bolao.concurso_numero}`}</Badge>
                   </div>
                 </div>
+
               </div>
 
               <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4 mb-8">
@@ -253,7 +265,25 @@ function DetalheBolao() {
                   <span>Sorteio: <strong>{new Date(bolao.data_sorteio).toLocaleDateString('pt-BR')} às {bolao.horario_sorteio}</strong></span>
                 </div>
 
-                {bolao.resultado_oficial && (
+                {bolao.is_combo ? (
+                  <div className="space-y-4">
+                    {(bolao.combo_loterias as any[])?.map((parte, idx) => parte.resultado_oficial && (
+                      <div key={idx} className="p-4 rounded-2xl bg-secondary/30 border border-border/60 shadow-inner space-y-3">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                          <Trophy className="h-3 w-3" style={{ color: LOTERIAS[parte.loteria_id as LoteriaId].cor }} /> 
+                          Resultado {LOTERIAS[parte.loteria_id as LoteriaId].nome} - Concurso {parte.concurso_numero}
+                        </p>
+                        <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                          {(parte.resultado_oficial as number[]).map(n => (
+                            <div key={n} className="w-8 h-8 rounded-full text-white flex items-center justify-center font-black text-xs shadow-lg animate-in zoom-in duration-300" style={{ backgroundColor: LOTERIAS[parte.loteria_id as LoteriaId].cor }}>
+                              {n.toString().padStart(2, '0')}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : bolao.resultado_oficial && (
                   <div className="p-4 rounded-2xl bg-secondary/30 border border-border/60 shadow-inner space-y-3">
                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Trophy className="h-3 w-3" style={{ color: cfg.cor }} /> Resultado Oficial Concurso {bolao.concurso_numero}
@@ -267,6 +297,7 @@ function DetalheBolao() {
                     </div>
                   </div>
                 )}
+
 
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Users className="h-4 w-4" style={{ color: cfg.cor }} />
@@ -300,68 +331,146 @@ function DetalheBolao() {
 
             
             <TabsContent value="jogos" className="mt-4 space-y-4">
-              <div className="rounded-2xl border border-border/40 bg-card overflow-hidden">
-                <div className="bg-muted/50 px-4 py-2 border-b border-border/40 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                  Jogos Gerados por IA
-                </div>
-                <div className="p-4 space-y-3">
-                  {(bolao.game_snapshot as any[])?.map((jogo, i) => {
-                    const dezenasJogo = Array.isArray(jogo.dezenas) ? jogo.dezenas : [];
-                    const resultado = Array.isArray(bolao.resultado_oficial) ? (bolao.resultado_oficial as number[]) : [];
-                    
-                    const acertos = resultado.length > 0 
-                      ? dezenasJogo.filter((n: number) => resultado.includes(n)).length
-                      : null;
-
+              {bolao.is_combo ? (
+                <div className="space-y-8">
+                  {(bolao.combo_loterias as any[])?.map((parte, pIdx) => {
+                    const cfgP = LOTERIAS[parte.loteria_id as LoteriaId];
                     return (
-                      <div key={i} className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-secondary/20 border border-border/20">
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfg.cor}20`, color: cfg.cor }}>
-                          {i+1}
+                      <div key={pIdx} className="rounded-2xl border border-border/40 bg-card overflow-hidden">
+                        <div className="bg-muted/50 px-4 py-3 border-b border-border/40 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <img src={cfgP.logo} alt={cfgP.nome} className="h-5 w-auto" />
+                            <span className="text-xs font-black uppercase tracking-widest">{cfgP.nome} - Concurso {parte.concurso_numero}</span>
+                          </div>
+                          {parte.resultado_oficial?.length > 0 && (
+                            <div className="flex gap-1">
+                              {parte.resultado_oficial.map((n: number) => (
+                                <div key={n} className="w-5 h-5 rounded-full bg-primary text-[8px] flex items-center justify-center text-white font-bold">{n}</div>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        <div className="flex flex-wrap gap-1.5 flex-1">
-                          {dezenasJogo.map((n: number) => {
-                            const isSorteada = resultado.includes(n);
+                        <div className="p-4 space-y-3">
+                          {parte.jogos?.map((jogo: any, jIdx: number) => {
+                            const acertos = parte.resultado_oficial?.length > 0
+                              ? jogo.dezenas.filter((n: number) => parte.resultado_oficial.includes(n)).length
+                              : null;
                             return (
-                              <div 
-                                key={n} 
-                                className={`w-7 h-7 rounded-full border flex items-center justify-center text-[11px] font-bold transition-all ${
-                                  isSorteada 
-                                    ? "text-white scale-110 shadow-lg" 
-                                    : "bg-background border-border/60"
-                                }`}
-                                style={isSorteada ? { backgroundColor: cfg.cor, borderColor: cfg.cor } : {}}
-                              >
-                                {n.toString().padStart(2, '0')}
+                              <div key={jIdx} className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-secondary/20 border border-border/20">
+                                <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfgP.cor}20`, color: cfgP.cor }}>
+                                  {jIdx+1}
+                                </div>
+                                <div className="flex flex-wrap gap-1.5 flex-1">
+                                  {jogo.dezenas.map((n: number) => {
+                                    const isSorteada = parte.resultado_oficial?.includes(n);
+                                    return (
+                                      <div 
+                                        key={n} 
+                                        className={`w-7 h-7 rounded-full border flex items-center justify-center text-[11px] font-bold transition-all ${
+                                          isSorteada ? "text-white scale-110 shadow-lg" : "bg-background border-border/60"
+                                        }`}
+                                        style={isSorteada ? { backgroundColor: cfgP.cor, borderColor: cfgP.cor } : {}}
+                                      >
+                                        {n.toString().padStart(2, '0')}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                {acertos !== null && (
+                                  <div className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 border border-green-500/20">
+                                    {acertos} ACERTOS
+                                  </div>
+                                )}
                               </div>
                             );
                           })}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {acertos !== null && resultado.length > 0 && (
-                            <div className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 border border-green-500/20 animate-in zoom-in duration-500">
-                              {acertos} ACERTOS
-                            </div>
-                          )}
-                          {jogo.score && (
-                            <div className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ backgroundColor: `${cfg.cor}15`, color: cfg.cor }}>
-                              SCORE {jogo.score}
-                            </div>
-                          )}
                         </div>
                       </div>
                     );
                   })}
                 </div>
-              </div>
+              ) : (
+                <div className="rounded-2xl border border-border/40 bg-card overflow-hidden">
+                  <div className="bg-muted/50 px-4 py-2 border-b border-border/40 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    Jogos Gerados por IA
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {(bolao.game_snapshot as any[])?.map((jogo, i) => {
+                      const dezenasJogo = Array.isArray(jogo.dezenas) ? jogo.dezenas : [];
+                      const resultado = Array.isArray(bolao.resultado_oficial) ? (bolao.resultado_oficial as number[]) : [];
+                      
+                      const acertos = resultado.length > 0 
+                        ? dezenasJogo.filter((n: number) => resultado.includes(n)).length
+                        : null;
+
+                      return (
+                        <div key={i} className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-secondary/20 border border-border/20">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfg.cor}20`, color: cfg.cor }}>
+                            {i+1}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5 flex-1">
+                            {dezenasJogo.map((n: number) => {
+                              const isSorteada = resultado.includes(n);
+                              return (
+                                <div 
+                                  key={n} 
+                                  className={`w-7 h-7 rounded-full border flex items-center justify-center text-[11px] font-bold transition-all ${
+                                    isSorteada 
+                                      ? "text-white scale-110 shadow-lg" 
+                                      : "bg-background border-border/60"
+                                  }`}
+                                  style={isSorteada ? { backgroundColor: cfg.cor, borderColor: cfg.cor } : {}}
+                                >
+                                  {n.toString().padStart(2, '0')}
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {acertos !== null && resultado.length > 0 && (
+                              <div className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 border border-green-500/20 animate-in zoom-in duration-500">
+                                {acertos} ACERTOS
+                              </div>
+                            )}
+                            {jogo.score && (
+                              <div className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ backgroundColor: `${cfg.cor}15`, color: cfg.cor }}>
+                                SCORE {jogo.score}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="conferir" className="mt-4">
-              <ConferidorJogos
-                jogos={(bolao.game_snapshot as any[]) ?? []}
-                loteriaId={bolao.loteria_id as LoteriaId}
-                resultadoOficial={Array.isArray(bolao.resultado_oficial) ? (bolao.resultado_oficial as number[]) : null}
-              />
+              {bolao.is_combo ? (
+                <div className="space-y-6">
+                  {(bolao.combo_loterias as any[])?.map((parte, pIdx) => (
+                    <div key={pIdx} className="space-y-2">
+                      <h3 className="text-xs font-black uppercase tracking-tighter text-muted-foreground ml-2">
+                        {LOTERIAS[parte.loteria_id as LoteriaId].nome}
+                      </h3>
+                      <ConferidorJogos
+                        jogos={parte.jogos ?? []}
+                        loteriaId={parte.loteria_id as LoteriaId}
+                        resultadoOficial={Array.isArray(parte.resultado_oficial) ? parte.resultado_oficial : null}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ConferidorJogos
+                  jogos={(bolao.game_snapshot as any[]) ?? []}
+                  loteriaId={bolao.loteria_id as LoteriaId}
+                  resultadoOficial={Array.isArray(bolao.resultado_oficial) ? (bolao.resultado_oficial as number[]) : null}
+                />
+              )}
             </TabsContent>
+
 
             <TabsContent value="participantes" className="mt-4">
               <ParticipantesList bolaoId={bolao.id} bolao={bolao} />

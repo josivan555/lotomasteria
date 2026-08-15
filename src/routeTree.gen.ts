@@ -25,6 +25,7 @@ import { Route as BoloesPagamentoCodigoRouteImport } from './routes/boloes.pagam
 import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
 import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as ApiPublicAtualizarResultadosRouteImport } from './routes/api/public/atualizar-resultados'
+import { Route as AuthenticatedAdminComboRouteImport } from './routes/_authenticated/admin/combo'
 import { Route as AuthenticatedLLoteriaRouteRouteImport } from './routes/_authenticated/l/$loteria/route'
 import { Route as AuthenticatedLLoteriaIndexRouteImport } from './routes/_authenticated/l/$loteria/index'
 import { Route as AuthenticatedLLoteriaVolanteRouteImport } from './routes/_authenticated/l/$loteria/volante'
@@ -116,6 +117,11 @@ const ApiPublicAtualizarResultadosRoute =
     path: '/api/public/atualizar-resultados',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminComboRoute = AuthenticatedAdminComboRouteImport.update({
+  id: '/combo',
+  path: '/combo',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const AuthenticatedLLoteriaRouteRoute =
   AuthenticatedLLoteriaRouteRouteImport.update({
     id: '/l/$loteria',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/boloes/$bolaoId': typeof BoloesBolaoIdRoute
   '/boloes/reserva': typeof BoloesReservaRoute
   '/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
+  '/admin/combo': typeof AuthenticatedAdminComboRoute
   '/api/public/atualizar-resultados': typeof ApiPublicAtualizarResultadosRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/loterias': typeof AuthenticatedLoteriasRoute
   '/boloes/$bolaoId': typeof BoloesBolaoIdRoute
   '/boloes/reserva': typeof BoloesReservaRoute
+  '/admin/combo': typeof AuthenticatedAdminComboRoute
   '/api/public/atualizar-resultados': typeof ApiPublicAtualizarResultadosRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/boloes/$bolaoId': typeof BoloesBolaoIdRoute
   '/boloes/reserva': typeof BoloesReservaRoute
   '/_authenticated/l/$loteria': typeof AuthenticatedLLoteriaRouteRouteWithChildren
+  '/_authenticated/admin/combo': typeof AuthenticatedAdminComboRoute
   '/api/public/atualizar-resultados': typeof ApiPublicAtualizarResultadosRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
@@ -263,6 +272,7 @@ export interface FileRouteTypes {
     | '/boloes/$bolaoId'
     | '/boloes/reserva'
     | '/l/$loteria'
+    | '/admin/combo'
     | '/api/public/atualizar-resultados'
     | '/api/public/mercadopago-webhook'
     | '/api/public/webhook'
@@ -287,6 +297,7 @@ export interface FileRouteTypes {
     | '/loterias'
     | '/boloes/$bolaoId'
     | '/boloes/reserva'
+    | '/admin/combo'
     | '/api/public/atualizar-resultados'
     | '/api/public/mercadopago-webhook'
     | '/api/public/webhook'
@@ -314,6 +325,7 @@ export interface FileRouteTypes {
     | '/boloes/$bolaoId'
     | '/boloes/reserva'
     | '/_authenticated/l/$loteria'
+    | '/_authenticated/admin/combo'
     | '/api/public/atualizar-resultados'
     | '/api/public/mercadopago-webhook'
     | '/api/public/webhook'
@@ -458,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAtualizarResultadosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/combo': {
+      id: '/_authenticated/admin/combo'
+      path: '/combo'
+      fullPath: '/admin/combo'
+      preLoaderRoute: typeof AuthenticatedAdminComboRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/l/$loteria': {
       id: '/_authenticated/l/$loteria'
       path: '/l/$loteria'
@@ -525,11 +544,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminComboRoute: typeof AuthenticatedAdminComboRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminComboRoute: AuthenticatedAdminComboRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
