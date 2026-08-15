@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
+import { Badge } from "@/components/ui/badge";
+
 import { toast } from "sonner";
 import { useState, useMemo } from "react";
 import { 
