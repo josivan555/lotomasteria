@@ -76,21 +76,7 @@ export const criarBolaoCombo = createServerFn({ method: "POST" })
         horarioEncerramento: z.string().optional(),
         totalCotas: z.number().int().positive(),
         valorCota: z.number().positive(),
-        loterias: z
-          .array(
-            z.object({
-              loteriaId: loteriaEnum,
-              concursoNumero: z.number().int().positive(),
-              dataSorteio: z.string(),
-              horarioSorteio: z.string(),
-              premioEstimado: z.number().optional(),
-              jogos: z
-                .array(z.object({ dezenas: z.array(z.number()), score: z.number().optional() }))
-                .min(1),
-            }),
-          )
-          .min(2)
-          .max(5),
+        bolaoIds: z.array(z.string().uuid()).min(2).max(10),
       })
       .parse(raw),
   )
@@ -104,17 +90,28 @@ export const criarBolaoCombo = createServerFn({ method: "POST" })
 
     if (!roleRow) throw new Error("Apenas administradores podem criar bolões.");
 
-    const partes = data.loterias.map((l) => ({
-      loteria_id: l.loteriaId,
-      concurso_numero: l.concursoNumero,
-      data_sorteio: l.dataSorteio,
-      horario_sorteio: l.horarioSorteio,
-      premio_estimado: l.premioEstimado ?? 0,
-      jogos: l.jogos,
-      resultado_oficial: [] as number[],
+    // Buscar os bolões selecionados
+    const { data: boloesExistentes, error: fetchError } = await context.supabase
+      .from("boloes")
+      .select("*")
+      .in("id", data.bolaoIds);
+
+    if (fetchError) throw new Error(fetchError.message);
+    if (!boloesExistentes || boloesExistentes.length < 2) {
+      throw new Error("Selecione pelo menos 2 bolões válidos.");
+    }
+
+    const partes = boloesExistentes.map((b) => ({
+      loteria_id: b.loteria_id,
+      concurso_numero: b.concurso_numero,
+      data_sorteio: b.data_sorteio,
+      horario_sorteio: b.horario_sorteio,
+      premio_estimado: b.premio_estimado ?? 0,
+      jogos: b.game_snapshot || [],
+      resultado_oficial: b.resultado_oficial || [],
     }));
 
-    const totalJogos = partes.reduce((acc, p) => acc + p.jogos.length, 0);
+    const totalJogos = partes.reduce((acc, p) => acc + (Array.isArray(p.jogos) ? p.jogos.length : 0), 0);
     const premioTotal = partes.reduce((acc, p) => acc + (p.premio_estimado || 0), 0);
     const datas = partes.map((p) => p.data_sorteio).sort();
     const ultimaData = datas[datas.length - 1]!;
@@ -145,6 +142,14 @@ export const criarBolaoCombo = createServerFn({ method: "POST" })
       .single();
 
     if (error) throw new Error(error.message);
+
+    // Opcional: Desativar ou marcar bolões originais para não aparecerem sozinhos na home
+    // se o admin desejar. Por enquanto, apenas criamos o combo.
+    await context.supabase
+      .from("boloes")
+      .update({ status: 'encerrado' }) // Ou um novo status 'em_combo'
+      .in("id", data.bolaoIds);
+
     return bolao;
   });
 
