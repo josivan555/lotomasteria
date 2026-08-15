@@ -29,6 +29,7 @@ function AdminComboCreator() {
   const [prazoVendas, setPrazoVendas] = useState(new Date().toISOString().split("T")[0]);
   const [horarioEncerramento, setHorarioEncerramento] = useState("18:00");
   const [searchTerm, setSearchTerm] = useState("");
+  const [loteriaFilter, setLoteriaFilter] = useState<LoteriaId | "all">("all");
   
   const [boloesSelecionados, setBoloesSelecionados] = useState<string[]>([]);
   
@@ -42,6 +43,7 @@ function AdminComboCreator() {
     return todosBoloes.filter((b: any) => 
       !b.is_combo && 
       (b.status === 'em_vendas' || b.status === 'publicado') &&
+      (loteriaFilter === "all" || b.loteria_id === loteriaFilter) &&
       (b.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
        b.concurso_numero.toString().includes(searchTerm))
     );
@@ -161,19 +163,38 @@ function AdminComboCreator() {
 
           <Card className="bg-card/40 backdrop-blur border-border/60">
             <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-col gap-4">
                 <div>
                   <CardTitle className="text-lg">Selecionar Bolões</CardTitle>
                   <CardDescription>Escolha os bolões individuais para compor o combo.</CardDescription>
                 </div>
-                <div className="relative w-full sm:w-64">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    placeholder="Buscar bolão..." 
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="pl-9 h-9 text-xs"
-                  />
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex p-1 bg-secondary/50 rounded-lg overflow-x-auto no-scrollbar whitespace-nowrap">
+                    <button
+                      onClick={() => setLoteriaFilter("all")}
+                      className={`px-3 py-1.5 text-[10px] font-black uppercase rounded-md transition-all ${loteriaFilter === "all" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      TODAS
+                    </button>
+                    {Object.entries(LOTERIAS).map(([id, cfg]) => (
+                      <button
+                        key={id}
+                        onClick={() => setLoteriaFilter(id as LoteriaId)}
+                        className={`px-3 py-1.5 text-[10px] font-black uppercase rounded-md transition-all ${loteriaFilter === id ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                      >
+                        {cfg.nome}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      placeholder="Buscar por nome ou concurso..." 
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                      className="pl-9 h-10 text-xs bg-muted/20 border-border/40"
+                    />
+                  </div>
                 </div>
               </div>
             </CardHeader>
