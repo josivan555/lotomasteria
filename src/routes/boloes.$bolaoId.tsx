@@ -265,7 +265,25 @@ function DetalheBolao() {
                   <span>Sorteio: <strong>{new Date(bolao.data_sorteio).toLocaleDateString('pt-BR')} às {bolao.horario_sorteio}</strong></span>
                 </div>
 
-                {bolao.resultado_oficial && (
+                {bolao.is_combo ? (
+                  <div className="space-y-4">
+                    {(bolao.combo_loterias as any[])?.map((parte, idx) => parte.resultado_oficial && (
+                      <div key={idx} className="p-4 rounded-2xl bg-secondary/30 border border-border/60 shadow-inner space-y-3">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                          <Trophy className="h-3 w-3" style={{ color: LOTERIAS[parte.loteria_id as LoteriaId].cor }} /> 
+                          Resultado {LOTERIAS[parte.loteria_id as LoteriaId].nome} - Concurso {parte.concurso_numero}
+                        </p>
+                        <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                          {(parte.resultado_oficial as number[]).map(n => (
+                            <div key={n} className="w-8 h-8 rounded-full text-white flex items-center justify-center font-black text-xs shadow-lg animate-in zoom-in duration-300" style={{ backgroundColor: LOTERIAS[parte.loteria_id as LoteriaId].cor }}>
+                              {n.toString().padStart(2, '0')}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : bolao.resultado_oficial && (
                   <div className="p-4 rounded-2xl bg-secondary/30 border border-border/60 shadow-inner space-y-3">
                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Trophy className="h-3 w-3" style={{ color: cfg.cor }} /> Resultado Oficial Concurso {bolao.concurso_numero}
@@ -279,6 +297,7 @@ function DetalheBolao() {
                     </div>
                   </div>
                 )}
+
 
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Users className="h-4 w-4" style={{ color: cfg.cor }} />
