@@ -266,19 +266,32 @@ function Landing() {
                 
                 return (
                   <div key={b.id} className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/60 backdrop-blur hover:border-primary/50 transition-all hover:shadow-lg">
-                    <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: cfg.cor }} />
-                    <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: cfg.cor }} />
-
+                    <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: b.is_combo ? '#FFD700' : cfg.cor }} />
+                    <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: b.is_combo ? '#FFD700' : cfg.cor }} />
+                    
+                    {b.is_combo && (
+                      <div className="absolute -right-12 top-6 rotate-45 bg-gradient-to-r from-yellow-400 to-amber-600 text-black text-[9px] font-black py-1 px-12 shadow-sm z-10 border-y border-white/20">
+                        COMBO {Array.isArray(b.combo_loterias) ? b.combo_loterias.length : ''}x
+                      </div>
+                    )}
                     
                     <div className="p-5 flex-1 flex flex-col">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-2">
-                          <img src={cfg.logo} alt={cfg.nome} className="h-6 w-auto" />
-                          <span className="font-bold text-sm">{cfg.nome}</span>
+                          {b.is_combo ? (
+                            <div className="flex -space-x-2">
+                              {(b.combo_loterias as any[])?.slice(0, 3).map((p: any, i: number) => (
+                                <img key={i} src={LOTERIAS[p.loteria_id as LoteriaId].logo} alt="logo" className="h-6 w-auto border-2 border-background rounded-full bg-background" />
+                              ))}
+                            </div>
+                          ) : (
+                            <img src={cfg.logo} alt={cfg.nome} className="h-6 w-auto" />
+                          )}
+                          <span className="font-bold text-sm">{b.is_combo ? 'COMBO ESPECIAL' : cfg.nome}</span>
                         </div>
                         <div className="flex flex-col items-end gap-1">
                           <div className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                            Concurso {b.concurso_numero}
+                            {b.is_combo ? 'Múltiplos Concursos' : `Concurso ${b.concurso_numero}`}
                           </div>
                           {(b.status === 'encerrado' || b.status === 'sorteado' || b.status === 'conferido' || dataSorteioPassada) && (
                             <span className="text-[10px] font-black uppercase text-red-500 animate-pulse bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
@@ -287,6 +300,7 @@ function Landing() {
                           )}
                         </div>
                       </div>
+
 
                       <h3 className="text-lg font-bold mb-1 group-hover:text-primary transition-colors">{b.nome}</h3>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
