@@ -397,26 +397,38 @@ function Landing() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/40">
-                    {paginatedBoloes.map((b: any) => {
-                      const cfg = LOTERIAS[b.loteria_id as LoteriaId];
-                      return (
-                        <tr key={b.id} className="hover:bg-secondary/10 transition-colors">
-                          <td className="px-4 py-3 font-semibold">{b.nome}</td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <img src={cfg.logo} alt={cfg.nome} className="h-4 w-auto" />
-                              <span className="text-xs">{cfg.nome}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-xs font-mono">{b.concurso_numero}</td>
-                          <td className="px-4 py-3 text-xs">
-                            {new Date(b.data_sorteio).toLocaleDateString('pt-BR')}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${b.status === 'encerrado' ? 'bg-red-500/10 text-red-500' : 'bg-secondary text-muted-foreground'}`}>
-                              {b.status}
-                            </span>
-                          </td>
+                      {paginatedBoloes.map((b: any) => {
+                        const cfg = LOTERIAS[b.loteria_id as LoteriaId];
+                        return (
+                          <tr key={b.id} className="hover:bg-secondary/10 transition-colors">
+                            <td className="px-4 py-3 font-semibold">
+                              {b.nome}
+                              {b.is_combo && <Badge variant="secondary" className="ml-2 scale-75 bg-amber-500/10 text-amber-500 border-amber-500/20">COMBO</Badge>}
+                            </td>
+                            <td className="px-4 py-3">
+                              {b.is_combo ? (
+                                <div className="flex -space-x-1">
+                                  {(b.combo_loterias as any[])?.slice(0, 3).map((p: any, i: number) => (
+                                    <img key={i} src={LOTERIAS[p.loteria_id as LoteriaId].logo} alt="logo" className="h-4 w-auto border border-background rounded-full bg-background" />
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <img src={cfg.logo} alt={cfg.nome} className="h-4 w-auto" />
+                                  <span className="text-xs">{cfg.nome}</span>
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-xs font-mono">{b.is_combo ? 'Múltiplos' : b.concurso_numero}</td>
+                            <td className="px-4 py-3 text-xs">
+                              {new Date(b.data_sorteio).toLocaleDateString('pt-BR')}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${b.status === 'encerrado' ? 'bg-red-500/10 text-red-500' : 'bg-secondary text-muted-foreground'}`}>
+                                {b.status}
+                              </span>
+                            </td>
+
                           <td className="px-4 py-3 text-right">
                             <div className="flex justify-end gap-2">
                               <Button variant="ghost" size="sm" asChild>
