@@ -215,12 +215,24 @@ function DetalheBolao() {
 
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="ball h-10 w-10 text-sm font-bold text-white" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
+                  {bolao.is_combo ? (
+                    <div className="flex -space-x-3">
+                      {(bolao.combo_loterias as any[])?.map((parte, i) => (
+                        <div key={i} className="ball h-10 w-10 text-sm font-bold text-white border-2 border-background shadow-lg" style={{ backgroundColor: LOTERIAS[parte.loteria_id as LoteriaId].cor, zIndex: 10 - i }}>{LOTERIAS[parte.loteria_id as LoteriaId].nome[0]}</div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="ball h-10 w-10 text-sm font-bold text-white" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
+                  )}
                   <div>
-                    <h1 className="text-2xl font-black leading-tight">{bolao.nome}</h1>
-                    <Badge variant="secondary" className="mt-1">Concurso {bolao.concurso_numero}</Badge>
+                    <h1 className="text-2xl font-black leading-tight">
+                      {bolao.nome}
+                      {bolao.is_combo && <Badge variant="secondary" className="ml-2 bg-amber-500/10 text-amber-500 border-amber-500/20">COMBO</Badge>}
+                    </h1>
+                    <Badge variant="secondary" className="mt-1">{bolao.is_combo ? 'Bolão Multi-Loteria' : `Concurso ${bolao.concurso_numero}`}</Badge>
                   </div>
                 </div>
+
               </div>
 
               <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4 mb-8">
