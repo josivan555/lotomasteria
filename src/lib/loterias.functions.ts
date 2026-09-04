@@ -41,7 +41,7 @@ export const listarConcursos = createServerFn({ method: "GET" })
     const sb = serverPublicClient();
     const { data: rows, error } = await sb
       .from("concursos")
-      .select("numero, data_apuracao, dezenas, soma")
+      .select("numero, data_apuracao, dezenas, soma, especial")
       .eq("loteria", data.loteria)
       .order("numero", { ascending: false })
       .limit(3500);
@@ -51,6 +51,7 @@ export const listarConcursos = createServerFn({ method: "GET" })
       data_apuracao: c.data_apuracao,
       dezenas: (c.dezenas as unknown as number[]) ?? [],
       soma: c.soma,
+      especial: c.especial === true,
     }));
   });
 
