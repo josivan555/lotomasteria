@@ -155,6 +155,7 @@ export type Database = {
           created_at: string
           data_apuracao: string
           dezenas: number[]
+          especial: boolean | null
           loteria: string
           numero: number
           soma: number
@@ -163,6 +164,7 @@ export type Database = {
           created_at?: string
           data_apuracao: string
           dezenas: number[]
+          especial?: boolean | null
           loteria?: string
           numero: number
           soma: number
@@ -171,6 +173,7 @@ export type Database = {
           created_at?: string
           data_apuracao?: string
           dezenas?: number[]
+          especial?: boolean | null
           loteria?: string
           numero?: number
           soma?: number
