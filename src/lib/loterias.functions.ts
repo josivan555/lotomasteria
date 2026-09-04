@@ -147,6 +147,7 @@ type CaixaResp = {
   numero: number;
   dataApuracao: string;
   listaDezenas: string[];
+  indicadorConcursoEspecial?: number;
 };
 
 async function fetchCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaResp | null> {
