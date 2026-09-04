@@ -41,7 +41,7 @@ export const listarConcursos = createServerFn({ method: "GET" })
     const sb = serverPublicClient();
     const { data: rows, error } = await sb
       .from("concursos")
-      .select("numero, data_apuracao, dezenas, soma")
+      .select("numero, data_apuracao, dezenas, soma, especial")
       .eq("loteria", data.loteria)
       .order("numero", { ascending: false })
       .limit(3500);
@@ -51,6 +51,7 @@ export const listarConcursos = createServerFn({ method: "GET" })
       data_apuracao: c.data_apuracao,
       dezenas: (c.dezenas as unknown as number[]) ?? [],
       soma: c.soma,
+      especial: c.especial === true,
     }));
   });
 
@@ -146,6 +147,7 @@ type CaixaResp = {
   numero: number;
   dataApuracao: string;
   listaDezenas: string[];
+  indicadorConcursoEspecial?: number;
 };
 
 async function fetchCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaResp | null> {
@@ -199,6 +201,7 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
       data_apuracao: string;
       dezenas: number[];
       soma: number;
+      especial: boolean;
     }[] = [];
 
     // Busca em lotes paralelos para acelerar
@@ -217,6 +220,7 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
           data_apuracao: parseData(r.dataApuracao),
           dezenas: dz,
           soma: dz.reduce((a, b) => a + b, 0),
+          especial: r.indicadorConcursoEspecial === 1,
         });
       }
     }
@@ -232,6 +236,86 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
       inseridos: rows.length,
       ultimo: alvo,
       faltam: Math.max(0, alvo - (salvos.size + rows.length)),
+    };
+  });
+
+// Meses em que a Caixa realiza concursos especiais (Independencia, Sao Joao, Virada).
+const MESES_ESPECIAIS = new Set(["06", "09", "12"]);
+
+/**
+ * Marca no historico quais concursos sao especiais (ex.: Lotofacil da Independencia),
+ * usando o indicador oficial da Caixa. Concursos fora dos meses de especiais sao
+ * marcados como comuns sem consultar a API.
+ */
+export const detectarEspeciais = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z
+      .object({
+        loteria: loteriaEnum,
+        limite: z.number().int().min(1).max(120).default(60),
+      })
+      .parse(raw),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: pendentes, error } = await supabaseAdmin
+      .from("concursos")
+      .select("numero, data_apuracao")
+      .eq("loteria", data.loteria)
+      .is("especial", null)
+      .order("numero", { ascending: false });
+    if (error) throw new Error(error.message);
+
+    const lista = pendentes ?? [];
+    const candidatos = lista.filter((r) => MESES_ESPECIAIS.has((r.data_apuracao ?? "").slice(5, 7)));
+    const comuns = lista.filter((r) => !MESES_ESPECIAIS.has((r.data_apuracao ?? "").slice(5, 7)));
+
+    for (let i = 0; i < comuns.length; i += 500) {
+      const lote = comuns.slice(i, i + 500).map((r) => r.numero);
+      await supabaseAdmin
+        .from("concursos")
+        .update({ especial: false })
+        .eq("loteria", data.loteria)
+        .in("numero", lote);
+    }
+
+    const alvo = candidatos.slice(0, data.limite);
+    let especiais = 0;
+    const CHUNK = 8;
+    for (let i = 0; i < alvo.length; i += CHUNK) {
+      const lote = alvo.slice(i, i + CHUNK);
+      const resultados = await Promise.all(lote.map((r) => fetchCaixa(data.loteria, r.numero)));
+      const marcarEspecial: number[] = [];
+      const marcarComum: number[] = [];
+      resultados.forEach((r, idx) => {
+        const numero = lote[idx].numero;
+        if (!r) return;
+        if (r.indicadorConcursoEspecial === 1) marcarEspecial.push(numero);
+        else marcarComum.push(numero);
+      });
+      if (marcarEspecial.length) {
+        especiais += marcarEspecial.length;
+        await supabaseAdmin
+          .from("concursos")
+          .update({ especial: true })
+          .eq("loteria", data.loteria)
+          .in("numero", marcarEspecial);
+      }
+      if (marcarComum.length) {
+        await supabaseAdmin
+          .from("concursos")
+          .update({ especial: false })
+          .eq("loteria", data.loteria)
+          .in("numero", marcarComum);
+      }
+    }
+
+    return {
+      verificados: alvo.length,
+      especiais,
+      restantes: Math.max(0, candidatos.length - alvo.length),
     };
   });
 
