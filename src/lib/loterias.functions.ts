@@ -201,6 +201,7 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
       data_apuracao: string;
       dezenas: number[];
       soma: number;
+      especial: boolean;
     }[] = [];
 
     // Busca em lotes paralelos para acelerar
@@ -219,6 +220,7 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
           data_apuracao: parseData(r.dataApuracao),
           dezenas: dz,
           soma: dz.reduce((a, b) => a + b, 0),
+          especial: r.indicadorConcursoEspecial === 1,
         });
       }
     }
