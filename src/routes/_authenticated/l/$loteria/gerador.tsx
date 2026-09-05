@@ -253,7 +253,10 @@ function Gerador() {
     () => concursosAll.filter((c) => c.especial === true).length,
     [concursosAll],
   );
-  const concursosBase = useMemo(() => aplicarBase(concursosAll, base), [concursosAll, base]);
+  const concursosBase = useMemo(() => {
+    const filtrados = aplicarBase(concursosAll, base);
+    return filtrados.length ? filtrados : concursosAll;
+  }, [concursosAll, base]);
   const concursos = useMemo(() => aplicarJanela(concursosBase, janela), [concursosBase, janela]);
 
 
