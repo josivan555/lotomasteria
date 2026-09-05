@@ -246,7 +246,13 @@ function Gerador() {
     queryFn: () => listar({ data: { loteria } }),
   });
   const { janela, setJanela } = useJanelaAnalise(loteria);
-  const concursos = useMemo(() => aplicarJanela(concursosAll, janela), [concursosAll, janela]);
+  const { base, setBase } = useBaseSorteios(loteria);
+  const totalEspecial = useMemo(
+    () => concursosAll.filter((c) => c.especial === true).length,
+    [concursosAll],
+  );
+  const concursosBase = useMemo(() => aplicarBase(concursosAll, base), [concursosAll, base]);
+  const concursos = useMemo(() => aplicarJanela(concursosBase, janela), [concursosBase, janela]);
 
 
   const ultimoFn = useServerFn(ultimoResultadoCaixa);
