@@ -1,16 +1,23 @@
 import { createFileRoute, useRouter, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listarConcursos, sincronizarConcursos, statusSincronizacao } from "@/lib/loterias.functions";
+import {
+  listarConcursos,
+  sincronizarConcursos,
+  statusSincronizacao,
+  detectarEspeciais,
+} from "@/lib/loterias.functions";
 import { LOTERIAS, isLoteriaId } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, CheckCircle2, AlertTriangle } from "lucide-react";
+import { RefreshCw, CheckCircle2, AlertTriangle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useJanelaAnalise } from "@/lib/janela-analise";
 import { JanelaAnalise } from "@/components/janela-analise";
+import { useBaseSorteios, aplicarBase } from "@/lib/base-sorteios";
+import { SeletorBaseSorteios } from "@/components/base-sorteios";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/historico")({
   component: Historico,
@@ -25,10 +32,12 @@ function Historico() {
   const listar = useServerFn(listarConcursos);
   const sync = useServerFn(sincronizarConcursos);
   const status = useServerFn(statusSincronizacao);
+  const detectar = useServerFn(detectarEspeciais);
   const router = useRouter();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
   const { janela, setJanela } = useJanelaAnalise(loteria);
+  const { base, setBase } = useBaseSorteios(loteria);
 
   const { data: concursos = [], isLoading } = useQuery({
     queryKey: ["concursos", loteria],
@@ -55,26 +64,61 @@ function Historico() {
     onError: (e) => toast.error(e.message),
   });
 
+  const especiaisMut = useMutation({
+    mutationFn: () => detectar({ data: { loteria, limite: 60 } }),
+    onSuccess: (r) => {
+      toast.success(
+        `${r.especiais} sorteio(s) especial(is) identificado(s)${
+          r.restantes ? ` — faltam ${r.restantes} concursos para verificar` : ""
+        }`,
+      );
+      queryClient.invalidateQueries({ queryKey: ["concursos", loteria] });
+      router.invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
   const emDia =
     statusSync?.ultimoOficial != null && statusSync?.ultimoNumero != null
       ? statusSync.ultimoNumero >= statusSync.ultimoOficial
       : null;
 
+  const totalEspecial = useMemo(
+    () => concursos.filter((c) => c.especial === true).length,
+    [concursos],
+  );
 
-  const filtrados = query ? concursos.filter((c) => String(c.numero).includes(query)) : concursos;
+  const daBase = useMemo(() => aplicarBase(concursos, base), [concursos, base]);
+  const filtrados = query ? daBase.filter((c) => String(c.numero).includes(query)) : daBase;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-xl font-bold md:text-2xl">Histórico · {cfg.nome}</h2>
-          <p className="text-sm text-muted-foreground">{concursos.length} concursos importados</p>
+          <p className="text-sm text-muted-foreground">
+            {concursos.length} concursos importados · {totalEspecial} especiais
+          </p>
         </div>
-        <Button className="w-full sm:w-auto" onClick={() => syncMut.mutate()} disabled={syncMut.isPending}>
-          <RefreshCw className={`mr-2 h-4 w-4 ${syncMut.isPending ? "animate-spin" : ""}`} />
-          Sincronizar 100 mais recentes
-        </Button>
-
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          <Button
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => especiaisMut.mutate()}
+            disabled={especiaisMut.isPending}
+          >
+            <Sparkles className={`mr-2 h-4 w-4 ${especiaisMut.isPending ? "animate-pulse" : ""}`} />
+            Identificar sorteios especiais
+          </Button>
+          <Button
+            className="w-full sm:w-auto"
+            onClick={() => syncMut.mutate()}
+            disabled={syncMut.isPending}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${syncMut.isPending ? "animate-spin" : ""}`} />
+            Sincronizar 100 mais recentes
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur">
@@ -119,7 +163,14 @@ function Historico() {
         </div>
       </div>
 
-      <JanelaAnalise total={concursos.length} janela={janela} onChange={setJanela} />
+      <SeletorBaseSorteios
+        base={base}
+        onChange={setBase}
+        totalRegular={concursos.length - totalEspecial}
+        totalEspecial={totalEspecial}
+      />
+
+      <JanelaAnalise total={filtrados.length} janela={janela} onChange={setJanela} />
 
       <Input
         placeholder="Buscar por número do concurso..."
@@ -127,7 +178,6 @@ function Historico() {
         onChange={(e) => setQuery(e.target.value)}
         className="w-full max-w-xs"
       />
-
 
       {isLoading ? (
         <p className="text-muted-foreground">Carregando...</p>
@@ -146,7 +196,19 @@ function Historico() {
               <tbody>
                 {filtrados.slice(0, 200).map((c) => (
                   <tr key={c.numero} className="border-b border-border/30">
-                    <td className="px-2 py-3 text-sm font-semibold md:px-4">{c.numero}</td>
+                    <td className="px-2 py-3 text-sm font-semibold md:px-4">
+                      <span className="flex items-center gap-1.5">
+                        {c.numero}
+                        {c.especial && (
+                          <span
+                            title="Sorteio especial"
+                            className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-500"
+                          >
+                            <Sparkles className="h-2.5 w-2.5" /> Especial
+                          </span>
+                        )}
+                      </span>
+                    </td>
                     <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">
                       {new Date(c.data_apuracao + "T00:00:00").toLocaleDateString("pt-BR")}
                     </td>
@@ -168,7 +230,6 @@ function Historico() {
               </tbody>
             </table>
           </div>
-
         </div>
       )}
     </div>
