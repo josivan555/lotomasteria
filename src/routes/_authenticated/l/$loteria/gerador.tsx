@@ -608,6 +608,14 @@ function Gerador() {
         </p>
       </div>
 
+      <SeletorBaseSorteios
+        base={base}
+        onChange={setBase}
+        totalRegular={concursosAll.length - totalEspecial}
+        totalEspecial={totalEspecial}
+      />
+
+
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
 
