@@ -17,6 +17,8 @@ import {
 import { LOTERIAS, isLoteriaId, type LoteriaConfig } from "@/lib/loterias-config";
 import { DezenaBall } from "@/components/dezena-ball";
 import { useJanelaAnalise, aplicarJanela } from "@/lib/janela-analise";
+import { useBaseSorteios, aplicarBase } from "@/lib/base-sorteios";
+import { SeletorBaseSorteios } from "@/components/base-sorteios";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -246,7 +248,16 @@ function Gerador() {
     queryFn: () => listar({ data: { loteria } }),
   });
   const { janela, setJanela } = useJanelaAnalise(loteria);
-  const concursos = useMemo(() => aplicarJanela(concursosAll, janela), [concursosAll, janela]);
+  const { base, setBase } = useBaseSorteios(loteria);
+  const totalEspecial = useMemo(
+    () => concursosAll.filter((c) => c.especial === true).length,
+    [concursosAll],
+  );
+  const concursosBase = useMemo(() => {
+    const filtrados = aplicarBase(concursosAll, base);
+    return filtrados.length ? filtrados : concursosAll;
+  }, [concursosAll, base]);
+  const concursos = useMemo(() => aplicarJanela(concursosBase, janela), [concursosBase, janela]);
 
 
   const ultimoFn = useServerFn(ultimoResultadoCaixa);
@@ -596,6 +607,14 @@ function Gerador() {
           .
         </p>
       </div>
+
+      <SeletorBaseSorteios
+        base={base}
+        onChange={setBase}
+        totalRegular={concursosAll.length - totalEspecial}
+        totalEspecial={totalEspecial}
+      />
+
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <div className="space-y-5 rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur md:p-5">
