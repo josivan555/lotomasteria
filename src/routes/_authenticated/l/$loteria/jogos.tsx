@@ -171,10 +171,9 @@ function Jogos() {
 
 
 
-  const renderJogo = (j: (typeof jogos)[number]) => {
+  const renderJogo = (j: (typeof jogos)[number], index: number) => {
     const c = j.score != null ? classificarScore(Number(j.score)) : null;
     const isSelected = jogosSelecionados.includes(j.id);
-    const isAdmin = userProfile?.isAdmin;
 
     return (
       <li
@@ -184,7 +183,7 @@ function Jogos() {
         }`}
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-          {isAdmin && (
+          <div className="flex items-center gap-2">
             <Checkbox
               checked={isSelected}
               onCheckedChange={(checked) => {
@@ -195,7 +194,10 @@ function Jogos() {
                 }
               }}
             />
-          )}
+            <span className="w-8 text-center font-mono text-xs font-bold text-muted-foreground">
+              #{String(index + 1).padStart(2, "0")}
+            </span>
+          </div>
           <span className="text-xs text-muted-foreground">
             {new Date(j.created_at).toLocaleDateString("pt-BR")}
           </span>
@@ -361,18 +363,6 @@ function Jogos() {
               Limpar abertos
             </Button>
 
-            {userProfile?.isAdmin && (
-              <Button
-                variant="secondary"
-                size="sm"
-                className="flex-1 border-primary/40 sm:flex-none"
-                disabled={jogosSelecionados.length === 0}
-                onClick={() => setModalBolao(true)}
-              >
-                <div className="mr-2 h-2 w-2 rounded-full bg-primary animate-pulse" />
-                Gerar Bolão ({jogosSelecionados.length})
-              </Button>
-            )}
           </div>
         )}
       </div>
@@ -515,7 +505,7 @@ function Jogos() {
           <section className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-2">
-                {userProfile?.isAdmin && vigentes.length > 0 && (
+                {vigentes.length > 0 && (
                   <Checkbox
                     id="select-all-vigentes"
                     checked={jogosSelecionados.length === vigentes.length && vigentes.length > 0}
@@ -535,17 +525,58 @@ function Jogos() {
                   Concurso atual: {ultimoSorteado + 1}
                 </span>
               )}
-              <span className="ml-auto text-xs text-muted-foreground">
-                {vigentes.length} jogo{vigentes.length === 1 ? "" : "s"}
-              </span>
+              <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                {jogosSelecionados.length > 0 && (
+                  <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                    {jogosSelecionados.length} selecionado{jogosSelecionados.length === 1 ? "" : "s"}
+                  </span>
+                )}
+                <span className="text-xs text-muted-foreground">
+                  {vigentes.length} jogo{vigentes.length === 1 ? "" : "s"}
+                </span>
+              </div>
             </div>
+            {jogosSelecionados.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/60 bg-secondary/30 p-2">
+                <span className="px-2 text-xs text-muted-foreground">Ações em lote:</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs"
+                  disabled={delLote.isPending}
+                  onClick={() => {
+                    if (
+                      confirm(
+                        `Remover os ${jogosSelecionados.length} jogos selecionados?\n\nEssa ação não pode ser desfeita.`,
+                      )
+                    ) {
+                      delLote.mutate(jogosSelecionados);
+                    }
+                  }}
+                >
+                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                  Excluir selecionados
+                </Button>
+                {userProfile?.isAdmin && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 border-primary/40 text-xs"
+                    onClick={() => setModalBolao(true)}
+                  >
+                    <div className="mr-1.5 h-2 w-2 rounded-full bg-primary animate-pulse" />
+                    Gerar Bolão
+                  </Button>
+                )}
+              </div>
+            )}
             {vigentes.length === 0 ? (
               <div className="rounded-xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
                 Nenhum jogo para o concurso atual. Os jogos de concursos já sorteados ficam no
                 histórico abaixo.
               </div>
             ) : (
-              <ol className="space-y-2">{vigentes.map(renderJogo)}</ol>
+              <ol className="space-y-2">{vigentes.map((j, i) => renderJogo(j, i))}</ol>
             )}
           </section>
 
@@ -650,7 +681,7 @@ function Jogos() {
                       </div>
                       {open && (
                         <ol className="space-y-2 border-t border-border/60 p-3">
-                          {g.itens.map(renderJogo)}
+                          {g.itens.map((j, i) => renderJogo(j, i))}
                         </ol>
                       )}
                     </div>
