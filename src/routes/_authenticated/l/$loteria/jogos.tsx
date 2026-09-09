@@ -693,7 +693,7 @@ function Jogos() {
                       </div>
                       {open && (
                         <ol className="space-y-2 border-t border-border/60 p-3">
-                          {g.itens.map(renderJogo)}
+                          {g.itens.map((j, i) => renderJogo(j, i))}
                         </ol>
                       )}
                     </div>
