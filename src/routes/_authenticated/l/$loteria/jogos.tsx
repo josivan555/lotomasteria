@@ -171,10 +171,9 @@ function Jogos() {
 
 
 
-  const renderJogo = (j: (typeof jogos)[number]) => {
+  const renderJogo = (j: (typeof jogos)[number], index: number) => {
     const c = j.score != null ? classificarScore(Number(j.score)) : null;
     const isSelected = jogosSelecionados.includes(j.id);
-    const isAdmin = userProfile?.isAdmin;
 
     return (
       <li
@@ -184,7 +183,7 @@ function Jogos() {
         }`}
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-          {isAdmin && (
+          <div className="flex items-center gap-2">
             <Checkbox
               checked={isSelected}
               onCheckedChange={(checked) => {
@@ -195,7 +194,10 @@ function Jogos() {
                 }
               }}
             />
-          )}
+            <span className="w-8 text-center font-mono text-xs font-bold text-muted-foreground">
+              #{String(index + 1).padStart(2, "0")}
+            </span>
+          </div>
           <span className="text-xs text-muted-foreground">
             {new Date(j.created_at).toLocaleDateString("pt-BR")}
           </span>
