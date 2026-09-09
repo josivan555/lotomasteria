@@ -363,18 +363,6 @@ function Jogos() {
               Limpar abertos
             </Button>
 
-            {userProfile?.isAdmin && (
-              <Button
-                variant="secondary"
-                size="sm"
-                className="flex-1 border-primary/40 sm:flex-none"
-                disabled={jogosSelecionados.length === 0}
-                onClick={() => setModalBolao(true)}
-              >
-                <div className="mr-2 h-2 w-2 rounded-full bg-primary animate-pulse" />
-                Gerar Bolão ({jogosSelecionados.length})
-              </Button>
-            )}
           </div>
         )}
       </div>
