@@ -169,7 +169,7 @@ export const listarBoloesPublicos = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     
     const boloesComInfo = await Promise.all((data ?? []).map(async (b: any) => {
-      const { data: p } = await supabase
+      const { data: p } = await supabaseAdmin
         .from("bolao_participantes")
         .select("quantidade_cotas, status")
         .eq("bolao_id", b.id);
@@ -287,7 +287,7 @@ export const obterBolao = createServerFn({ method: "GET" })
     }
 
 
-    const { data: p } = await supabase
+    const { data: p } = await supabaseAdmin
       .from("bolao_participantes")
       .select("quantidade_cotas, status")
       .eq("bolao_id", bolao.id);
@@ -358,7 +358,7 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
     const valorTotal = data.cotas * bolao.valor_cota;
 
     // 2. Criar registro de participante (status reservado)
-    const { data: participante, error } = await supabase
+    const { data: participante, error } = await supabaseAdmin
       .from("bolao_participantes")
       .insert({
         bolao_id: data.bolaoId,
@@ -435,7 +435,7 @@ export const buscarReservaBolao = createServerFn({ method: "GET" })
   .inputValidator((raw: unknown) => z.object({ codigo: z.string().min(3) }).parse(raw))
   .handler(async ({ data }) => {
     // 1. Tentar busca exata por código de referência
-    let { data: reserva, error } = await supabase
+    let { data: reserva, error } = await supabaseAdmin
       .from("bolao_participantes")
       .select("*, boloes(*)")
       .eq("codigo_referencia", data.codigo.toUpperCase())
@@ -448,7 +448,7 @@ export const buscarReservaBolao = createServerFn({ method: "GET" })
       const query = data.codigo.trim();
       // Apenas busca por nome se tiver pelo menos 3 caracteres para evitar resultados demais
       if (query.length >= 3) {
-        const { data: reservasPorNome, error: nameError } = await supabase
+        const { data: reservasPorNome, error: nameError } = await supabaseAdmin
           .from("bolao_participantes")
           .select("*, boloes(*)")
           .ilike("nome_completo", `%${query}%`)
