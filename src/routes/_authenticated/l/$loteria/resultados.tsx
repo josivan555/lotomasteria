@@ -129,10 +129,10 @@ function Resultados() {
           nums: j.dezenas,
           hits: j.dezenas.filter((n) => drawnSet.has(n)).length,
         }))
-        .sort((a, b) => (aguardando ? a.idx - b.idx : b.hits - a.hits || a.idx - b.idx));
-      return { numero, res, sorteadas, drawnSet, aguardando, itens };
+        .sort((a, b) => (noHistorico ? b.hits - a.hits || a.idx - b.idx : a.idx - b.idx));
+      return { numero, res, sorteadas, drawnSet, aguardando, noHistorico, itens };
     }).filter((g) => g.itens.length > 0);
-  }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualAplicado, pdfFrom, pdfTo]);
+  }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualNums, manualAplicado, pdfFrom, pdfTo]);
 
   const tierDefs =
     loteria === "lotofacil"
