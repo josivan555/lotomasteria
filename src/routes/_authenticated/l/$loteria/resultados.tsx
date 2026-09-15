@@ -115,13 +115,13 @@ function Resultados() {
         (j) => (j.concurso_alvo ?? oficial?.numero ?? null) === numero && dentroDoFiltro(j.created_at),
       );
       const res = resultadoPorNumero.get(numero) ?? null;
-      // Concurso já sorteado? Só assim ele pode ser conferido/recolhido no histórico.
-      const jaSorteado = !!res || (!!oficial && numero <= oficial.numero);
-      const sorteadas = manualAplicado.length && jaSorteado
-        ? manualAplicado
-        : (res?.dezenas ?? []);
+      // Marcação ao vivo: mesmo parcialmente digitadas, as dezenas já marcam os jogos.
+      const sorteadas = manualNums.length ? manualNums : (res?.dezenas ?? []);
       const drawnSet = new Set(sorteadas);
       const aguardando = sorteadas.length === 0;
+      // Só vai para o histórico (recolhido) quando o resultado do concurso existe
+      // ou quando a digitação manual está completa.
+      const noHistorico = !!res || manualAplicado.length > 0;
       const itens = doGrupo
         .map((j, i) => ({
           id: j.id,
