@@ -132,7 +132,7 @@ function Resultados() {
         .sort((a, b) => (aguardando ? a.idx - b.idx : b.hits - a.hits || a.idx - b.idx));
       return { numero, res, sorteadas, drawnSet, aguardando, itens };
     }).filter((g) => g.itens.length > 0);
-  }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualNums, pdfFrom, pdfTo]);
+  }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualAplicado, pdfFrom, pdfTo]);
 
   const tierDefs =
     loteria === "lotofacil"
