@@ -115,7 +115,11 @@ function Resultados() {
         (j) => (j.concurso_alvo ?? oficial?.numero ?? null) === numero && dentroDoFiltro(j.created_at),
       );
       const res = resultadoPorNumero.get(numero) ?? null;
-      const sorteadas = manualNums.length ? manualNums : (res?.dezenas ?? []);
+      // Concurso já sorteado? Só assim ele pode ser conferido/recolhido no histórico.
+      const jaSorteado = !!res || (!!oficial && numero <= oficial.numero);
+      const sorteadas = manualAplicado.length && jaSorteado
+        ? manualAplicado
+        : (res?.dezenas ?? []);
       const drawnSet = new Set(sorteadas);
       const aguardando = sorteadas.length === 0;
       const itens = doGrupo
