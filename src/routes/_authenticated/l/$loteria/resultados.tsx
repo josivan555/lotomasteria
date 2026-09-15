@@ -165,8 +165,8 @@ function Resultados() {
     return `${t} pontos`;
   };
 
-  const conferidos = grupos.filter((g) => !g.aguardando);
-  const emAberto = grupos.filter((g) => g.aguardando);
+  const conferidos = grupos.filter((g) => g.noHistorico);
+  const emAberto = grupos.filter((g) => !g.noHistorico);
   const podeExportar = conferidos.length > 0;
   const [aberto, setAberto] = useState<number | null>(null);
 
