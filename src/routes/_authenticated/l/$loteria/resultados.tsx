@@ -115,13 +115,13 @@ function Resultados() {
         (j) => (j.concurso_alvo ?? oficial?.numero ?? null) === numero && dentroDoFiltro(j.created_at),
       );
       const res = resultadoPorNumero.get(numero) ?? null;
-      // Concurso já sorteado? Só assim ele pode ser conferido/recolhido no histórico.
-      const jaSorteado = !!res || (!!oficial && numero <= oficial.numero);
-      const sorteadas = manualAplicado.length && jaSorteado
-        ? manualAplicado
-        : (res?.dezenas ?? []);
+      // Marcação ao vivo: mesmo parcialmente digitadas, as dezenas já marcam os jogos.
+      const sorteadas = manualNums.length ? manualNums : (res?.dezenas ?? []);
       const drawnSet = new Set(sorteadas);
       const aguardando = sorteadas.length === 0;
+      // Só vai para o histórico (recolhido) quando o resultado do concurso existe
+      // ou quando a digitação manual está completa.
+      const noHistorico = !!res || manualAplicado.length > 0;
       const itens = doGrupo
         .map((j, i) => ({
           id: j.id,
@@ -129,10 +129,10 @@ function Resultados() {
           nums: j.dezenas,
           hits: j.dezenas.filter((n) => drawnSet.has(n)).length,
         }))
-        .sort((a, b) => (aguardando ? a.idx - b.idx : b.hits - a.hits || a.idx - b.idx));
-      return { numero, res, sorteadas, drawnSet, aguardando, itens };
+        .sort((a, b) => (noHistorico ? b.hits - a.hits || a.idx - b.idx : a.idx - b.idx));
+      return { numero, res, sorteadas, drawnSet, aguardando, noHistorico, itens };
     }).filter((g) => g.itens.length > 0);
-  }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualAplicado, pdfFrom, pdfTo]);
+  }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualNums, manualAplicado, pdfFrom, pdfTo]);
 
   const tierDefs =
     loteria === "lotofacil"
@@ -165,8 +165,8 @@ function Resultados() {
     return `${t} pontos`;
   };
 
-  const conferidos = grupos.filter((g) => !g.aguardando);
-  const emAberto = grupos.filter((g) => g.aguardando);
+  const conferidos = grupos.filter((g) => g.noHistorico);
+  const emAberto = grupos.filter((g) => !g.noHistorico);
   const podeExportar = conferidos.length > 0;
   const [aberto, setAberto] = useState<number | null>(null);
 
