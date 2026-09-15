@@ -66,6 +66,13 @@ function Resultados() {
     [manual, cfg.total],
   );
 
+  // Só considera as dezenas manuais quando a digitação está completa, para os jogos
+  // não serem "conferidos" (e recolhidos no histórico) no meio da digitação.
+  const manualAplicado = useMemo(
+    () => (manualNums.length === cfg.tamanho ? manualNums : []),
+    [manualNums, cfg.tamanho],
+  );
+
   // Concursos-alvo distintos dos jogos salvos (jogos antigos sem alvo usam o último oficial)
   const alvos = useMemo(() => {
     const set = new Set<number>();
@@ -108,7 +115,11 @@ function Resultados() {
         (j) => (j.concurso_alvo ?? oficial?.numero ?? null) === numero && dentroDoFiltro(j.created_at),
       );
       const res = resultadoPorNumero.get(numero) ?? null;
-      const sorteadas = manualNums.length ? manualNums : (res?.dezenas ?? []);
+      // Concurso já sorteado? Só assim ele pode ser conferido/recolhido no histórico.
+      const jaSorteado = !!res || (!!oficial && numero <= oficial.numero);
+      const sorteadas = manualAplicado.length && jaSorteado
+        ? manualAplicado
+        : (res?.dezenas ?? []);
       const drawnSet = new Set(sorteadas);
       const aguardando = sorteadas.length === 0;
       const itens = doGrupo
@@ -121,7 +132,7 @@ function Resultados() {
         .sort((a, b) => (aguardando ? a.idx - b.idx : b.hits - a.hits || a.idx - b.idx));
       return { numero, res, sorteadas, drawnSet, aguardando, itens };
     }).filter((g) => g.itens.length > 0);
-  }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualNums, pdfFrom, pdfTo]);
+  }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualAplicado, pdfFrom, pdfTo]);
 
   const tierDefs =
     loteria === "lotofacil"
