@@ -66,6 +66,13 @@ function Resultados() {
     [manual, cfg.total],
   );
 
+  // Só considera as dezenas manuais quando a digitação está completa, para os jogos
+  // não serem "conferidos" (e recolhidos no histórico) no meio da digitação.
+  const manualAplicado = useMemo(
+    () => (manualNums.length === cfg.tamanho ? manualNums : []),
+    [manualNums, cfg.tamanho],
+  );
+
   // Concursos-alvo distintos dos jogos salvos (jogos antigos sem alvo usam o último oficial)
   const alvos = useMemo(() => {
     const set = new Set<number>();
