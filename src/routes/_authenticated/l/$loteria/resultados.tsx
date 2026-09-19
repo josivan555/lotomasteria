@@ -179,6 +179,12 @@ function Resultados() {
     }
     const temPremios = premioPorAcerto.size > 0;
     const totalGanho = g.itens.reduce((s, it) => s + (premioPorAcerto.get(it.hits) ?? 0), 0);
+    const minFaixa = cfg.faixas.length ? Math.min(...cfg.faixas) : Infinity;
+    const premiados = g.itens.filter((it) => it.hits >= minFaixa).length;
+    const pctPremiados = g.itens.length ? (premiados / g.itens.length) * 100 : 0;
+    const totalAcertos = g.itens.reduce((s, it) => s + it.hits, 0);
+    const totalPossivel = g.itens.reduce((s, it) => s + it.nums.length, 0);
+    const pctAcertos = totalPossivel ? (totalAcertos / totalPossivel) * 100 : 0;
     return (
       <section key={g.numero} className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
