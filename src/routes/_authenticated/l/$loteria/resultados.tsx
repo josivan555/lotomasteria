@@ -209,6 +209,50 @@ function Resultados() {
           </span>
         </div>
 
+        {!g.aguardando && (
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Aproveitamento de jogos
+                </span>
+                <span className="font-mono text-lg font-bold" style={{ color: cfg.cor }}>
+                  {pctPremiados.toFixed(1)}%
+                </span>
+              </div>
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-secondary">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${pctPremiados}%`, backgroundColor: cfg.cor }}
+                />
+              </div>
+              <div className="mt-1 text-[11px] text-muted-foreground">
+                {premiados} de {g.itens.length} jogo{g.itens.length > 1 ? "s" : ""} premiado
+                {premiados === 1 ? "" : "s"}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border/60 bg-card/60 p-3 backdrop-blur">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Aproveitamento de dezenas
+                </span>
+                <span className="font-mono text-lg font-bold" style={{ color: cfg.cor }}>
+                  {pctAcertos.toFixed(1)}%
+                </span>
+              </div>
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-secondary">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${pctAcertos}%`, backgroundColor: cfg.cor }}
+                />
+              </div>
+              <div className="mt-1 text-[11px] text-muted-foreground">
+                {totalAcertos} de {totalPossivel} dezenas acertadas
+              </div>
+            </div>
+          </div>
+        )}
+
         {!g.aguardando && temPremios && (
           <div
             className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3"
