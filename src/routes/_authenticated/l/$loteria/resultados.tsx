@@ -31,6 +31,9 @@ export const Route = createFileRoute("/_authenticated/l/$loteria/resultados")({
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+const brl = (v: number) =>
+  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
 function parseNumbers(str: string): number[] {
   const matches = str.match(/\d+/g) ?? [];
   return [...new Set(matches.map((n) => parseInt(n, 10)).filter((n) => n > 0))];
@@ -93,7 +96,10 @@ function Resultados() {
   });
 
   const resultadoPorNumero = useMemo(() => {
-    const map = new Map<number, { numero: number; data_apuracao: string; dezenas: number[] }>();
+    const map = new Map<
+      number,
+      NonNullable<Awaited<ReturnType<typeof porConcurso>>>
+    >();
     alvos.forEach((numero, i) => {
       const r = resultadosQueries[i]?.data;
       if (r) map.set(numero, r);
@@ -167,6 +173,12 @@ function Resultados() {
 
   const renderGrupo = (g: (typeof grupos)[number]) => {
     const maxHits = g.itens.reduce((m, it) => Math.max(m, it.hits), 0);
+    const premioPorAcerto = new Map<number, number>();
+    for (const r of g.res?.rateio ?? []) {
+      if (r.acertos != null && r.premio > 0) premioPorAcerto.set(r.acertos, r.premio);
+    }
+    const temPremios = premioPorAcerto.size > 0;
+    const totalGanho = g.itens.reduce((s, it) => s + (premioPorAcerto.get(it.hits) ?? 0), 0);
     return (
       <section key={g.numero} className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
@@ -191,10 +203,25 @@ function Resultados() {
           </span>
         </div>
 
+        {!g.aguardando && temPremios && (
+          <div
+            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3"
+            style={{ borderColor: `${cfg.cor}55`, backgroundColor: `${cfg.cor}12` }}
+          >
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Total ganho neste concurso
+            </span>
+            <span className="font-mono text-xl font-bold" style={{ color: cfg.cor }}>
+              {brl(totalGanho)}
+            </span>
+          </div>
+        )}
+
         {!g.aguardando && (
           <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
             {tierDefs.map((t) => {
               const count = g.itens.filter((it) => it.hits === t).length;
+              const premio = premioPorAcerto.get(t) ?? 0;
               return (
                 <div
                   key={t}
@@ -207,6 +234,18 @@ function Resultados() {
                     {count}
                   </div>
                   <div className="mt-0.5 text-[11px] text-muted-foreground">{tierName(t)}</div>
+                  {premio > 0 && (
+                    <>
+                      <div className="mt-1 text-[10px] text-muted-foreground">
+                        {brl(premio)} por jogo
+                      </div>
+                      {count > 0 && (
+                        <div className="text-[11px] font-bold" style={{ color: cfg.cor }}>
+                          {brl(premio * count)}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               );
             })}
@@ -235,6 +274,14 @@ function Resultados() {
                   );
                 })}
               </div>
+              {!g.aguardando && (premioPorAcerto.get(it.hits) ?? 0) > 0 && (
+                <span
+                  className="shrink-0 rounded-md px-2 py-1 font-mono text-xs font-bold"
+                  style={{ color: cfg.cor, backgroundColor: `${cfg.cor}18` }}
+                >
+                  {brl(premioPorAcerto.get(it.hits) ?? 0)}
+                </span>
+              )}
               <div className="ml-auto flex w-16 shrink-0 flex-col items-center">
                 <span
                   className="font-mono text-lg font-bold"

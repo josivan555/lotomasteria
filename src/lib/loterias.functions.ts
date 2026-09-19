@@ -148,6 +148,11 @@ type CaixaResp = {
   dataApuracao: string;
   listaDezenas: string[];
   indicadorConcursoEspecial?: number;
+  listaRateioPremio?: {
+    descricaoFaixa: string;
+    numeroDeGanhadores: number;
+    valorPremio: number;
+  }[];
 };
 
 async function fetchCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaResp | null> {
@@ -328,10 +333,23 @@ export const resultadoDoConcurso = createServerFn({ method: "GET" })
     const r = await fetchCaixa(data.loteria, data.numero);
     if (!r || !r.listaDezenas?.length) return null;
     const dz = r.listaDezenas.map(Number).sort((a, b) => a - b);
+    const faixasCfg = LOTERIAS[data.loteria].faixas;
+    const rateio = (r.listaRateioPremio ?? []).map((f, i) => {
+      const digitos = (f.descricaoFaixa ?? "").match(/\d+/);
+      const parsed = digitos ? parseInt(digitos[0], 10) : NaN;
+      const acertos = faixasCfg.includes(parsed) ? parsed : (faixasCfg[i] ?? null);
+      return {
+        acertos,
+        descricao: f.descricaoFaixa ?? "",
+        ganhadores: f.numeroDeGanhadores ?? 0,
+        premio: f.valorPremio ?? 0,
+      };
+    });
     return {
       numero: r.numero,
       data_apuracao: parseData(r.dataApuracao),
       dezenas: dz,
+      rateio,
     };
   });
 
