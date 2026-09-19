@@ -170,6 +170,12 @@ function Resultados() {
 
   const renderGrupo = (g: (typeof grupos)[number]) => {
     const maxHits = g.itens.reduce((m, it) => Math.max(m, it.hits), 0);
+    const premioPorAcerto = new Map<number, number>();
+    for (const r of g.res?.rateio ?? []) {
+      if (r.acertos != null && r.premio > 0) premioPorAcerto.set(r.acertos, r.premio);
+    }
+    const temPremios = premioPorAcerto.size > 0;
+    const totalGanho = g.itens.reduce((s, it) => s + (premioPorAcerto.get(it.hits) ?? 0), 0);
     return (
       <section key={g.numero} className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
