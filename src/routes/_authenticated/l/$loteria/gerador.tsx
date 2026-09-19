@@ -1002,6 +1002,30 @@ function Gerador() {
             />
           </div>
 
+          {historicoDesatualizado && (
+            <div className="flex items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+              <div className="text-xs">
+                <p className="font-bold text-amber-600 dark:text-amber-400">
+                  Histórico desatualizado
+                </p>
+                <p className="mt-0.5 text-muted-foreground">
+                  O banco de dados não está sincronizado com o último sorteio oficial
+                  {ultimoOficial?.numero ? ` (concurso ${ultimoOficial.numero})` : ""}.
+                  Gere os jogos assim mesmo ou{" "}
+                  <Link
+                    to="/l/$loteria/historico"
+                    params={{ loteria }}
+                    className="font-medium text-primary underline"
+                  >
+                    sincronize o histórico
+                  </Link>{" "}
+                  para estatísticas completas.
+                </p>
+              </div>
+            </div>
+          )}
+
           <Button className="w-full" size="lg" onClick={gerar} disabled={salvarTodosMut.isPending}>
             <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} {qtd === 1 ? "jogo" : "jogos"}
             {ilimitado ? "" : ` · ${formatCreditos(custoCreditos)} crédito(s)`}
