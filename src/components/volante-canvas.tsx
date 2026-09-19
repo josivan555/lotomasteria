@@ -176,10 +176,11 @@ export function VolanteCanvas({
 
   useEffect(() => {
     const info = VOLANTE_ART[cfg.id];
+    setArt(null);
+    if (!info) return;
     const im = new Image();
     im.src = info.url;
     im.onload = () => setArt(im);
-    setArt(null);
   }, [cfg.id]);
 
   useEffect(() => {
@@ -230,7 +231,7 @@ export function VolanteCanvas({
     // arte do volante como guia
     if (cal.mostrarCartao && art) {
       const w = cm(cal.cartaoW);
-      const h = w * VOLANTE_ART[cfg.id].ratio;
+      const h = w * (VOLANTE_ART[cfg.id]?.ratio ?? 1);
       ctx.globalAlpha = 0.85;
       ctx.drawImage(art, cm(cal.cartaoX), cm(cal.cartaoY), w, h);
       ctx.globalAlpha = 1;
