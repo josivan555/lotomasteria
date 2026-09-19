@@ -200,10 +200,25 @@ function Resultados() {
           </span>
         </div>
 
+        {!g.aguardando && temPremios && (
+          <div
+            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3"
+            style={{ borderColor: `${cfg.cor}55`, backgroundColor: `${cfg.cor}12` }}
+          >
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Total ganho neste concurso
+            </span>
+            <span className="font-mono text-xl font-bold" style={{ color: cfg.cor }}>
+              {brl(totalGanho)}
+            </span>
+          </div>
+        )}
+
         {!g.aguardando && (
           <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
             {tierDefs.map((t) => {
               const count = g.itens.filter((it) => it.hits === t).length;
+              const premio = premioPorAcerto.get(t) ?? 0;
               return (
                 <div
                   key={t}
@@ -216,6 +231,18 @@ function Resultados() {
                     {count}
                   </div>
                   <div className="mt-0.5 text-[11px] text-muted-foreground">{tierName(t)}</div>
+                  {premio > 0 && (
+                    <>
+                      <div className="mt-1 text-[10px] text-muted-foreground">
+                        {brl(premio)} por jogo
+                      </div>
+                      {count > 0 && (
+                        <div className="text-[11px] font-bold" style={{ color: cfg.cor }}>
+                          {brl(premio * count)}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               );
             })}
