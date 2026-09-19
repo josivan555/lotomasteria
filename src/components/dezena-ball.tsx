@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { formatDezena } from "@/lib/loterias-config";
 
 export function DezenaBall({
   n,
@@ -20,7 +21,7 @@ export function DezenaBall({
         className,
       )}
     >
-      {String(n).padStart(2, "0")}
+      {formatDezena(n)}
     </span>
   );
 }

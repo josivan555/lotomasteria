@@ -134,12 +134,7 @@ function Resultados() {
     }).filter((g) => g.itens.length > 0);
   }, [alvos, jogos, oficial?.numero, resultadoPorNumero, manualNums, manualAplicado, pdfFrom, pdfTo]);
 
-  const tierDefs =
-    loteria === "lotofacil"
-      ? [15, 14, 13, 12, 11]
-      : loteria === "megasena"
-        ? [6, 5, 4]
-        : [5, 4, 3, 2];
+  const tierDefs = cfg.faixas;
 
   const tierLabel = (h: number) => {
     if (loteria === "megasena") {

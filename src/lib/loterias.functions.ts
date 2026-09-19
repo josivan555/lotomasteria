@@ -342,7 +342,7 @@ export const salvarJogo = createServerFn({ method: "POST" })
       .object({
         loteria: loteriaEnum,
         nome: z.string().optional(),
-        dezenas: z.array(z.number().int().min(1).max(80)).min(3).max(20),
+        dezenas: z.array(z.number().int().min(1).max(100)).min(3).max(50),
         score: z.number().optional(),
         concurso: z.number().int().positive().optional(),
         metadata: z.record(z.string(), z.unknown()).optional(),
