@@ -270,6 +270,12 @@ function Gerador() {
     ultimoOficial?.proximoConcurso ??
     (ultimoOficial?.numero ? ultimoOficial.numero + 1 : undefined);
 
+  // Histórico desatualizado: vazio ou atrás do último concurso oficial da Caixa
+  const ultimoSalvo = concursosAll[0]?.numero ?? null;
+  const historicoDesatualizado =
+    !concursosAll.length ||
+    (ultimoOficial?.numero != null && ultimoSalvo != null && ultimoSalvo < ultimoOficial.numero);
+
   const stats = useMemo(
     () => (concursos.length ? computeNumberStats(cfg, concursos) : null),
     [concursos, cfg],
