@@ -270,6 +270,12 @@ function Gerador() {
     ultimoOficial?.proximoConcurso ??
     (ultimoOficial?.numero ? ultimoOficial.numero + 1 : undefined);
 
+  // Histórico desatualizado: vazio ou atrás do último concurso oficial da Caixa
+  const ultimoSalvo = concursosAll[0]?.numero ?? null;
+  const historicoDesatualizado =
+    !concursosAll.length ||
+    (ultimoOficial?.numero != null && ultimoSalvo != null && ultimoSalvo < ultimoOficial.numero);
+
   const stats = useMemo(
     () => (concursos.length ? computeNumberStats(cfg, concursos) : null),
     [concursos, cfg],
@@ -476,6 +482,18 @@ function Gerador() {
     if (!stats) {
       toast.error("Sincronize o histórico primeiro.");
       return;
+    }
+    if (historicoDesatualizado) {
+      toast.warning("Histórico desatualizado!", {
+        description:
+          "O banco de dados não está sincronizado com o último sorteio oficial. Atualize o histórico para gerar jogos com estatísticas completas.",
+        action: {
+          label: "Sincronizar agora",
+          onClick: () =>
+            router.navigate({ to: "/l/$loteria/historico", params: { loteria } }),
+        },
+        duration: 8000,
+      });
     }
     if (semSaldo) {
       toast.error(
@@ -983,6 +1001,30 @@ function Gerador() {
               variant="danger"
             />
           </div>
+
+          {historicoDesatualizado && (
+            <div className="flex items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+              <div className="text-xs">
+                <p className="font-bold text-amber-600 dark:text-amber-400">
+                  Histórico desatualizado
+                </p>
+                <p className="mt-0.5 text-muted-foreground">
+                  O banco de dados não está sincronizado com o último sorteio oficial
+                  {ultimoOficial?.numero ? ` (concurso ${ultimoOficial.numero})` : ""}.
+                  Gere os jogos assim mesmo ou{" "}
+                  <Link
+                    to="/l/$loteria/historico"
+                    params={{ loteria }}
+                    className="font-medium text-primary underline"
+                  >
+                    sincronize o histórico
+                  </Link>{" "}
+                  para estatísticas completas.
+                </p>
+              </div>
+            </div>
+          )}
 
           <Button className="w-full" size="lg" onClick={gerar} disabled={salvarTodosMut.isPending}>
             <Dice5 className="mr-2 h-4 w-4" /> Gerar {qtd} {qtd === 1 ? "jogo" : "jogos"}
