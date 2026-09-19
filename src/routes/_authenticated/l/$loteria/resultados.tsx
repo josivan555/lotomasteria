@@ -93,7 +93,10 @@ function Resultados() {
   });
 
   const resultadoPorNumero = useMemo(() => {
-    const map = new Map<number, { numero: number; data_apuracao: string; dezenas: number[] }>();
+    const map = new Map<
+      number,
+      NonNullable<Awaited<ReturnType<typeof porConcurso>>>
+    >();
     alvos.forEach((numero, i) => {
       const r = resultadosQueries[i]?.data;
       if (r) map.set(numero, r);
