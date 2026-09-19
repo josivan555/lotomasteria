@@ -148,6 +148,11 @@ type CaixaResp = {
   dataApuracao: string;
   listaDezenas: string[];
   indicadorConcursoEspecial?: number;
+  listaRateioPremio?: {
+    descricaoFaixa: string;
+    numeroDeGanhadores: number;
+    valorPremio: number;
+  }[];
 };
 
 async function fetchCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaResp | null> {
