@@ -483,6 +483,18 @@ function Gerador() {
       toast.error("Sincronize o histórico primeiro.");
       return;
     }
+    if (historicoDesatualizado) {
+      toast.warning("Histórico desatualizado!", {
+        description:
+          "O banco de dados não está sincronizado com o último sorteio oficial. Atualize o histórico para gerar jogos com estatísticas completas.",
+        action: {
+          label: "Sincronizar agora",
+          onClick: () =>
+            router.navigate({ to: "/l/$loteria/historico", params: { loteria } }),
+        },
+        duration: 8000,
+      });
+    }
     if (semSaldo) {
       toast.error(
         `Você precisa de ${formatCreditos(custoCreditos)} crédito(s) e tem ${formatCreditos(saldoAtual)}. Compre mais créditos.`,
