@@ -58,6 +58,8 @@ function LoteriasHub() {
       <div className="grid gap-5 md:grid-cols-3">
         {LOTERIA_IDS.map((id) => {
           const cfg = LOTERIAS[id];
+          const resumo = resumoPorLoteria.get(id);
+          const premioPrincipal = resumo?.faixas?.[0]?.premio ?? 0;
           return (
             <Link
               key={id}
@@ -82,6 +84,42 @@ function LoteriasHub() {
               </div>
 
               <p className="mt-4 text-sm text-muted-foreground">{cfg.descricaoLonga}</p>
+
+              {resumo && (
+                <div className="mt-4 space-y-1.5 rounded-lg border border-border/50 bg-background/40 p-3 text-xs">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    <span>
+                      Concurso {resumo.numero} · {formatarData(resumo.data_apuracao)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Trophy className="h-3.5 w-3.5 text-primary" />
+                    {premioPrincipal > 0 ? (
+                      <span className="font-bold text-primary">
+                        {brl.format(premioPrincipal)}
+                        <span className="ml-1 font-normal text-muted-foreground">
+                          ({resumo.faixas[0].faixa})
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="font-bold text-primary">
+                        {resumo.acumulou ? "Acumulou!" : "Sem ganhadores"}
+                      </span>
+                    )}
+                  </div>
+                  {resumo.estimativaProximo > 0 && (
+                    <p className="text-muted-foreground">
+                      Próximo prêmio estimado:{" "}
+                      <span className="font-semibold text-foreground">
+                        {brl.format(resumo.estimativaProximo)}
+                      </span>
+                      {resumo.proximoData ? ` · ${formatarData(resumo.proximoData)}` : ""}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="mt-4 flex items-center justify-between text-xs">
                 <span className="rounded-full bg-secondary px-2 py-0.5 text-muted-foreground">
                   {cfg.total} números
