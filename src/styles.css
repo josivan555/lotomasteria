@@ -143,6 +143,71 @@
   --glow: oklch(0.34 0.16 265 / 45%);
 }
 
+[data-loteria="lotomania"] {
+  --background: oklch(0.16 0.03 55);
+  --card: oklch(0.21 0.04 55);
+  --popover: oklch(0.21 0.04 55);
+  --secondary: oklch(0.28 0.05 55);
+  --muted: oklch(0.25 0.035 55);
+  --muted-foreground: oklch(0.76 0.03 55);
+  --primary: oklch(0.7 0.18 55);
+  --primary-foreground: oklch(0.16 0.03 55);
+  --accent: oklch(0.82 0.16 90);
+  --border: oklch(0.36 0.05 55 / 60%);
+  --input: oklch(0.28 0.04 55);
+  --ring: oklch(0.7 0.18 55);
+  --glow: oklch(0.35 0.16 55 / 42%);
+}
+
+[data-loteria="duplasena"] {
+  --background: oklch(0.15 0.035 20);
+  --card: oklch(0.2 0.045 20);
+  --popover: oklch(0.2 0.045 20);
+  --secondary: oklch(0.27 0.055 20);
+  --muted: oklch(0.24 0.04 20);
+  --muted-foreground: oklch(0.76 0.03 20);
+  --primary: oklch(0.58 0.2 22);
+  --primary-foreground: oklch(0.98 0.01 22);
+  --accent: oklch(0.82 0.16 90);
+  --border: oklch(0.36 0.06 20 / 60%);
+  --input: oklch(0.27 0.05 20);
+  --ring: oklch(0.58 0.2 22);
+  --glow: oklch(0.33 0.16 22 / 45%);
+}
+
+[data-loteria="timemania"] {
+  --background: oklch(0.16 0.03 110);
+  --card: oklch(0.21 0.04 110);
+  --popover: oklch(0.21 0.04 110);
+  --secondary: oklch(0.28 0.05 110);
+  --muted: oklch(0.25 0.035 110);
+  --muted-foreground: oklch(0.78 0.03 110);
+  --primary: oklch(0.82 0.17 105);
+  --primary-foreground: oklch(0.18 0.04 140);
+  --accent: oklch(0.7 0.17 150);
+  --border: oklch(0.36 0.05 110 / 60%);
+  --input: oklch(0.28 0.04 110);
+  --ring: oklch(0.82 0.17 105);
+  --glow: oklch(0.36 0.14 110 / 42%);
+}
+
+[data-loteria="diadesorte"] {
+  --background: oklch(0.16 0.03 75);
+  --card: oklch(0.21 0.04 75);
+  --popover: oklch(0.21 0.04 75);
+  --secondary: oklch(0.28 0.05 75);
+  --muted: oklch(0.25 0.035 75);
+  --muted-foreground: oklch(0.77 0.03 75);
+  --primary: oklch(0.76 0.15 78);
+  --primary-foreground: oklch(0.18 0.04 78);
+  --accent: oklch(0.82 0.16 90);
+  --border: oklch(0.36 0.05 75 / 60%);
+  --input: oklch(0.28 0.04 75);
+  --ring: oklch(0.76 0.15 78);
+  --glow: oklch(0.35 0.14 78 / 42%);
+}
+
+
 @layer base {
   * {
     border-color: var(--color-border);
