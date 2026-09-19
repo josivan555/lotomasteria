@@ -274,6 +274,14 @@ function Resultados() {
                   );
                 })}
               </div>
+              {!g.aguardando && (premioPorAcerto.get(it.hits) ?? 0) > 0 && (
+                <span
+                  className="shrink-0 rounded-md px-2 py-1 font-mono text-xs font-bold"
+                  style={{ color: cfg.cor, backgroundColor: `${cfg.cor}18` }}
+                >
+                  {brl(premioPorAcerto.get(it.hits) ?? 0)}
+                </span>
+              )}
               <div className="ml-auto flex w-16 shrink-0 flex-col items-center">
                 <span
                   className="font-mono text-lg font-bold"
