@@ -31,6 +31,9 @@ export const Route = createFileRoute("/_authenticated/l/$loteria/resultados")({
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+const brl = (v: number) =>
+  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
 function parseNumbers(str: string): number[] {
   const matches = str.match(/\d+/g) ?? [];
   return [...new Set(matches.map((n) => parseInt(n, 10)).filter((n) => n > 0))];
