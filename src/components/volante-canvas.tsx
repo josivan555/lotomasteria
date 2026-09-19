@@ -37,15 +37,17 @@ export function volanteLayout(cfg: LoteriaConfig): VolanteLayout {
       pos: (n) => ({ col: 4 - Math.floor((n - 1) / 5), row: (n - 1) % 5 }),
     };
   }
-  if (cfg.id === "megasena") {
-    return { cols: 10, rows: 6, pos: (n) => ({ col: (n - 1) % 10, row: Math.floor((n - 1) / 10) }) };
-  }
-  // quina: 80 numeros em 10 colunas x 8 linhas
-  return { cols: 10, rows: 8, pos: (n) => ({ col: (n - 1) % 10, row: Math.floor((n - 1) / 10) }) };
+  // demais loterias: grade de 10 colunas (ou 5 quando tem poucas dezenas)
+  const cols = cfg.total <= 31 ? 5 : 10;
+  return {
+    cols,
+    rows: Math.ceil(cfg.total / cols),
+    pos: (n) => ({ col: (n - 1) % cols, row: Math.floor((n - 1) / cols) }),
+  };
 }
 
 /** arte oficial do volante de cada loteria (apenas guia visual, nao e impressa) */
-export const VOLANTE_ART: Record<LoteriaId, { url: string; ratio: number }> = {
+export const VOLANTE_ART: Partial<Record<LoteriaId, { url: string; ratio: number }>> = {
   lotofacil: { url: volanteLoto.url, ratio: 1857 / 847 },
   megasena: { url: volanteMega.url, ratio: 1798 / 875 },
   quina: { url: volanteQuina.url, ratio: 992 / 450 },
@@ -91,7 +93,20 @@ export type Calibracao = {
   papel: "A4" | "Letter";
 };
 
+const PADRAO_GENERICO: Calibracao = {
+  offsetX: 8, offsetY: 4.5, passoX: 0.63, passoY: 0.32,
+  marcaW: 0.32, marcaH: 0.18,
+  cartaoX: 6.5, cartaoY: 0.5, cartaoW: 8.1, mostrarCartao: false,
+  ajusteEsquerda: -0.15, ajusteTopo: 0, usarSecao2: false, secao2Y: 3,
+  usarSecao3: false, secao3Y: 6, papel: "A4",
+  qtdX: 8, qtdY: 13.5,
+};
+
 const PADROES: Record<LoteriaId, Calibracao> = {
+  lotomania: PADRAO_GENERICO,
+  duplasena: PADRAO_GENERICO,
+  timemania: PADRAO_GENERICO,
+  diadesorte: PADRAO_GENERICO,
   lotofacil: {
     offsetX: 7.85, offsetY: 4.95, passoX: 1.26, passoY: 0.45,
     marcaW: 0.38, marcaH: 0.22,

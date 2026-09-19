@@ -55,7 +55,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
 
   // Faixas premiadas por loteria (mínimo premiado até o total)
   const faixas = useMemo(() => {
-    const min = cfg.id === "lotofacil" ? 11 : cfg.id === "quina" ? 2 : 4;
+    const min = Math.min(...cfg.faixas);
     const out: number[] = [];
     for (let k = cfg.tamanho; k >= min; k--) out.push(k);
     return out;
@@ -170,7 +170,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
 
       <div className="space-y-2">
         {listados.map((jogo) => {
-          const premiado = completo && jogo.acertos >= (cfg.id === "lotofacil" ? 11 : cfg.id === "quina" ? 2 : 4);
+          const premiado = completo && jogo.acertos >= Math.min(...cfg.faixas);
           return (
             <div
               key={jogo.indice}
