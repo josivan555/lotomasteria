@@ -1,6 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LOTERIA_IDS, LOTERIAS } from "@/lib/loterias-config";
-import { Sparkles } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
+import { resumoOficialTodas } from "@/lib/loterias.functions";
+import { Sparkles, CalendarDays, Trophy } from "lucide-react";
+
+const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
+function formatarData(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
 
 export const Route = createFileRoute("/_authenticated/loterias")({
   head: () => ({
@@ -22,6 +32,14 @@ export const Route = createFileRoute("/_authenticated/loterias")({
 });
 
 function LoteriasHub() {
+  const resumoFn = useServerFn(resumoOficialTodas);
+  const { data: resumos = [] } = useQuery({
+    queryKey: ["resumo-oficial-todas"],
+    queryFn: () => resumoFn(),
+    staleTime: 5 * 60_000,
+  });
+  const resumoPorLoteria = new Map(resumos.map((r) => [r.loteria as LoteriaId, r]));
+
   return (
     <div className="space-y-8">
       <div className="text-center">
