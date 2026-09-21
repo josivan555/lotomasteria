@@ -105,7 +105,7 @@ export const salvarJogosComCreditos = createServerFn({ method: "POST" })
         jogos: z
           .array(
             z.object({
-              dezenas: z.array(z.number().int().min(1).max(80)).min(3).max(20),
+              dezenas: z.array(z.number().int().min(1).max(100)).min(3).max(50),
               score: z.number().optional(),
             }),
           )
