@@ -312,6 +312,23 @@ function Gerador() {
     setAdv((prev) => ({ ...prev, [k]: { ...prev[k], ...patch } }));
   }
 
+  // Restaura os filtros recomendados da modalidade (usado quando nada passa)
+  function restaurarPadroes() {
+    setTamanho(cfg.tamanho);
+    setSomaMin(defaults.somaMin);
+    setSomaMax(defaults.somaMax);
+    setParesMin(defaults.paresMin);
+    setParesMax(defaults.paresMax);
+    setMaxConsecutivas(defaults.maxConsecutivas);
+    setMolduraMin(defaults.molduraMin ?? 0);
+    setMolduraMax(defaults.molduraMax ?? cfg.tamanho);
+    setIncluir([]);
+    setExcluir([]);
+    setRepetirMin(defaults.repetirAnteriorMin);
+    setRepetirMax(defaults.repetirAnteriorMax);
+    setAdv(advDefaults(cfg));
+  }
+
   const [resultados, setResultados] = useState<Result[]>([]);
   const [iaPensando, setIaPensando] = useState(false);
   const [configCarregada, setConfigCarregada] = useState<string | null>(null);
@@ -417,28 +434,34 @@ function Gerador() {
       const tol =
         qtd <= 2 ? 0.6 : qtd <= 5 ? 0.9 : qtd <= 10 ? 1.2 : qtd <= 50 ? 1.6 : qtd <= 100 ? 2.0 : 2.5;
 
+      // Os sorteios têm menos dezenas do que a aposta em várias modalidades
+      // (ex.: Lotomania sorteia 20 e a aposta tem 50). Sem esta escala, as
+      // faixas históricas ficam impossíveis para o jogo gerado.
+      const sorteadas = concursos[0]?.dezenas.length || cfg.tamanho;
+      const fator = tamanho / sorteadas;
+
       const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, Math.round(v)));
-      const somaM = mean(somas), somaS = std(somas);
+      const somaM = mean(somas) * fator, somaS = std(somas) * fator;
       setSomaMin(clamp(somaM - tol * somaS, 1, 9999));
       setSomaMax(clamp(somaM + tol * somaS, 1, 9999));
 
-      const parM = mean(pares), parS = std(pares);
-      setParesMin(clamp(parM - tol * parS, 0, cfg.tamanho));
-      setParesMax(clamp(parM + tol * parS, 0, cfg.tamanho));
+      const parM = mean(pares) * fator, parS = std(pares) * fator;
+      setParesMin(clamp(parM - tol * parS, 0, tamanho));
+      setParesMax(clamp(parM + tol * parS, 0, tamanho));
 
       if (cfg.moldura && molduras.length) {
-        const mM = mean(molduras), mS = std(molduras);
-        setMolduraMin(clamp(mM - tol * mS, 0, cfg.tamanho));
-        setMolduraMax(clamp(mM + tol * mS, 0, cfg.tamanho));
+        const mM = mean(molduras) * fator, mS = std(molduras) * fator;
+        setMolduraMin(clamp(mM - tol * mS, 0, tamanho));
+        setMolduraMax(clamp(mM + tol * mS, 0, tamanho));
       }
 
       if (repeats.length) {
-        const rM = mean(repeats), rS = std(repeats);
-        setRepetirMin(clamp(rM - tol * rS, 0, cfg.tamanho));
-        setRepetirMax(clamp(rM + tol * rS, 0, cfg.tamanho));
+        const rM = mean(repeats) * fator, rS = std(repeats) * fator;
+        setRepetirMin(clamp(rM - tol * rS, 0, Math.min(tamanho, sorteadas)));
+        setRepetirMax(clamp(rM + tol * rS, 0, Math.min(tamanho, sorteadas)));
       }
 
-      const cM = mean(consecs), cS = std(consecs);
+      const cM = mean(consecs) * fator, cS = std(consecs);
       setMaxConsecutivas(clamp(cM + tol * cS, 2, 10));
 
       // Filtros avançados: faixas calculadas a partir do histórico real
@@ -446,10 +469,10 @@ function Gerador() {
       const an = amostra.map((c) => analisarJogo(cfg, c.dezenas));
       const faixa = (vals: number[], lo: number, hi: number) => {
         if (!vals.length) return null;
-        const m = mean(vals), s = std(vals);
+        const m = mean(vals) * fator, s = std(vals) * fator;
         return { min: clamp(m - tol * s, lo, hi), max: clamp(m + tol * s, lo, hi) };
       };
-      const aplica = (k: AdvKey, vals: number[], lo = 0, hi = cfg.tamanho) => {
+      const aplica = (k: AdvKey, vals: number[], lo = 0, hi = tamanho) => {
         const f = faixa(vals, lo, hi);
         if (f) setAdvField(k, f);
       };
@@ -460,7 +483,8 @@ function Gerador() {
       aplica("linha", an.flatMap((x) => x.porLinha));
       aplica("coluna", an.flatMap((x) => x.porColuna));
       if (cfg.moldura) aplica("miolo", an.map((x) => x.centro));
-      if (repeats.length) aplica("ausentes", repeats.map((r) => cfg.tamanho - r));
+      if (repeats.length)
+        aplica("ausentes", repeats.map((r) => Math.max(0, tamanho - r * fator)));
 
       setIncluir([]);
       setExcluir([]);
@@ -538,7 +562,12 @@ function Gerador() {
     const anterior = concursos[0]?.dezenas;
     const jogos = gerarJogos(cfg, qtd, stats.scores, filtros, anterior, tamanho);
     if (!jogos.length) {
-      toast.error("Nenhum jogo passou nos filtros. Afrouxe algum parâmetro.");
+      toast.error("Nenhum jogo passou nos filtros.", {
+        description:
+          "As faixas estão estreitas demais para esta modalidade. Afrouxe um parâmetro ou volte aos valores recomendados.",
+        action: { label: "Restaurar padrão", onClick: restaurarPadroes },
+        duration: 10000,
+      });
       return;
     }
     const lista = jogos.map((j) => ({ dezenas: j.dezenas, score: j.score }));
