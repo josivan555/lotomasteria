@@ -562,7 +562,12 @@ function Gerador() {
     const anterior = concursos[0]?.dezenas;
     const jogos = gerarJogos(cfg, qtd, stats.scores, filtros, anterior, tamanho);
     if (!jogos.length) {
-      toast.error("Nenhum jogo passou nos filtros. Afrouxe algum parâmetro.");
+      toast.error("Nenhum jogo passou nos filtros.", {
+        description:
+          "As faixas estão estreitas demais para esta modalidade. Afrouxe um parâmetro ou volte aos valores recomendados.",
+        action: { label: "Restaurar padrão", onClick: restaurarPadroes },
+        duration: 10000,
+      });
       return;
     }
     const lista = jogos.map((j) => ({ dezenas: j.dezenas, score: j.score }));
