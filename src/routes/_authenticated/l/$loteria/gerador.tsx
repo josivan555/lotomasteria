@@ -312,6 +312,23 @@ function Gerador() {
     setAdv((prev) => ({ ...prev, [k]: { ...prev[k], ...patch } }));
   }
 
+  // Restaura os filtros recomendados da modalidade (usado quando nada passa)
+  function restaurarPadroes() {
+    setTamanho(cfg.tamanho);
+    setSomaMin(defaults.somaMin);
+    setSomaMax(defaults.somaMax);
+    setParesMin(defaults.paresMin);
+    setParesMax(defaults.paresMax);
+    setMaxConsecutivas(defaults.maxConsecutivas);
+    setMolduraMin(defaults.molduraMin ?? 0);
+    setMolduraMax(defaults.molduraMax ?? cfg.tamanho);
+    setIncluir([]);
+    setExcluir([]);
+    setRepetirMin(defaults.repetirAnteriorMin);
+    setRepetirMax(defaults.repetirAnteriorMax);
+    setAdv(advDefaults(cfg));
+  }
+
   const [resultados, setResultados] = useState<Result[]>([]);
   const [iaPensando, setIaPensando] = useState(false);
   const [configCarregada, setConfigCarregada] = useState<string | null>(null);
