@@ -49,7 +49,7 @@ export const listarConcursos = createServerFn({ method: "GET" })
     const sb = serverPublicClient();
     const { data: rows, error } = await sb
       .from("concursos")
-      .select("numero, data_apuracao, dezenas, soma, especial, mes_sorte")
+      .select("numero, data_apuracao, dezenas, soma, especial, mes_sorte, time_coracao")
       .eq("loteria", data.loteria)
       .order("numero", { ascending: false })
       .limit(3500);
@@ -61,6 +61,7 @@ export const listarConcursos = createServerFn({ method: "GET" })
       soma: c.soma,
       especial: c.especial === true,
       mes_sorte: (c as { mes_sorte?: number | null }).mes_sorte ?? null,
+      time_coracao: (c as { time_coracao?: string | null }).time_coracao ?? null,
     }));
   });
 
@@ -217,6 +218,7 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
       soma: number;
       especial: boolean;
       mes_sorte?: number | null;
+      time_coracao?: string | null;
     }[] = [];
 
     // Busca em lotes paralelos para acelerar
@@ -238,6 +240,9 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
           especial: r.indicadorConcursoEspecial === 1,
           ...(data.loteria === "diadesorte"
             ? { mes_sorte: mesDoNome((r as { nomeTimeCoracaoMesSorte?: string }).nomeTimeCoracaoMesSorte) }
+            : {}),
+          ...(data.loteria === "timemania"
+            ? { time_coracao: ((r as { nomeTimeCoracaoMesSorte?: string }).nomeTimeCoracaoMesSorte ?? "").trim() || null }
             : {}),
         });
       }

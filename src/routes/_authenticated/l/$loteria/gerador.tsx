@@ -224,7 +224,30 @@ export const Route = createFileRoute("/_authenticated/l/$loteria/gerador")({
   component: Gerador,
 });
 
-type Result = { dezenas: number[]; score: number; mes?: number };
+type Result = { dezenas: number[]; score: number; mes?: number; time?: string };
+
+/** Times escolhidos por estatística (frequência total, recente e atraso), distribuídos entre os jogos. */
+function distribuirTimes(qtd: number, concursos: { time_coracao?: string | null }[]): string[] {
+  const hist = concursos.map((c) => c.time_coracao).filter((t): t is string => !!t);
+  if (!hist.length) return [];
+  const nomes = [...new Set(hist)];
+  const idx = new Map(nomes.map((n, i) => [n, i]));
+  const fH = Array(nomes.length).fill(0), f50 = Array(nomes.length).fill(0), atr = Array(nomes.length).fill(hist.length);
+  hist.forEach((t, i) => {
+    const k = idx.get(t)!;
+    fH[k]++;
+    if (i < 50) f50[k]++;
+    if (atr[k] === hist.length) atr[k] = i;
+  });
+  const norm = (a: number[]) => { const mn = Math.min(...a), r = Math.max(...a) - mn || 1; return a.map((v) => (v - mn) / r); };
+  const nH = norm(fH), n50 = norm(f50), nA = norm(atr);
+  const w = nH.map((v, i) => 0.4 * v + 0.3 * n50[i] + 0.3 * nA[i]);
+  // Concentra nos 10 melhores times
+  const top = w.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v).slice(0, 10);
+  const pesos = Array(nomes.length).fill(0);
+  top.forEach((t) => (pesos[t.i] = t.v + 0.1));
+  return distribuirMeses(qtd, pesos).map((m) => nomes[m - 1]);
+}
 
 const MESES_ABREV = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
 
@@ -607,7 +630,12 @@ function Gerador() {
       loteria === "diadesorte"
         ? distribuirMeses(jogos.length, scoresMeses(concursosBase as { mes_sorte?: number | null }[]))
         : null;
+    const times =
+      loteria === "timemania"
+        ? distribuirTimes(jogos.length, concursosBase as { time_coracao?: string | null }[])
+        : [];
     const lista = jogos.map((j, i) => ({
+      ...(times[i] ? { time: times[i] } : {}),
       dezenas: j.dezenas,
       score: j.score,
       ...(meses ? { mes: meses[i] } : {}),
@@ -623,7 +651,7 @@ function Gerador() {
         data: {
           loteria,
           concurso: concursoAlvo,
-          jogos: [{ dezenas: r.dezenas, score: r.score, mes: r.mes }],
+          jogos: [{ dezenas: r.dezenas, score: r.score, mes: r.mes, time: r.time }],
         },
       }),
     onSuccess: () => {
@@ -641,7 +669,7 @@ function Gerador() {
         data: {
           loteria,
           concurso: concursoAlvo,
-          jogos: lista.map((r) => ({ dezenas: r.dezenas, score: r.score, mes: r.mes })),
+          jogos: lista.map((r) => ({ dezenas: r.dezenas, score: r.score, mes: r.mes, time: r.time })),
         },
       }),
     onSuccess: (r) => {
@@ -1157,6 +1185,11 @@ function Gerador() {
                         {r.mes && (
                           <span className="ml-1 inline-flex h-7 items-center rounded-full border border-primary/50 bg-primary/15 px-2.5 text-[11px] font-bold tracking-wide text-primary sm:h-8 sm:text-xs" title="Mês de Sorte (escolhido por estatística)">
                             {MESES_ABREV[r.mes - 1]}
+                          </span>
+                        )}
+                        {r.time && (
+                          <span className="ml-1 inline-flex h-7 items-center rounded-full border border-primary/50 bg-primary/15 px-2.5 text-[11px] font-bold tracking-wide text-primary sm:h-8 sm:text-xs" title="Time do Coração (escolhido por estatística)">
+                            ⚽ {r.time}
                           </span>
                         )}
                       </div>
