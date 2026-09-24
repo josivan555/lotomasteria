@@ -160,6 +160,7 @@ export type Database = {
           mes_sorte: number | null
           numero: number
           soma: number
+          time_coracao: string | null
         }
         Insert: {
           created_at?: string
@@ -170,6 +171,7 @@ export type Database = {
           mes_sorte?: number | null
           numero: number
           soma: number
+          time_coracao?: string | null
         }
         Update: {
           created_at?: string
@@ -180,6 +182,7 @@ export type Database = {
           mes_sorte?: number | null
           numero?: number
           soma?: number
+          time_coracao?: string | null
         }
         Relationships: [
           {
