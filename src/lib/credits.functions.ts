@@ -107,6 +107,7 @@ export const salvarJogosComCreditos = createServerFn({ method: "POST" })
             z.object({
               dezenas: z.array(z.number().int().min(1).max(100)).min(3).max(50),
               score: z.number().optional(),
+              mes: z.number().int().min(1).max(12).optional(),
             }),
           )
           .min(1)
@@ -144,16 +145,18 @@ export const salvarJogosComCreditos = createServerFn({ method: "POST" })
     const rows = data.jogos.map((j) => ({
       user_id: context.userId,
       loteria: data.loteria,
-      nome: `${cfg.nome} · Score ${j.score ?? 0}`,
+      nome: `${cfg.nome} · Score ${j.score ?? 0}${j.mes ? ` · Mês ${MESES[j.mes - 1]}` : ""}`,
       dezenas: j.dezenas,
       score: j.score ?? null,
       concurso_alvo: data.concurso ?? null,
-      metadata: {} as never,
+      metadata: (j.mes ? { mes_sorte: j.mes } : {}) as never,
     }));
     const { error } = await context.supabase.from("jogos_salvos").insert(rows);
     if (error) throw new Error(error.message);
 
     return { salvos: rows.length, custo, saldo: (saldoNovo as unknown as number) ?? 0 };
   });
+
+const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
 export const pacotesCreditos = createServerFn({ method: "GET" }).handler(async () => CREDIT_PACKAGES);
