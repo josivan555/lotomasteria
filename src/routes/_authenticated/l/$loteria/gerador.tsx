@@ -224,7 +224,40 @@ export const Route = createFileRoute("/_authenticated/l/$loteria/gerador")({
   component: Gerador,
 });
 
-type Result = { dezenas: number[]; score: number };
+type Result = { dezenas: number[]; score: number; mes?: number };
+
+const MESES_ABREV = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
+
+/** Score estatístico por mês (frequência histórica, recente e atraso). */
+function scoresMeses(concursos: { mes_sorte?: number | null }[]): number[] {
+  const hist = concursos.map((c) => c.mes_sorte).filter((m): m is number => !!m);
+  const w = Array(12).fill(1);
+  if (!hist.length) return w;
+  const fH = Array(12).fill(0), f50 = Array(12).fill(0), atr = Array(12).fill(hist.length);
+  hist.forEach((m, i) => {
+    fH[m - 1]++;
+    if (i < 50) f50[m - 1]++;
+    if (atr[m - 1] === hist.length) atr[m - 1] = i;
+  });
+  const norm = (a: number[]) => { const mn = Math.min(...a), r = Math.max(...a) - mn || 1; return a.map((v) => (v - mn) / r); };
+  const nH = norm(fH), n50 = norm(f50), nA = norm(atr);
+  return nH.map((v, i) => 0.4 * v + 0.3 * n50[i] + 0.3 * nA[i] + 0.1);
+}
+
+/** Distribui meses entre os jogos proporcionalmente ao score (melhores meses primeiro). */
+function distribuirMeses(qtd: number, w: number[]): number[] {
+  const total = w.reduce((a, b) => a + b, 0);
+  const ordem = w.map((v, i) => ({ i, v })).sort((a, b) => b.v - a.v);
+  const cotas = ordem.map((o) => ({ m: o.i + 1, q: (o.v / total) * qtd, n: 0 }));
+  const out: number[] = [];
+  for (let k = 0; k < qtd; k++) {
+    let best = cotas[0];
+    for (const c of cotas) if (c.q - c.n > best.q - best.n) best = c;
+    best.n++;
+    out.push(best.m);
+  }
+  return out;
+}
 
 function Gerador() {
   const { loteria } = useParams({ from: "/_authenticated/l/$loteria/gerador" });
@@ -570,7 +603,15 @@ function Gerador() {
       });
       return;
     }
-    const lista = jogos.map((j) => ({ dezenas: j.dezenas, score: j.score }));
+    const meses =
+      loteria === "diadesorte"
+        ? distribuirMeses(jogos.length, scoresMeses(concursosBase as { mes_sorte?: number | null }[]))
+        : null;
+    const lista = jogos.map((j, i) => ({
+      dezenas: j.dezenas,
+      score: j.score,
+      ...(meses ? { mes: meses[i] } : {}),
+    }));
     setResultados(lista);
     toast.success(`${jogos.length} jogos gerados. Salvando em Meus Jogos...`);
     salvarTodosMut.mutate(lista);
@@ -582,7 +623,7 @@ function Gerador() {
         data: {
           loteria,
           concurso: concursoAlvo,
-          jogos: [{ dezenas: r.dezenas, score: r.score }],
+          jogos: [{ dezenas: r.dezenas, score: r.score, mes: r.mes }],
         },
       }),
     onSuccess: () => {
@@ -600,7 +641,7 @@ function Gerador() {
         data: {
           loteria,
           concurso: concursoAlvo,
-          jogos: lista.map((r) => ({ dezenas: r.dezenas, score: r.score })),
+          jogos: lista.map((r) => ({ dezenas: r.dezenas, score: r.score, mes: r.mes })),
         },
       }),
     onSuccess: (r) => {
@@ -1113,6 +1154,11 @@ function Gerador() {
                             className="h-7! w-7! text-[11px]! sm:h-8! sm:w-8! sm:text-xs!"
                           />
                         ))}
+                        {r.mes && (
+                          <span className="ml-1 inline-flex h-7 items-center rounded-full border border-primary/50 bg-primary/15 px-2.5 text-[11px] font-bold tracking-wide text-primary sm:h-8 sm:text-xs" title="Mês de Sorte (escolhido por estatística)">
+                            {MESES_ABREV[r.mes - 1]}
+                          </span>
+                        )}
                       </div>
                     </div>
 

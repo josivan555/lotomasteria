@@ -157,6 +157,7 @@ export type Database = {
           dezenas: number[]
           especial: boolean | null
           loteria: string
+          mes_sorte: number | null
           numero: number
           soma: number
         }
@@ -166,6 +167,7 @@ export type Database = {
           dezenas: number[]
           especial?: boolean | null
           loteria?: string
+          mes_sorte?: number | null
           numero: number
           soma: number
         }
@@ -175,6 +177,7 @@ export type Database = {
           dezenas?: number[]
           especial?: boolean | null
           loteria?: string
+          mes_sorte?: number | null
           numero?: number
           soma?: number
         }

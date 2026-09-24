@@ -28,6 +28,14 @@ function apiPath(loteria: LoteriaId): string {
   return loteria;
 }
 
+const MESES_NOMES = ["janeiro","fevereiro","marco","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+function mesDoNome(nome?: string | null): number | null {
+  if (!nome) return null;
+  const k = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+  const i = MESES_NOMES.findIndex((m) => k.startsWith(m.slice(0, 3)));
+  return i >= 0 ? i + 1 : null;
+}
+
 function parseData(dd: string): string {
   const [d, m, y] = dd.split("/");
   return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
@@ -41,7 +49,7 @@ export const listarConcursos = createServerFn({ method: "GET" })
     const sb = serverPublicClient();
     const { data: rows, error } = await sb
       .from("concursos")
-      .select("numero, data_apuracao, dezenas, soma, especial")
+      .select("numero, data_apuracao, dezenas, soma, especial, mes_sorte")
       .eq("loteria", data.loteria)
       .order("numero", { ascending: false })
       .limit(3500);
@@ -52,6 +60,7 @@ export const listarConcursos = createServerFn({ method: "GET" })
       dezenas: (c.dezenas as unknown as number[]) ?? [],
       soma: c.soma,
       especial: c.especial === true,
+      mes_sorte: (c as { mes_sorte?: number | null }).mes_sorte ?? null,
     }));
   });
 
@@ -207,6 +216,7 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
       dezenas: number[];
       soma: number;
       especial: boolean;
+      mes_sorte?: number | null;
     }[] = [];
 
     // Busca em lotes paralelos para acelerar
@@ -226,6 +236,9 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
           dezenas: dz,
           soma: dz.reduce((a, b) => a + b, 0),
           especial: r.indicadorConcursoEspecial === 1,
+          ...(data.loteria === "diadesorte"
+            ? { mes_sorte: mesDoNome((r as { nomeTimeCoracaoMesSorte?: string }).nomeTimeCoracaoMesSorte) }
+            : {}),
         });
       }
     }
