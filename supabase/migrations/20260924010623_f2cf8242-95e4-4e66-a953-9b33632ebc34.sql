@@ -1,0 +1,1 @@
+ALTER TABLE public.concursos ADD COLUMN IF NOT EXISTS mes_sorte smallint;
