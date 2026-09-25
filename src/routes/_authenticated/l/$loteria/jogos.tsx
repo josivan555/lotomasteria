@@ -345,11 +345,16 @@ function Jogos() {
                   cor: cfg.cor,
                   titulo: "Jogos em aberto",
                   sufixoArquivo: "em-aberto",
-                  jogos: vigentes.map((j) => ({
-                    dezenas: j.dezenas,
-                    score: j.score,
-                    created_at: j.created_at,
-                  })),
+                  jogos: vigentes.map((j) => {
+                    const md = (j as { metadata?: { mes_sorte?: number; time_coracao?: string } | null }).metadata;
+                    return {
+                      dezenas: j.dezenas,
+                      score: j.score,
+                      created_at: j.created_at,
+                      mes: md?.mes_sorte ?? null,
+                      time: md?.time_coracao ?? null,
+                    };
+                  }),
                 })
               }
             >
@@ -668,11 +673,16 @@ function Jogos() {
                               cor: cfg.cor,
                               titulo: `Concurso ${g.numero}`,
                               sufixoArquivo: `concurso-${g.numero}`,
-                              jogos: g.itens.map((j) => ({
-                                dezenas: j.dezenas,
-                                score: j.score,
-                                created_at: j.created_at,
-                              })),
+                              jogos: g.itens.map((j) => {
+                                const md = (j as { metadata?: { mes_sorte?: number; time_coracao?: string } | null }).metadata;
+                                return {
+                                  dezenas: j.dezenas,
+                                  score: j.score,
+                                  created_at: j.created_at,
+                                  mes: md?.mes_sorte ?? null,
+                                  time: md?.time_coracao ?? null,
+                                };
+                              }),
                             })
                           }
                         >
