@@ -560,20 +560,22 @@ function Gerador() {
 
   function gerar() {
     if (!stats) {
-      toast.error("Sincronize o histórico primeiro.");
+      toast.warning("Histórico vazio ou desatualizado!", {
+        description:
+          "Sincronize o banco de dados com os sorteios oficiais antes de gerar jogos. Levando você para o Histórico...",
+        duration: 6000,
+      });
+      router.navigate({ to: "/l/$loteria/historico", params: { loteria } });
       return;
     }
     if (historicoDesatualizado) {
       toast.warning("Histórico desatualizado!", {
         description:
-          "O banco de dados não está sincronizado com o último sorteio oficial. Atualize o histórico para gerar jogos com estatísticas completas.",
-        action: {
-          label: "Sincronizar agora",
-          onClick: () =>
-            router.navigate({ to: "/l/$loteria/historico", params: { loteria } }),
-        },
-        duration: 8000,
+          "Há sorteios novos para sincronizar. Atualize o histórico para gerar jogos com estatísticas completas. Levando você para o Histórico...",
+        duration: 6000,
       });
+      router.navigate({ to: "/l/$loteria/historico", params: { loteria } });
+      return;
     }
     if (semSaldo) {
       toast.error(
