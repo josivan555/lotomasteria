@@ -422,7 +422,7 @@ export const listarJogosSalvos = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     let q = context.supabase
       .from("jogos_salvos")
-      .select("id, loteria, nome, dezenas, score, concurso_alvo, created_at")
+      .select("id, loteria, nome, dezenas, score, concurso_alvo, metadata, created_at")
       .order("created_at", { ascending: false })
       .limit(300);
     if (data.loteria) q = q.eq("loteria", data.loteria);
