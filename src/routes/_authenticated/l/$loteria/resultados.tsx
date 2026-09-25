@@ -129,12 +129,17 @@ function Resultados() {
       // ou quando a digitação manual está completa.
       const noHistorico = !!res || manualAplicado.length > 0;
       const itens = doGrupo
-        .map((j, i) => ({
-          id: j.id,
-          idx: i,
-          nums: j.dezenas,
-          hits: j.dezenas.filter((n) => drawnSet.has(n)).length,
-        }))
+        .map((j, i) => {
+          const md = (j as { metadata?: { mes_sorte?: number; time_coracao?: string } | null }).metadata;
+          return {
+            id: j.id,
+            idx: i,
+            nums: j.dezenas,
+            hits: j.dezenas.filter((n) => drawnSet.has(n)).length,
+            mes: md?.mes_sorte ?? null,
+            time: md?.time_coracao ?? null,
+          };
+        })
         .sort((a, b) => (noHistorico ? b.hits - a.hits || a.idx - b.idx : a.idx - b.idx));
       return { numero, res, sorteadas, drawnSet, aguardando, noHistorico, itens };
     }).filter((g) => g.itens.length > 0);
@@ -366,7 +371,12 @@ function Resultados() {
         ? { numero: g.res.numero, data: g.res.data_apuracao, dezenas: g.res.dezenas }
         : null,
       sorteadas: g.sorteadas,
-      itens: g.itens.map((it) => ({ nums: it.nums, hits: it.hits })),
+      itens: g.itens.map((it) => ({
+        nums: it.nums,
+        hits: it.hits,
+        mes: it.mes,
+        time: it.time,
+      })),
       tierLabel,
     });
   }
