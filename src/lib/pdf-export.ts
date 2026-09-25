@@ -7,6 +7,7 @@ const MESES_ABREV = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT"
 export const mesAbrev = (m?: number | null) => (m ? MESES_ABREV[m - 1] ?? "" : "");
 
 type Extras = { mes?: number | null; time?: string | null };
+type JogoPDF = { dezenas: number[]; score?: number | null; created_at: string } & Extras;
 
 
 function header(doc: jsPDF, title: string, subtitle?: string, cor?: string) {
@@ -29,7 +30,7 @@ function header(doc: jsPDF, title: string, subtitle?: string, cor?: string) {
 export function exportarJogosPDF(opts: {
   loteriaNome: string;
   cor: string;
-  jogos: { dezenas: number[]; score?: number | null; created_at: string } & Extras[];
+  jogos: JogoPDF[];
   titulo?: string;
   sufixoArquivo?: string;
 }) {
