@@ -3,6 +3,13 @@ import autoTable from "jspdf-autotable";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+const MESES_ABREV = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
+export const mesAbrev = (m?: number | null) => (m ? MESES_ABREV[m - 1] ?? "" : "");
+
+type Extras = { mes?: number | null; time?: string | null };
+type JogoPDF = { dezenas: number[]; score?: number | null; created_at: string } & Extras;
+
+
 function header(doc: jsPDF, title: string, subtitle?: string, cor?: string) {
   doc.setFillColor(cor ?? "#7a1f8f");
   doc.rect(0, 0, doc.internal.pageSize.getWidth(), 22, "F");
@@ -23,7 +30,7 @@ function header(doc: jsPDF, title: string, subtitle?: string, cor?: string) {
 export function exportarJogosPDF(opts: {
   loteriaNome: string;
   cor: string;
-  jogos: { dezenas: number[]; score?: number | null; created_at: string }[];
+  jogos: JogoPDF[];
   titulo?: string;
   sufixoArquivo?: string;
 }) {
@@ -35,18 +42,33 @@ export function exportarJogosPDF(opts: {
     opts.cor,
   );
 
+  const temMes = opts.jogos.some((j) => j.mes);
+  const temTime = opts.jogos.some((j) => j.time);
+  const head = ["#", "Data", "Dezenas", ...(temMes ? ["Mês"] : []), ...(temTime ? ["Time"] : []), "Score"];
+  const body = opts.jogos.map((j, i) => [
+    String(i + 1),
+    new Date(j.created_at).toLocaleDateString("pt-BR"),
+    j.dezenas.map(pad).join("  "),
+    ...(temMes ? [mesAbrev(j.mes) || "-"] : []),
+    ...(temTime ? [j.time || "-"] : []),
+    j.score != null ? Number(j.score).toFixed(1) : "-",
+  ]);
+
+  let col = 2;
+  const columnStyles: Record<number, Record<string, string>> = {
+    2: { font: "courier", fontStyle: "bold" },
+  };
+  if (temMes) columnStyles[++col] = { halign: "center" };
+  if (temTime) columnStyles[++col] = { fontStyle: "bold" };
+  columnStyles[++col] = { halign: "right" };
+
   autoTable(doc, {
     startY: 36,
-    head: [["#", "Data", "Dezenas", "Score"]],
-    body: opts.jogos.map((j, i) => [
-      String(i + 1),
-      new Date(j.created_at).toLocaleDateString("pt-BR"),
-      j.dezenas.map(pad).join("  "),
-      j.score != null ? Number(j.score).toFixed(1) : "-",
-    ]),
+    head: [head],
+    body,
     styles: { font: "helvetica", fontSize: 10, cellPadding: 3 },
     headStyles: { fillColor: opts.cor, textColor: "#ffffff" },
-    columnStyles: { 2: { font: "courier", fontStyle: "bold" } },
+    columnStyles,
   });
 
   doc.save(
@@ -59,7 +81,7 @@ export function exportarResultadosPDF(opts: {
   cor: string;
   concurso?: { numero: number; data: string; dezenas: number[] } | null;
   sorteadas: number[];
-  itens: { nums: number[]; hits: number }[];
+  itens: ({ nums: number[]; hits: number } & Extras)[];
   tierLabel: (h: number) => string;
 }) {
   const doc = new jsPDF();
@@ -86,18 +108,32 @@ export function exportarResultadosPDF(opts: {
     y += 8;
   }
 
+  const temMes = opts.itens.some((it) => it.mes);
+  const temTime = opts.itens.some((it) => it.time);
+  const head = ["#", "Dezenas do jogo", "Acertos", "Faixa", ...(temMes ? ["Mês"] : []), ...(temTime ? ["Time"] : [])];
+  const body = opts.itens.map((it, i) => [
+    String(i + 1),
+    it.nums.map((n) => (opts.sorteadas.includes(n) ? `[${pad(n)}]` : pad(n))).join("  "),
+    String(it.hits),
+    opts.tierLabel(it.hits) || "-",
+    ...(temMes ? [mesAbrev(it.mes) || "-"] : []),
+    ...(temTime ? [it.time || "-"] : []),
+  ]);
+
+  let col = 3;
+  const columnStyles: Record<number, Record<string, string>> = {
+    1: { font: "courier", fontStyle: "bold" },
+  };
+  if (temMes) columnStyles[++col] = { halign: "center" };
+  if (temTime) columnStyles[++col] = { fontStyle: "bold" };
+
   autoTable(doc, {
     startY: y,
-    head: [["#", "Dezenas do jogo", "Acertos", "Faixa"]],
-    body: opts.itens.map((it, i) => [
-      String(i + 1),
-      it.nums.map((n) => (opts.sorteadas.includes(n) ? `[${pad(n)}]` : pad(n))).join("  "),
-      String(it.hits),
-      opts.tierLabel(it.hits) || "-",
-    ]),
+    head: [head],
+    body,
     styles: { font: "helvetica", fontSize: 10, cellPadding: 3 },
     headStyles: { fillColor: opts.cor, textColor: "#ffffff" },
-    columnStyles: { 1: { font: "courier", fontStyle: "bold" } },
+    columnStyles,
   });
 
   doc.setFontSize(8);

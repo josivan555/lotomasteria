@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trophy, Download, Clock, ChevronDown, History } from "lucide-react";
-import { exportarResultadosPDF } from "@/lib/pdf-export";
+import { exportarResultadosPDF, mesAbrev } from "@/lib/pdf-export";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria/resultados")({
   head: () => ({
@@ -129,12 +129,17 @@ function Resultados() {
       // ou quando a digitação manual está completa.
       const noHistorico = !!res || manualAplicado.length > 0;
       const itens = doGrupo
-        .map((j, i) => ({
-          id: j.id,
-          idx: i,
-          nums: j.dezenas,
-          hits: j.dezenas.filter((n) => drawnSet.has(n)).length,
-        }))
+        .map((j, i) => {
+          const md = (j as { metadata?: { mes_sorte?: number; time_coracao?: string } | null }).metadata;
+          return {
+            id: j.id,
+            idx: i,
+            nums: j.dezenas,
+            hits: j.dezenas.filter((n) => drawnSet.has(n)).length,
+            mes: md?.mes_sorte ?? null,
+            time: md?.time_coracao ?? null,
+          };
+        })
         .sort((a, b) => (noHistorico ? b.hits - a.hits || a.idx - b.idx : a.idx - b.idx));
       return { numero, res, sorteadas, drawnSet, aguardando, noHistorico, itens };
     }).filter((g) => g.itens.length > 0);
@@ -311,6 +316,16 @@ function Resultados() {
               <span className="w-16 shrink-0 text-xs font-semibold text-muted-foreground">
                 Jogo {pad(i + 1)}
               </span>
+              {it.mes ? (
+                <span title="Mês de Sorte (escolhido por estatística)" className="shrink-0 rounded-full border border-primary/50 bg-primary/15 px-2 py-0.5 text-[11px] font-bold text-primary">
+                  📅 {mesAbrev(it.mes)}
+                </span>
+              ) : null}
+              {it.time ? (
+                <span title="Time do Coração (escolhido por estatística)" className="shrink-0 rounded-full border border-primary/50 bg-primary/15 px-2 py-0.5 text-[11px] font-bold text-primary">
+                  ⚽ {it.time}
+                </span>
+              ) : null}
               <div className="flex flex-1 flex-wrap gap-1">
                 {it.nums.map((n) => {
                   const hit = !g.aguardando && g.drawnSet.has(n);
@@ -366,7 +381,12 @@ function Resultados() {
         ? { numero: g.res.numero, data: g.res.data_apuracao, dezenas: g.res.dezenas }
         : null,
       sorteadas: g.sorteadas,
-      itens: g.itens.map((it) => ({ nums: it.nums, hits: it.hits })),
+      itens: g.itens.map((it) => ({
+        nums: it.nums,
+        hits: it.hits,
+        mes: it.mes,
+        time: it.time,
+      })),
       tierLabel,
     });
   }
