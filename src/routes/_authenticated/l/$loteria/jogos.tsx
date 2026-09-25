@@ -210,6 +210,24 @@ function Jogos() {
                 className="h-7! w-7! text-[11px]! sm:h-8! sm:w-8! sm:text-xs!"
               />
             ))}
+            {(() => {
+              const md = (j as { metadata?: { mes_sorte?: number; time_coracao?: string } | null }).metadata;
+              const MES = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
+              return (
+                <>
+                  {md?.mes_sorte ? (
+                    <span title="Mês de Sorte (escolhido por estatística)" className="self-center rounded-full border border-primary/50 bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
+                      📅 {MES[md.mes_sorte - 1]}
+                    </span>
+                  ) : null}
+                  {md?.time_coracao ? (
+                    <span title="Time do Coração (escolhido por estatística)" className="self-center rounded-full border border-primary/50 bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
+                      ⚽ {md.time_coracao}
+                    </span>
+                  ) : null}
+                </>
+              );
+            })()}
           </div>
         </div>
 
