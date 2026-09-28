@@ -374,7 +374,11 @@ function AdminDashboard() {
                                       concurso_numero: b.concurso_numero,
                                       total_cotas: b.total_cotas,
                                       valor_cota: b.valor_cota,
-                                      premio_estimado: b.premio_estimado
+                                      premio_estimado: b.premio_estimado,
+                                      data_sorteio: b.data_sorteio,
+                                      horario_sorteio: String(b.horario_sorteio ?? "").slice(0, 5),
+                                      prazo_vendas: String(b.prazo_vendas ?? "").slice(0, 10),
+                                      horario_encerramento: String(b.horario_encerramento ?? "").slice(0, 5),
                                     });
                                   }}
                                 >
