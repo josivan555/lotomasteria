@@ -5,7 +5,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { resumoOficialTodas } from "@/lib/loterias.functions";
 import { listarBoloesPublicos } from "@/lib/boloes.functions";
-import { Sparkles, CalendarDays, Trophy, Users } from "lucide-react";
+import { CalendarDays, Clock3, Coins, Target, Trophy, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
 
 /** Cor dos bolões combo (várias modalidades juntas). */
 const COR_COMBO = "#f5c542";
@@ -31,6 +33,8 @@ export const Route = createFileRoute("/_authenticated/loterias")({
         property: "og:description",
         content: "Análises e geradores dedicados para Lotofácil, Mega-Sena e Quina.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LoteriasHub,
@@ -47,94 +51,102 @@ function LoteriasHub() {
 
   return (
     <div className="space-y-8">
-      <div className="app-panel lottery-grid relative overflow-hidden rounded-lg px-5 py-8 text-center md:py-10">
-        <div className="absolute inset-x-0 top-0 h-1 bg-primary shadow-[0_0_20px_var(--primary)]" />
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary">
-          <Sparkles className="h-3 w-3" /> Escolha uma modalidade
+      <section className="lottery-hub-hero">
+        <div className="lottery-hub-emblem">
+          <img src={logoAsset.url} alt="LotoMaster IA" />
         </div>
-        <h1 className="mt-4 text-3xl font-black md:text-4xl">
-          Qual loteria você quer analisar?
-        </h1>
-        <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
-          Cada modalidade tem seu próprio dashboard, gerador inteligente com filtros dedicados,
-          histórico oficial e coleção de jogos salvos.
-        </p>
-      </div>
+        <div className="lottery-hub-copy">
+          <h1>
+            Qual <span>loteria</span> você quer analisar?
+          </h1>
+          <p>
+            Cada modalidade tem seu próprio dashboard, gerador inteligente com filtros dedicados,
+            histórico oficial e coleção de jogos salvos.
+          </p>
+        </div>
+        <div className="lottery-hub-balls" aria-hidden="true">
+          <span>15</span><span>42</span><span>33</span>
+        </div>
+      </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {LOTERIA_IDS.map((id) => {
           const cfg = LOTERIAS[id];
           const resumo = resumoPorLoteria.get(id);
           const premioPrincipal = resumo?.faixas?.[0]?.premio ?? 0;
           return (
-            <Link
+            <article
               key={id}
-              to="/l/$loteria/dashboard"
-              params={{ loteria: id }}
-              className="app-panel group relative overflow-hidden rounded-lg p-5 transition hover:-translate-y-1 hover:border-primary/55 hover:shadow-[0_18px_45px_color-mix(in_oklab,var(--primary)_12%,transparent)]"
+              data-loteria={id}
+              className="lottery-choice-card group"
             >
-              <div
-                className={`absolute inset-0 -z-10 bg-gradient-to-br ${cfg.corFundo} opacity-35 transition group-hover:opacity-65`}
-              />
-              <div className="flex flex-col gap-3">
+              <div className="lottery-choice-banner">
                 <img
-                  src={cfg.logo}
-                  alt={`Logo ${cfg.nome}`}
-                  className="h-12 w-auto self-start rounded-md shadow-sm"
+                  src={cfg.banner}
+                  alt={cfg.nome}
+                  className="h-full w-full object-cover object-left"
                   loading="lazy"
                 />
-                <div>
-                  <h2 className="text-lg font-bold">{cfg.nome}</h2>
-                  <p className="text-xs text-muted-foreground">{cfg.descricaoCurta}</p>
-                </div>
               </div>
+              <div className="lottery-choice-body">
+                <div>
+                  <h2>{cfg.nome}</h2>
+                  <p className="lottery-choice-short">
+                    <Clock3 /> {cfg.descricaoCurta}
+                  </p>
+                </div>
 
-              <p className="mt-4 text-sm text-muted-foreground">{cfg.descricaoLonga}</p>
+                <p className="lottery-choice-description">{cfg.descricaoLonga}</p>
 
-              {resumo && (
-                <div className="mt-4 space-y-1.5 rounded-lg border border-border/50 bg-background/40 p-3 text-xs">
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
-                    <CalendarDays className="h-3.5 w-3.5" />
-                    <span>
-                      Concurso {resumo.numero} · {formatarData(resumo.data_apuracao)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Trophy className="h-3.5 w-3.5 text-primary" />
-                    {premioPrincipal > 0 ? (
-                      <span className="font-bold text-primary">
-                        {brl.format(premioPrincipal)}
-                        <span className="ml-1 font-normal text-muted-foreground">
-                          ({resumo.faixas[0].faixa})
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="font-bold text-primary">
-                        {resumo.acumulou ? "Acumulou!" : "Sem ganhadores"}
-                      </span>
-                    )}
-                  </div>
-                  {resumo.estimativaProximo > 0 && (
-                    <p className="text-muted-foreground">
-                      Próximo prêmio estimado:{" "}
-                      <span className="font-semibold text-foreground">
-                        {brl.format(resumo.estimativaProximo)}
-                      </span>
-                      {resumo.proximoData ? ` · ${formatarData(resumo.proximoData)}` : ""}
-                    </p>
+                <div className="lottery-prize-box">
+                  {resumo ? (
+                    <>
+                      <div className="lottery-prize-row">
+                        <Trophy />
+                        <div>
+                          <p>Concurso {resumo.numero} · {formatarData(resumo.data_apuracao)}</p>
+                          {premioPrincipal > 0 ? (
+                            <strong>
+                              {brl.format(premioPrincipal)} <small>({resumo.faixas[0].faixa})</small>
+                            </strong>
+                          ) : (
+                            <strong>{resumo.acumulou ? "Acumulou!" : "Sem ganhadores"}</strong>
+                          )}
+                        </div>
+                      </div>
+                      {resumo.estimativaProximo > 0 && (
+                        <div className="lottery-prize-row lottery-prize-next">
+                          <Coins />
+                          <div>
+                            <p>Próximo prêmio estimado:</p>
+                            <strong>
+                              {brl.format(resumo.estimativaProximo)}
+                              {resumo.proximoData ? ` · ${formatarData(resumo.proximoData)}` : ""}
+                            </strong>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="lottery-prize-row">
+                      <CalendarDays />
+                      <div><p>Dados do concurso</p><strong>Carregando resultado...</strong></div>
+                    </div>
                   )}
                 </div>
-              )}
 
-              <div className="mt-4 flex items-center justify-between text-xs">
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-muted-foreground">
-                  {cfg.total} números
-                </span>
-                <span className="font-semibold text-primary group-hover:underline">
-                  Abrir análise →
-                </span>
+                <div className="lottery-choice-footer">
+                  <span className="lottery-number-chip">
+                    <Users /> {cfg.total} números
+                  </span>
+                  <Button asChild size="sm" className="lottery-open-button">
+                    <Link to="/l/$loteria/dashboard" params={{ loteria: id }}>
+                      Abrir análise →
+                    </Link>
+                  </Button>
+                </div>
               </div>
-            </Link>
+            </article>
           );
         })}
       </div>
