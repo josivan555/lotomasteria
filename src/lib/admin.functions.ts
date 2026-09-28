@@ -105,8 +105,6 @@ export const atualizarBolao = createServerFn({ method: "POST" })
         const dataPrazo = data.prazo_vendas ?? String(current.prazo_vendas).slice(0, 10);
         const horaPrazo = data.horario_encerramento ?? current.horario_encerramento ?? "20:00:00";
         (updateData as any).prazo_vendas = `${dataPrazo}T${horaPrazo.length === 5 ? horaPrazo + ":00" : horaPrazo}`;
-        if (data.horario_encerramento) (updateData as any).horario_encerramento = data.horario_encerramento;
-        delete (updateData as any).horario_encerramento === undefined;
       }
       if (!data.horario_encerramento) delete (updateData as any).horario_encerramento;
     }
