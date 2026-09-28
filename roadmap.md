@@ -5,4 +5,4 @@
 - [x] Apply global colors, typography, surfaces, controls, and responsive behavior
 - [x] Redesign public and authenticated navigation
 - [x] Restyle lottery selection, authentication, and pool detail screens
-- [ ] Verify desktop and mobile rendering
+- [x] Verify desktop and mobile rendering
