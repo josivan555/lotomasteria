@@ -305,6 +305,7 @@
   overflow: hidden;
   border-bottom: 1px solid color-mix(in oklab, var(--primary) 74%, transparent);
   background: color-mix(in oklab, var(--primary) 34%, var(--surface-strong));
+  & > img { position: absolute; inset: 0; }
   /* scrim: escurece a faixa para o nome em destaque ficar legível sobre a arte */
   &::before {
     content: "";
@@ -328,6 +329,8 @@
 @utility lottery-choice-banner-title {
   position: relative;
   z-index: 2;
+  flex: 1 1 auto;
+  min-width: 0;
   padding: 0 1.25rem 0.8rem;
   & h2 {
     font-size: clamp(1.55rem, 4.2vw, 2.05rem);
