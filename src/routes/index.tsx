@@ -104,7 +104,7 @@ function Landing() {
         </Link>
         <nav className="flex flex-wrap items-center gap-1 sm:gap-2">
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-            <Link to="/"><Home className="h-4 w-4" /> Início</Link>
+            <Link to={isLoggedIn ? "/loterias" : "/"}><Home className="h-4 w-4" /> Início</Link>
           </Button>
           <Button asChild size="sm">
             <Link to="/"><TicketCheck className="h-4 w-4" /> Bolões</Link>

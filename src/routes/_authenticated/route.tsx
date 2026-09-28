@@ -124,7 +124,7 @@ function AuthedLayout() {
               </div>
               <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
                 <Link to="/loterias">
-                  <Home className="mr-1.5 h-4 w-4" /> Loterias
+                  <Home className="mr-1.5 h-4 w-4" /> Início
                 </Link>
               </Button>
               <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
