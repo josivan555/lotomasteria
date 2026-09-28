@@ -280,7 +280,7 @@ function Landing() {
                     key={b.id}
                     data-loteria={b.is_combo ? undefined : b.loteria_id}
                     className="lottery-choice-card group relative transition-all hover:-translate-y-1"
-                    style={b.is_combo ? ({ "--primary": "oklch(0.83 0.16 88)" } as React.CSSProperties) : undefined}
+                    style={b.is_combo ? ({ "--primary": "oklch(0.83 0.16 88)" } as import("react").CSSProperties) : undefined}
                   >
                     {b.is_combo && (
                       <div className="absolute -right-12 top-6 rotate-45 bg-gradient-to-r from-yellow-400 to-amber-600 text-black text-[9px] font-black py-1 px-12 shadow-sm z-20 border-y border-white/20">
