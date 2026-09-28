@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { resumoOficialTodas } from "@/lib/loterias.functions";
 import { listarBoloesPublicos } from "@/lib/boloes.functions";
-import { CalendarDays, Clock3, Coins, Target, Trophy, Users } from "lucide-react";
+import { CalendarDays, Clock3, Coins, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
 
