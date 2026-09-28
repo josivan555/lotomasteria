@@ -94,11 +94,21 @@ export const atualizarBolao = createServerFn({ method: "POST" })
     const { id, ...updateData } = data;
     
     // Se mudou cota ou valor, atualiza o total
-    const { data: current } = await context.supabase.from("boloes").select("total_cotas, valor_cota").eq("id", id).single();
+    const { data: current } = await context.supabase.from("boloes").select("total_cotas, valor_cota, prazo_vendas, horario_encerramento").eq("id", id).single();
     if (current) {
       const finalCotas = data.total_cotas ?? current.total_cotas;
       const finalValor = data.valor_cota ?? current.valor_cota;
       (updateData as any).valor_total = finalCotas * finalValor;
+
+      // Monta o prazo de vendas (timestamp) a partir da data + horário de encerramento
+      if (data.prazo_vendas || data.horario_encerramento) {
+        const dataPrazo = data.prazo_vendas ?? String(current.prazo_vendas).slice(0, 10);
+        const horaPrazo = data.horario_encerramento ?? current.horario_encerramento ?? "20:00:00";
+        (updateData as any).prazo_vendas = `${dataPrazo}T${horaPrazo.length === 5 ? horaPrazo + ":00" : horaPrazo}`;
+        if (data.horario_encerramento) (updateData as any).horario_encerramento = data.horario_encerramento;
+        delete (updateData as any).horario_encerramento === undefined;
+      }
+      if (!data.horario_encerramento) delete (updateData as any).horario_encerramento;
     }
 
     const { error } = await context.supabase
