@@ -123,18 +123,32 @@ function AuthedLayout() {
                 <NotificationBell />
               </div>
               <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
-                <Link to="/loterias">
+                <Link
+                  to="/loterias"
+                  activeOptions={{ exact: true }}
+                  activeProps={{ className: "text-primary" }}
+                  inactiveProps={{ className: "text-muted-foreground" }}
+                >
                   <Home className="mr-1.5 h-4 w-4" /> Início
                 </Link>
               </Button>
               <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
-                <Link to="/">
+                <Link
+                  to="/"
+                  activeOptions={{ exact: true }}
+                  activeProps={{ className: "text-primary" }}
+                  inactiveProps={{ className: "text-muted-foreground" }}
+                >
                   <TicketCheck className="mr-1.5 h-4 w-4" /> Bolões
                 </Link>
               </Button>
               {profile?.isAdmin && (
-                <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex text-primary">
-                  <Link to="/admin">
+                <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+                  <Link
+                    to="/admin"
+                    activeProps={{ className: "text-primary" }}
+                    inactiveProps={{ className: "text-muted-foreground" }}
+                  >
                     <ShieldCheck className="mr-1.5 h-4 w-4" /> Painel Admin
                   </Link>
                 </Button>
