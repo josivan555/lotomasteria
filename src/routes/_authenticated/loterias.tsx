@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { resumoOficialTodas } from "@/lib/loterias.functions";
-import { Sparkles, CalendarDays, Trophy } from "lucide-react";
+import { listarBoloesPublicos } from "@/lib/boloes.functions";
+import { Sparkles, CalendarDays, Trophy, Users } from "lucide-react";
 
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -132,6 +133,77 @@ function LoteriasHub() {
           );
         })}
       </div>
+
+      <BoloesAbertos />
     </div>
+  );
+}
+
+function BoloesAbertos() {
+  const listarFn = useServerFn(listarBoloesPublicos);
+  const { data: boloes = [], isLoading } = useQuery({
+    queryKey: ["boloes-publicos", "ativos"],
+    queryFn: () => listarFn(),
+    staleTime: 60_000,
+  });
+  const abertos = (boloes as any[]).filter((b) => {
+    const horario = b.horario_encerramento || "23:59:59";
+    const prazo = new Date(`${b.prazo_vendas}T${horario}`);
+    return b.cotas_disponiveis > 0 && new Date() <= prazo && !["encerrado", "sorteado", "conferido"].includes(b.status);
+  });
+
+  return (
+    <section className="space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 text-xl font-black tracking-tight md:text-2xl">
+          <Users className="h-5 w-5 text-primary" /> Bolões abertos
+        </h2>
+        <Link to="/boloes/reserva" className="text-sm font-semibold text-primary hover:underline">
+          Minhas reservas →
+        </Link>
+      </div>
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">Carregando bolões...</p>
+      ) : abertos.length === 0 ? (
+        <p className="rounded-xl border border-border/60 bg-card/60 p-6 text-center text-sm text-muted-foreground">
+          Nenhum bolão aberto no momento.
+        </p>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          {abertos.map((b) => {
+            const cfg = LOTERIAS[b.loteria_id as LoteriaId];
+            const pct = Math.min(100, (b.cotas_compradas / b.total_cotas) * 100);
+            return (
+              <Link
+                key={b.id}
+                to="/boloes/$bolaoId"
+                params={{ bolaoId: b.id }}
+                search={{ tab: "participantes" } as any}
+                className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/60 p-5 transition-all hover:border-primary/50"
+                style={{ borderTopColor: b.is_combo ? "#FFD700" : cfg?.cor, borderTopWidth: 3 }}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-bold">{b.is_combo ? "COMBO ESPECIAL" : cfg?.nome}</span>
+                  {!b.is_combo && (
+                    <span className="text-xs text-muted-foreground">Concurso {b.concurso_numero}</span>
+                  )}
+                </div>
+                <p className="line-clamp-2 text-sm">{b.nome}</p>
+                <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{b.cotas_disponiveis} cotas livres</span>
+                  <span className="font-bold text-foreground">
+                    {Number(b.valor_cota).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}/cota
+                  </span>
+                </div>
+                <span className="text-sm font-semibold text-primary group-hover:underline">Participar →</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }
