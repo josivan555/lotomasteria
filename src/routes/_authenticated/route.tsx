@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect, Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureBrowserSession } from "@/lib/session-guard";
-import { LogOut, Home, ShieldCheck } from "lucide-react";
+import { LogOut, Home, ShieldCheck, TicketCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notification-bell";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -58,26 +58,27 @@ function AuthedLayout() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-30 border-b border-border/50 bg-card/80 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-3 py-2 md:px-8 md:py-3">
+      <header className="app-header sticky top-0 z-30">
+        <div className="mx-auto max-w-7xl px-3 py-2 md:px-8 md:py-3">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 md:flex md:justify-between md:gap-3">
             <Link
               to="/loterias"
-              className="flex min-w-0 items-center gap-2 text-base font-bold tracking-tight md:text-lg"
+              className="flex min-w-0 items-center gap-2.5 text-base font-black md:text-lg"
             >
               <img
                 src={logoAsset.url}
                 alt="LotoMaster IA"
-                className="h-8 w-8 shrink-0 rounded-lg object-contain ring-1 ring-border/40 md:h-9 md:w-9"
+                className="h-9 w-9 shrink-0 object-contain drop-shadow-[0_0_12px_color-mix(in_oklab,var(--neon)_35%,transparent)] md:h-10 md:w-10"
               />
               <span className="truncate">
-                LotoMaster <span className="text-primary">IA</span>
+                Loto<span className="neon-text">Master</span>
+                <span className="block text-[8px] font-semibold uppercase text-muted-foreground md:text-[9px]">Sonhe · escolha · ganhe</span>
               </span>
             </Link>
 
             <div className="flex shrink-0 items-center gap-1 md:gap-2">
               {loteriaAtual && (
-                <div className="hidden items-center gap-1 rounded-lg border border-border/60 bg-background/40 p-1 md:flex">
+                <div className="hidden items-center gap-1 rounded-lg border border-line/30 bg-surface/55 p-1 md:flex">
                   {LOTERIA_IDS.filter((id) => id !== loteriaAtual).map((id) => {
                     const l = LOTERIAS[id];
                     return (
@@ -126,6 +127,11 @@ function AuthedLayout() {
                   <Home className="mr-1.5 h-4 w-4" /> Loterias
                 </Link>
               </Button>
+              <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+                <Link to="/">
+                  <TicketCheck className="mr-1.5 h-4 w-4" /> Bolões
+                </Link>
+              </Button>
               {profile?.isAdmin && (
                 <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex text-primary">
                   <Link to="/admin">
@@ -169,8 +175,8 @@ function AuthedLayout() {
         </div>
       </header>
 
-      <main>
-        <div className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-10">
+      <main className="relative">
+        <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-10">
           <Outlet />
         </div>
       </main>

@@ -18,6 +18,7 @@ import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, QrCode, Download, Copy
 import { useState, useRef } from "react";
 import { toPng } from 'html-to-image';
 import { toast } from "sonner";
+import { PublicHeader } from "@/components/public-header";
 
 export const Route = createFileRoute("/boloes/$bolaoId")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -83,7 +84,9 @@ function DetalheBolao() {
     };
 
     return (
-      <div className="mx-auto max-w-xl px-4 py-12 md:py-20">
+      <div className="min-h-screen">
+      <PublicHeader />
+      <main className="mx-auto max-w-xl px-4 py-12 md:py-20">
         <div className="text-center mb-8">
           <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-500/10 text-green-500">
             <CheckCircle2 className="h-10 w-10" />
@@ -97,7 +100,7 @@ function DetalheBolao() {
         <div 
           id="comprovante-reserva" 
           ref={comprovanteRef}
-          className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl mb-8"
+          className="app-panel relative mb-8 overflow-hidden rounded-lg"
         >
           <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: cfg.cor }} />
           
@@ -194,24 +197,27 @@ function DetalheBolao() {
             <Link to="/">Voltar para a página inicial</Link>
           </Button>
         </div>
+      </main>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 md:py-12">
+    <div className="min-h-screen">
+    <PublicHeader showSearch />
+    <main className="mx-auto max-w-7xl px-4 py-5 md:px-6 md:py-8">
       <div className="flex justify-between items-center mb-6">
         <Button asChild variant="ghost" size="sm">
           <Link to="/"><ChevronLeft className="mr-2 h-4 w-4" /> Voltar</Link>
         </Button>
       </div>
  
-      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
+      <div className="flex flex-col gap-5 lg:grid lg:grid-cols-5">
 
-        <div className="lg:col-span-2 space-y-8">
-          <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl">
-            <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: cfg.cor }} />
-            <div className="p-5 sm:p-8">
+        <div className="space-y-5 lg:col-span-3">
+          <div className="app-panel relative overflow-hidden rounded-lg">
+            <div className="absolute inset-x-0 top-0 h-28 bg-cover bg-center opacity-55" style={{ backgroundImage: `linear-gradient(90deg, var(--surface-strong), transparent), url(${cfg.banner})` }} />
+            <div className="relative p-5 sm:p-7">
 
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">
@@ -225,7 +231,7 @@ function DetalheBolao() {
                     <div className="ball h-10 w-10 text-sm font-bold text-white" style={{ backgroundColor: cfg.cor }}>{cfg.nome[0]}</div>
                   )}
                   <div>
-                    <h1 className="text-2xl font-black leading-tight">
+                    <h1 className="text-2xl font-black leading-tight sm:text-3xl">
                       {bolao.nome}
                       {bolao.is_combo && <Badge variant="secondary" className="ml-2 bg-amber-500/10 text-amber-500 border-amber-500/20">COMBO</Badge>}
                     </h1>
@@ -235,24 +241,24 @@ function DetalheBolao() {
 
               </div>
 
-              <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4 mb-8">
-                <div className="rounded-2xl bg-secondary/30 p-4 border border-border/40">
+              <div className="mt-9 flex flex-col gap-4 sm:grid sm:grid-cols-2">
+                <div className="rounded-lg border border-line/45 bg-surface/80 p-4">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">Estimativa de Prêmio</p>
                   <p className="text-lg font-black text-foreground">{formatBRL(bolao.premio_estimado || 0)}</p>
                 </div>
-                <div className="rounded-2xl p-4 border" style={{ backgroundColor: `${cfg.cor}10`, borderColor: `${cfg.cor}20` }}>
+                <div className="rounded-lg border border-primary/45 bg-primary/10 p-4">
                   <p className="text-[10px] uppercase tracking-wider font-bold mb-1" style={{ color: cfg.cor }}>Valor da Cota</p>
                   <p className="text-lg sm:text-xl font-black" style={{ color: cfg.cor }}>{formatBRL(bolao.valor_cota)}</p>
                 </div>
               </div>
 
-              <div className="space-y-3 mb-8">
+              <div className="my-6 space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Progresso de vendas</span>
                   <span className="font-bold">{bolao.cotas_compradas} de {bolao.total_cotas} cotas</span>
                 </div>
-                <div className="h-3 w-full bg-secondary rounded-full overflow-hidden">
-                  <div className="h-full transition-all duration-700" style={{ width: `${progresso}%`, backgroundColor: cfg.cor }} />
+                <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
+                  <div className="h-full bg-primary shadow-[0_0_16px_var(--primary)] transition-all duration-700" style={{ width: `${progresso}%` }} />
                 </div>
                 <p className="text-center text-xs text-muted-foreground font-medium">
                   {bolao.cotas_disponiveis} cotas ainda disponíveis para compra
@@ -311,7 +317,7 @@ function DetalheBolao() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-dashed border-border/60 p-6 bg-muted/20">
+          <div className="app-panel rounded-lg p-6">
             <h3 className="font-bold mb-4 flex items-center gap-2">
               <Users className="h-4 w-4" style={{ color: cfg.cor }} /> Por que participar?
             </h3>
@@ -480,8 +486,8 @@ function DetalheBolao() {
         </div>
 
         {tab !== "conferir" && (
-          <div className="space-y-6">
-            <div className="rounded-3xl border border-border/60 bg-card p-5 sm:p-8 shadow-xl">
+          <div className="space-y-6 lg:col-span-2">
+            <div className="app-panel sticky top-24 rounded-lg p-5 sm:p-7">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-black">Comprar Cotas</h2>
                 <Button variant="link" size="sm" asChild className="font-bold p-0 h-auto" style={{ color: cfg.cor }}>
@@ -563,7 +569,7 @@ function DetalheBolao() {
                     </p>
                   </div>
 
-                  <div className="mt-8 rounded-2xl bg-secondary/50 p-6 space-y-3">
+                   <div className="mt-8 space-y-3 rounded-lg border border-line/35 bg-secondary/50 p-6">
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Subtotal ({form.cotas}x)</span>
                       <span>{formatBRL(form.cotas * bolao.valor_cota)}</span>
@@ -575,8 +581,7 @@ function DetalheBolao() {
                   </div>
 
                   <Button 
-                    className="w-full h-14 text-lg font-black shadow-xl text-white" 
-                    style={{ backgroundColor: cfg.cor }}
+                    className="h-14 w-full text-lg font-black" 
                     disabled={mutation.isPending}
                   >
                     {mutation.isPending ? "Processando..." : "Confirmar e Pagar"}
@@ -592,6 +597,7 @@ function DetalheBolao() {
           </div>
         )}
       </div>
+    </main>
     </div>
   );
 }

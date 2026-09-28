@@ -47,11 +47,12 @@ function LoteriasHub() {
 
   return (
     <div className="space-y-8">
-      <div className="text-center">
+      <div className="app-panel lottery-grid relative overflow-hidden rounded-lg px-5 py-8 text-center md:py-10">
+        <div className="absolute inset-x-0 top-0 h-1 bg-primary shadow-[0_0_20px_var(--primary)]" />
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary">
           <Sparkles className="h-3 w-3" /> Escolha uma modalidade
         </div>
-        <h1 className="mt-4 text-3xl font-black tracking-tight md:text-4xl">
+        <h1 className="mt-4 text-3xl font-black md:text-4xl">
           Qual loteria você quer analisar?
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
@@ -60,7 +61,7 @@ function LoteriasHub() {
         </p>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {LOTERIA_IDS.map((id) => {
           const cfg = LOTERIAS[id];
           const resumo = resumoPorLoteria.get(id);
@@ -70,10 +71,10 @@ function LoteriasHub() {
               key={id}
               to="/l/$loteria/dashboard"
               params={{ loteria: id }}
-              className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/60 p-6 backdrop-blur transition hover:border-primary/50 hover:shadow-lg"
+              className="app-panel group relative overflow-hidden rounded-lg p-5 transition hover:-translate-y-1 hover:border-primary/55 hover:shadow-[0_18px_45px_color-mix(in_oklab,var(--primary)_12%,transparent)]"
             >
               <div
-                className={`absolute inset-0 -z-10 bg-gradient-to-br ${cfg.corFundo} opacity-60 transition group-hover:opacity-100`}
+                className={`absolute inset-0 -z-10 bg-gradient-to-br ${cfg.corFundo} opacity-35 transition group-hover:opacity-65`}
               />
               <div className="flex flex-col gap-3">
                 <img
@@ -157,24 +158,24 @@ function BoloesAbertos() {
   });
 
   return (
-    <section className="bolao-panel space-y-4 p-4 md:p-6">
+    <section className="app-panel lottery-grid space-y-4 rounded-lg p-4 md:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-gold/40 bg-gold/15 text-gold">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-primary/50 bg-primary/15 text-primary shadow-[0_0_20px_color-mix(in_oklab,var(--primary)_20%,transparent)]">
             <Users className="h-4 w-4" />
           </span>
           <div>
-            <h2 className="text-lg font-black tracking-tight text-gold md:text-xl">
+            <h2 className="text-lg font-black text-primary md:text-xl">
               Bolões abertos
             </h2>
             <p className="text-xs text-muted-foreground">
-              Cada bolão traz a cor da sua modalidade — dourado é combo.
+              Escolha seu bolão e acompanhe as cotas em tempo real.
             </p>
           </div>
         </div>
         <Link
           to="/boloes/reserva"
-          className="rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:bg-gold/20"
+          className="rounded-lg border border-primary/35 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition hover:bg-primary/20"
         >
           Minhas reservas →
         </Link>

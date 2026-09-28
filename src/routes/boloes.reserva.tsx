@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PublicHeader } from "@/components/public-header";
 
 export const Route = createFileRoute("/boloes/reserva")({
   component: BuscaReserva,
@@ -47,7 +48,9 @@ function BuscaReserva() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12 md:py-20">
+    <div className="min-h-screen">
+      <PublicHeader />
+      <main className="mx-auto max-w-2xl px-4 py-12 md:py-20">
       <Button asChild variant="ghost" className="mb-8">
         <Link to="/">
           <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
@@ -55,7 +58,7 @@ function BuscaReserva() {
       </Button>
 
       {!reserva ? (
-        <div className="rounded-3xl border border-border/60 bg-card p-8 shadow-xl">
+        <div className="app-panel rounded-lg p-8">
           <div className="mb-6 text-center">
             <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
               <Search className="h-8 w-8" />
@@ -105,7 +108,7 @@ function BuscaReserva() {
             </p>
           </div>
 
-          <div className="rounded-3xl border border-border/60 bg-card p-8 shadow-2xl relative overflow-hidden">
+          <div className="app-panel relative overflow-hidden rounded-lg p-8">
             <div 
               className="absolute top-0 left-0 w-full h-2" 
               style={{ backgroundColor: LOTERIAS[reserva.boloes.loteria_id as LoteriaId].cor }} 
@@ -166,6 +169,7 @@ function BuscaReserva() {
           </div>
         </div>
       )}
+      </main>
     </div>
   );
 }
