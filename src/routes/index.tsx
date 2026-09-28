@@ -393,7 +393,7 @@ function Landing() {
                       </div>
 
                     </div>
-                  </div>
+                  </article>
                 );
               })}
             </div>
