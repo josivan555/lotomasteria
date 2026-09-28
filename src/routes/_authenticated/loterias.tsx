@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -5,6 +6,9 @@ import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { resumoOficialTodas } from "@/lib/loterias.functions";
 import { listarBoloesPublicos } from "@/lib/boloes.functions";
 import { Sparkles, CalendarDays, Trophy, Users } from "lucide-react";
+
+/** Cor dos bolões combo (várias modalidades juntas). */
+const COR_COMBO = "#f5c542";
 
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -153,25 +157,39 @@ function BoloesAbertos() {
   });
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 text-xl font-black tracking-tight md:text-2xl">
-          <Users className="h-5 w-5 text-primary" /> Bolões abertos
-        </h2>
-        <Link to="/boloes/reserva" className="text-sm font-semibold text-primary hover:underline">
+    <section className="bolao-panel space-y-4 p-4 md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-gold/40 bg-gold/15 text-gold">
+            <Users className="h-4 w-4" />
+          </span>
+          <div>
+            <h2 className="text-lg font-black tracking-tight text-gold md:text-xl">
+              Bolões abertos
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Cada bolão traz a cor da sua modalidade — dourado é combo.
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/boloes/reserva"
+          className="rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:bg-gold/20"
+        >
           Minhas reservas →
         </Link>
       </div>
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Carregando bolões...</p>
       ) : abertos.length === 0 ? (
-        <p className="rounded-xl border border-border/60 bg-card/60 p-6 text-center text-sm text-muted-foreground">
+        <p className="rounded-xl border border-dashed border-gold/25 p-6 text-center text-sm text-muted-foreground">
           Nenhum bolão aberto no momento.
         </p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {abertos.map((b) => {
             const cfg = LOTERIAS[b.loteria_id as LoteriaId];
+            const cor = b.is_combo ? COR_COMBO : cfg?.cor ?? COR_COMBO;
             const pct = Math.min(100, (b.cotas_compradas / b.total_cotas) * 100);
             return (
               <Link
@@ -179,26 +197,37 @@ function BoloesAbertos() {
                 to="/boloes/$bolaoId"
                 params={{ bolaoId: b.id }}
                 search={{ tab: "participantes" } as any}
-                className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/60 p-5 transition-all hover:border-primary/50"
-                style={{ borderTopColor: b.is_combo ? "#FFD700" : cfg?.cor, borderTopWidth: 3 }}
+                className="bolao-card group flex flex-col gap-3 p-5"
+                style={{ "--bl": cor } as CSSProperties}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold">{b.is_combo ? "COMBO ESPECIAL" : cfg?.nome}</span>
+                  <span className="bolao-chip rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide">
+                    {b.is_combo ? "Combo especial" : cfg?.nome ?? "Bolão"}
+                  </span>
                   {!b.is_combo && (
-                    <span className="text-xs text-muted-foreground">Concurso {b.concurso_numero}</span>
+                    <span className="text-xs text-muted-foreground">
+                      Concurso {b.concurso_numero}
+                    </span>
                   )}
                 </div>
-                <p className="line-clamp-2 text-sm">{b.nome}</p>
+                <p className="line-clamp-2 text-sm font-semibold">{b.nome}</p>
                 <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
+                  <div className="bolao-bar h-full" style={{ width: `${pct}%` }} />
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{b.cotas_disponiveis} cotas livres</span>
-                  <span className="font-bold text-foreground">
-                    {Number(b.valor_cota).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}/cota
+                  <span>
+                    {b.cotas_disponiveis} de {b.total_cotas} cotas livres
+                  </span>
+                  <span className="bolao-ink text-sm font-black">
+                    {brl.format(Number(b.valor_cota))}
+                    <span className="text-[11px] font-medium text-muted-foreground">
+                      /cota
+                    </span>
                   </span>
                 </div>
-                <span className="text-sm font-semibold text-primary group-hover:underline">Participar →</span>
+                <span className="bolao-ink text-sm font-semibold group-hover:underline">
+                  Participar →
+                </span>
               </Link>
             );
           })}

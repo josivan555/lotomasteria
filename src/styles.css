@@ -284,3 +284,58 @@
   );
   color: oklch(0.98 0.01 325);
 }
+
+/* ===== Área de bolões: identidade própria (dourado) + cor da modalidade ===== */
+@utility bolao-panel {
+  border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent);
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--gold) 8%, transparent),
+      transparent 45%
+    ),
+    color-mix(in srgb, var(--card) 55%, transparent);
+}
+
+@utility bolao-card {
+  border: 1px solid color-mix(in srgb, var(--bl) 38%, transparent);
+  border-radius: 1rem;
+  background:
+    linear-gradient(
+      155deg,
+      color-mix(in srgb, var(--bl) 20%, transparent),
+      transparent 62%
+    ),
+    var(--card);
+  box-shadow: inset 3px 0 0 0 color-mix(in srgb, var(--bl) 85%, transparent);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+  &:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--bl) 70%, transparent);
+    box-shadow:
+      inset 3px 0 0 0 var(--bl),
+      0 14px 34px -18px color-mix(in srgb, var(--bl) 65%, transparent);
+  }
+}
+
+@utility bolao-chip {
+  background: color-mix(in srgb, var(--bl) 24%, transparent);
+  border: 1px solid color-mix(in srgb, var(--bl) 48%, transparent);
+  color: color-mix(in srgb, var(--bl) 42%, white);
+}
+
+@utility bolao-bar {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--bl) 65%, transparent),
+    var(--bl)
+  );
+}
+
+@utility bolao-ink {
+  color: color-mix(in srgb, var(--bl) 45%, white);
+}
