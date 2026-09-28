@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -5,6 +6,9 @@ import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { resumoOficialTodas } from "@/lib/loterias.functions";
 import { listarBoloesPublicos } from "@/lib/boloes.functions";
 import { Sparkles, CalendarDays, Trophy, Users } from "lucide-react";
+
+/** Cor dos bolões combo (várias modalidades juntas). */
+const COR_COMBO = "#f5c542";
 
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
