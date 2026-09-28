@@ -193,6 +193,231 @@
   background-size: 18px 18px;
 }
 
+@utility lottery-hub-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(15rem, 0.72fr);
+  align-items: center;
+  min-height: 10.75rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--accent) 72%, transparent);
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(90deg, oklch(0.12 0.095 255 / 98%) 0%, oklch(0.14 0.105 250 / 94%) 56%, oklch(0.11 0.07 240 / 55%) 100%),
+    url("./assets/lottery-universe-bg.jpg") center 38% / cover;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--accent) 30%, transparent),
+    0 0 36px color-mix(in oklab, var(--accent) 18%, transparent);
+  padding: 1.5rem 2rem;
+}
+
+@utility lottery-hub-emblem {
+  display: grid;
+  place-items: center;
+  width: 8.25rem;
+  height: 7.5rem;
+  border-right: 1px solid color-mix(in oklab, var(--foreground) 58%, transparent);
+  margin-right: 2rem;
+  padding-right: 2rem;
+  & img {
+    width: 5.5rem;
+    height: 5.5rem;
+    object-fit: contain;
+    filter: drop-shadow(0 0 18px color-mix(in oklab, var(--neon) 35%, transparent));
+  }
+}
+
+@utility lottery-hub-copy {
+  position: relative;
+  z-index: 2;
+  & h1 {
+    font-size: clamp(2rem, 3.1vw, 3.5rem);
+    line-height: 1.02;
+    font-weight: 900;
+  }
+  & h1 span { color: var(--neon); }
+  & p {
+    max-width: 48rem;
+    margin-top: 0.75rem;
+    color: color-mix(in oklab, var(--foreground) 76%, var(--accent));
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+}
+
+@utility lottery-hub-balls {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 34%;
+  padding-right: 1.1rem;
+  background: linear-gradient(90deg, transparent, oklch(0.1 0.05 240 / 18%));
+  & span {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    width: 7.2rem;
+    margin-left: -1rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 50%, transparent);
+    border-radius: 9999px;
+    background: radial-gradient(circle at 32% 25%, oklch(0.96 0.03 160), var(--neon) 28%, oklch(0.45 0.18 155) 62%, oklch(0.18 0.1 155));
+    color: oklch(0.12 0.04 235);
+    box-shadow: inset -12px -14px 20px oklch(0.04 0.03 220 / 45%), 0 0 28px color-mix(in oklab, var(--neon) 35%, transparent);
+    font-size: 2.2rem;
+    font-weight: 900;
+  }
+  & span:nth-child(2) {
+    width: 6.5rem;
+    background: radial-gradient(circle at 32% 25%, oklch(0.96 0.02 230), oklch(0.67 0.2 250) 31%, oklch(0.3 0.17 260) 68%);
+  }
+  & span:nth-child(3) {
+    width: 5.2rem;
+    background: radial-gradient(circle at 32% 25%, oklch(0.98 0.03 90), oklch(0.83 0.18 85) 31%, oklch(0.48 0.14 65) 68%);
+    font-size: 1.7rem;
+  }
+}
+
+@utility lottery-choice-card {
+  display: flex;
+  min-height: 30.5rem;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--primary) 84%, transparent);
+  border-radius: 1.15rem;
+  background:
+    radial-gradient(circle at 86% 12%, color-mix(in oklab, var(--primary) 32%, transparent), transparent 30%),
+    linear-gradient(160deg, color-mix(in oklab, var(--primary) 15%, var(--surface-strong)), var(--surface-strong) 50%);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--primary) 28%, transparent), 0 16px 42px oklch(0.04 0.04 245 / 42%);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--primary) 36%, transparent), 0 20px 48px color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+}
+
+@utility lottery-choice-banner {
+  position: relative;
+  height: 6.35rem;
+  overflow: hidden;
+  border-bottom: 1px solid color-mix(in oklab, var(--primary) 74%, transparent);
+  background: color-mix(in oklab, var(--primary) 34%, var(--surface-strong));
+  &::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 2.2rem;
+    background: linear-gradient(transparent, color-mix(in oklab, var(--primary) 15%, var(--surface-strong)));
+  }
+}
+
+@utility lottery-choice-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.15rem 1.25rem 1.25rem;
+  & h2 { font-size: 1.35rem; line-height: 1.1; font-weight: 900; }
+}
+
+@utility lottery-choice-short {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  color: color-mix(in oklab, var(--foreground) 72%, var(--accent));
+  font-size: 0.83rem;
+  & svg { width: 1rem; height: 1rem; color: var(--primary); }
+}
+
+@utility lottery-choice-description {
+  min-height: 4.8rem;
+  margin-top: 1rem;
+  color: color-mix(in oklab, var(--foreground) 78%, var(--accent));
+  font-size: 0.88rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+@utility lottery-prize-box {
+  overflow: hidden;
+  margin-top: 0.9rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 62%, transparent);
+  border-radius: 0.85rem;
+  background: oklch(0.08 0.04 245 / 70%);
+}
+
+@utility lottery-prize-row {
+  display: grid;
+  grid-template-columns: 1.45rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.8rem;
+  & svg { width: 1.25rem; height: 1.25rem; color: var(--primary); }
+  & p { color: color-mix(in oklab, var(--foreground) 70%, var(--accent)); font-size: 0.75rem; }
+  & strong { display: block; color: var(--primary); font-size: 0.88rem; line-height: 1.3; }
+  & small { color: var(--foreground); font-weight: 500; }
+}
+
+@utility lottery-prize-next {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0.15rem 0.8rem auto;
+    height: 1px;
+    background: linear-gradient(90deg, var(--primary), transparent);
+    opacity: 0.7;
+  }
+}
+
+@utility lottery-choice-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+@utility lottery-number-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2rem;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--primary) 25%, transparent);
+  padding: 0.35rem 0.7rem;
+  color: color-mix(in oklab, var(--primary) 70%, var(--foreground));
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+  & svg { width: 0.9rem; height: 0.9rem; }
+}
+
+@utility lottery-open-button {
+  border-color: color-mix(in oklab, var(--primary) 86%, var(--foreground));
+  background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 72%, var(--foreground)), var(--primary));
+  color: var(--primary-foreground);
+  box-shadow: 0 0 22px color-mix(in oklab, var(--primary) 28%, transparent);
+}
+
+@media (max-width: 900px) {
+  .lottery-hub-hero { grid-template-columns: auto minmax(0, 1fr); padding: 1.3rem; }
+  .lottery-hub-emblem { width: 5.5rem; height: 5rem; margin-right: 1rem; padding-right: 1rem; }
+  .lottery-hub-emblem img { width: 3.8rem; height: 3.8rem; }
+  .lottery-hub-balls { display: none; }
+}
+
+@media (max-width: 560px) {
+  .lottery-hub-hero { display: block; min-height: auto; padding: 1.2rem; }
+  .lottery-hub-emblem { width: 3.6rem; height: 3.6rem; margin: 0 0 0.85rem; padding: 0; border: 0; }
+  .lottery-hub-emblem img { width: 3.6rem; height: 3.6rem; }
+  .lottery-hub-copy h1 { font-size: 2rem; }
+  .lottery-hub-copy p { font-size: 0.88rem; }
+  .lottery-choice-card { min-height: 29rem; }
+}
+
 @utility lottery-workspace {
   --lottery-soft: color-mix(in oklab, var(--primary) 18%, transparent);
   --lottery-line: color-mix(in oklab, var(--primary) 62%, transparent);
