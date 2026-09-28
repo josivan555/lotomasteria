@@ -299,12 +299,13 @@ export const obterBolao = createServerFn({ method: "GET" })
         combo_loterias: await Promise.all(
           partes.map(async (parte) => {
             if (Array.isArray(parte.rateio_oficial) && parte.rateio_oficial.length > 0) return parte;
+            if (!Array.isArray(parte.resultado_oficial) || parte.resultado_oficial.length === 0) return parte;
             const oficial = await buscarConcursoOficial(parte.loteria_id as LoteriaId, parte.concurso_numero);
             return oficial ? { ...parte, rateio_oficial: oficial.faixas } : parte;
           }),
         ),
       };
-    } else {
+    } else if (Array.isArray(bolaoAtual.resultado_oficial) && bolaoAtual.resultado_oficial.length > 0) {
       const { buscarConcursoOficial } = await import("./caixa.server");
       const oficial = await buscarConcursoOficial(
         bolaoAtual.loteria_id as LoteriaId,

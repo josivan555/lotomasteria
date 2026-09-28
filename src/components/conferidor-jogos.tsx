@@ -56,13 +56,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
     return arr;
   }, [conferidos, ordem]);
 
-  // Faixas premiadas por loteria (mínimo premiado até o total)
-  const faixas = useMemo(() => {
-    const min = Math.min(...cfg.faixas);
-    const out: number[] = [];
-    for (let k = cfg.tamanho; k >= min; k--) out.push(k);
-    return out;
-  }, [cfg]);
+  const faixas = cfg.faixas;
 
   const resumo = useMemo(
     () =>
