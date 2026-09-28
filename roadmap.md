@@ -19,3 +19,10 @@
 - [x] Mover o nome de cada modalidade para a faixa de arte no topo do cartão
 - [x] Destacar o nome em letras grandes, grossas e em caixa alta
 - [x] Conferir o nome em uma linha no computador e no celular
+
+# Conferência dos bolões
+
+- [x] Reduzir as bolas usadas para marcar o resultado
+- [x] Mostrar o progresso até completar as dezenas sorteadas
+- [x] Exibir as faixas premiadas, quantidade de jogos e valor por faixa
+- [x] Exibir o prêmio principal e o total ganho pelos jogos

@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { cn } from "@/lib/utils";
-import { Sparkles, Eraser } from "lucide-react";
+import { Sparkles, Eraser, Trophy } from "lucide-react";
+import { formatBRL } from "@/lib/credits-config";
 
 type Jogo = { dezenas: number[]; score?: number };
 
@@ -11,11 +12,13 @@ type Props = {
   jogos: Jogo[];
   loteriaId: LoteriaId;
   resultadoOficial?: number[] | null;
+  premioEstimado?: number;
+  rateio?: { faixa: string; ganhadores: number; premio: number }[] | null;
 };
 
 type Ordem = "order" | "hits-desc" | "hits-asc";
 
-export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
+export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEstimado = 0, rateio }: Props) {
   const cfg = LOTERIAS[loteriaId];
   const [selected, setSelected] = useState<Set<number>>(
     () => new Set(resultadoOficial ?? []),
@@ -53,13 +56,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
     return arr;
   }, [conferidos, ordem]);
 
-  // Faixas premiadas por loteria (mínimo premiado até o total)
-  const faixas = useMemo(() => {
-    const min = Math.min(...cfg.faixas);
-    const out: number[] = [];
-    for (let k = cfg.tamanho; k >= min; k--) out.push(k);
-    return out;
-  }, [cfg]);
+  const faixas = cfg.faixas;
 
   const resumo = useMemo(
     () =>
@@ -71,10 +68,23 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
   );
 
   const completo = selected.size === cfg.tamanho;
+  const progresso = Math.min(100, (selected.size / cfg.tamanho) * 100);
+  const premiosPorFaixa = useMemo(() => {
+    const valores = new Map<number, number>();
+    for (const [indice, item] of (rateio ?? []).entries()) {
+      const numero = Number(item.faixa.match(/\d+/)?.[0]);
+      const faixa = cfg.faixas.includes(numero) ? numero : cfg.faixas[indice];
+      if (faixa !== undefined) valores.set(faixa, item.premio);
+    }
+    return valores;
+  }, [cfg.faixas, rateio]);
+  const totalGanho = completo
+    ? conferidos.reduce((total, jogo) => total + (premiosPorFaixa.get(jogo.acertos) ?? 0), 0)
+    : 0;
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-border/40 bg-card p-4 sm:p-5">
+      <div className="rounded-lg border border-border/40 bg-card p-4 sm:p-5">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-sm font-black">Dezenas sorteadas</p>
@@ -88,23 +98,38 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
           </Badge>
         </div>
 
-        <div className="mx-auto grid max-w-md grid-cols-5 gap-1.5 sm:gap-2">
+        <div className="mb-4 rounded-lg border border-border/40 bg-secondary/25 px-3 py-3">
+          <div className="mb-2 flex items-center justify-between gap-3 text-xs">
+            <span className="font-bold text-muted-foreground">Progresso do resultado</span>
+            <span className="font-mono font-black text-primary">{selected.size}/{cfg.tamanho}</span>
+          </div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary shadow-[0_0_14px_var(--primary)] transition-[width] duration-300"
+              style={{ width: `${progresso}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="mx-auto flex max-w-xl flex-wrap justify-center gap-1.5 sm:gap-2">
           {Array.from({ length: cfg.total }, (_, i) => i + 1).map((n) => {
             const on = selected.has(n);
             return (
-              <button
+              <Button
                 key={n}
                 type="button"
+                variant="outline"
+                size="icon"
                 onClick={() => toggle(n)}
                 className={cn(
-                  "aspect-square rounded-full border text-[12px] font-bold font-mono transition-all",
+                  "h-8 w-8 shrink-0 rounded-full p-0 text-[10px] font-bold font-mono transition-all sm:h-9 sm:w-9 sm:text-[11px]",
                   on
                     ? "border-primary bg-primary text-primary-foreground scale-105 shadow-lg shadow-primary/25"
                     : "border-border/60 bg-secondary/30 text-muted-foreground hover:border-primary/50 hover:text-foreground",
                 )}
               >
                 {n.toString().padStart(2, "0")}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -130,12 +155,30 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
         </div>
       </div>
 
+      <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-primary" />
+            <div>
+              <p className="text-[10px] font-bold uppercase text-muted-foreground">Prêmio estimado principal</p>
+              <p className="text-lg font-black text-primary">{formatBRL(premioEstimado)}</p>
+            </div>
+          </div>
+          {completo && totalGanho > 0 && (
+            <div className="text-right">
+              <p className="text-[10px] font-bold uppercase text-muted-foreground">Total ganho nos jogos</p>
+              <p className="text-lg font-black text-primary">{formatBRL(totalGanho)}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {selected.size > 0 && (
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           {resumo.map((r) => (
             <div
               key={r.faixa}
-              className="rounded-xl border border-border/40 bg-card p-3 text-center"
+              className="rounded-lg border border-border/40 bg-card p-3 text-center"
             >
               <div
                 className={cn(
@@ -146,7 +189,14 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
                 {r.qtd}
               </div>
               <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                {r.faixa} acertos
+                jogos com {r.faixa} acertos
+              </div>
+              <div className="mt-1 text-[10px] font-bold text-primary">
+                {premiosPorFaixa.has(r.faixa)
+                  ? `${formatBRL(premiosPorFaixa.get(r.faixa) ?? 0)} cada`
+                  : r.faixa === cfg.faixaPrincipal && premioEstimado > 0
+                    ? `estimado ${formatBRL(premioEstimado)}`
+                    : "valor após o sorteio"}
               </div>
             </div>
           ))}
@@ -171,6 +221,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
       <div className="space-y-2">
         {listados.map((jogo) => {
           const premiado = completo && jogo.acertos >= Math.min(...cfg.faixas);
+          const premioJogo = completo ? (premiosPorFaixa.get(jogo.acertos) ?? 0) : 0;
           return (
             <div
               key={jogo.indice}
@@ -209,6 +260,11 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial }: Props) {
                 <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
                   {premiado ? "premiado" : "acertos"}
                 </div>
+                {premioJogo > 0 && (
+                  <div className="mt-0.5 text-[10px] font-black text-primary">
+                    {formatBRL(premioJogo)}
+                  </div>
+                )}
               </div>
             </div>
           );

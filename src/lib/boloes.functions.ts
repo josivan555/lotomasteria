@@ -239,7 +239,7 @@ export const obterBolao = createServerFn({ method: "GET" })
           const oficial = await buscarConcursoOficial(parte.loteria_id as LoteriaId, parte.concurso_numero);
           if (!oficial) return parte;
           mudou = true;
-          return { ...parte, resultado_oficial: oficial.dezenas };
+          return { ...parte, resultado_oficial: oficial.dezenas, rateio_oficial: oficial.faixas };
         }),
       );
 
@@ -286,6 +286,33 @@ export const obterBolao = createServerFn({ method: "GET" })
       }
     }
 
+
+    // Inclui os valores oficiais de cada faixa na tela de conferência, inclusive
+    // para bolões antigos que foram criados antes desses dados serem armazenados.
+    if ((bolaoAtual as any).is_combo) {
+      const { buscarConcursoOficial } = await import("./caixa.server");
+      const partes = Array.isArray((bolaoAtual as any).combo_loterias)
+        ? ((bolaoAtual as any).combo_loterias as any[])
+        : [];
+      bolaoAtual = {
+        ...bolaoAtual,
+        combo_loterias: await Promise.all(
+          partes.map(async (parte) => {
+            if (Array.isArray(parte.rateio_oficial) && parte.rateio_oficial.length > 0) return parte;
+            if (!Array.isArray(parte.resultado_oficial) || parte.resultado_oficial.length === 0) return parte;
+            const oficial = await buscarConcursoOficial(parte.loteria_id as LoteriaId, parte.concurso_numero);
+            return oficial ? { ...parte, rateio_oficial: oficial.faixas } : parte;
+          }),
+        ),
+      };
+    } else if (Array.isArray(bolaoAtual.resultado_oficial) && bolaoAtual.resultado_oficial.length > 0) {
+      const { buscarConcursoOficial } = await import("./caixa.server");
+      const oficial = await buscarConcursoOficial(
+        bolaoAtual.loteria_id as LoteriaId,
+        bolaoAtual.concurso_numero,
+      );
+      if (oficial) bolaoAtual = { ...bolaoAtual, rateio_oficial: oficial.faixas };
+    }
 
     const { data: p } = await supabaseAdmin
       .from("bolao_participantes")
