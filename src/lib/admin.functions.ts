@@ -82,6 +82,8 @@ export const atualizarBolao = createServerFn({ method: "POST" })
       concurso_numero: z.number().optional(),
       data_sorteio: z.string().optional(),
       horario_sorteio: z.string().optional(),
+      prazo_vendas: z.string().optional(),
+      horario_encerramento: z.string().optional(),
       total_cotas: z.number().optional(),
       valor_cota: z.number().optional(),
       premio_estimado: z.number().optional(),
