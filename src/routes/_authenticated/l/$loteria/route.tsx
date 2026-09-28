@@ -62,8 +62,28 @@ function LoteriaLayout() {
 
 
   return (
-    <div className="space-y-6">
-      <div className="app-header sticky top-[96px] z-20 -mx-4 px-3 py-2 md:-mx-8 md:top-[65px] md:px-8">
+    <div className="lottery-workspace space-y-5 md:space-y-6">
+      <section className="lottery-hero relative overflow-hidden rounded-lg">
+        <div className="lottery-hero-grid absolute inset-0" />
+        <img
+          src={cfg.banner}
+          alt=""
+          aria-hidden="true"
+          className="absolute -right-8 top-1/2 h-28 w-auto -translate-y-1/2 opacity-35 drop-shadow-2xl sm:right-4 sm:h-36 md:right-8 md:h-44 md:opacity-55"
+        />
+        <div className="relative flex min-h-32 items-center gap-4 px-5 py-6 sm:min-h-36 md:px-8">
+          <div className="lottery-logo-frame flex h-16 w-16 shrink-0 items-center justify-center rounded-lg md:h-20 md:w-20">
+            <img src={cfg.logo} alt={`Logo ${cfg.nome}`} className="max-h-12 max-w-14 object-contain md:max-h-16 md:max-w-16" />
+          </div>
+          <div className="min-w-0 max-w-2xl">
+            <p className="lottery-kicker text-[10px] font-black uppercase tracking-widest md:text-xs">Central de análise</p>
+            <h1 className="mt-1 truncate text-2xl font-black leading-tight sm:text-3xl md:text-4xl">{cfg.nome}</h1>
+            <p className="mt-1 max-w-xl text-xs font-medium text-muted-foreground sm:text-sm md:text-base">{cfg.descricaoCurta}</p>
+          </div>
+        </div>
+      </section>
+
+      <div className="lottery-nav sticky top-[96px] z-20 -mx-4 px-3 py-2 md:-mx-8 md:top-[65px] md:px-8">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
           <div className="flex items-center justify-between gap-2 md:hidden">
             <div className="flex min-w-0 items-center gap-2">
@@ -74,25 +94,25 @@ function LoteriaLayout() {
           </div>
 
           <nav className="grid grid-cols-3 gap-1.5 md:flex md:min-w-0 md:flex-1 md:flex-wrap md:gap-2">
-            <NavPill to="/l/$loteria/dashboard" loteria={loteria} cor={cfg.cor} icon={<BarChart3 className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/dashboard" loteria={loteria} icon={<BarChart3 className="h-4 w-4" />}>
               Dashboard
             </NavPill>
-            <NavPill to="/l/$loteria/gerador" loteria={loteria} cor={cfg.cor} icon={<Dice5 className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/gerador" loteria={loteria} icon={<Dice5 className="h-4 w-4" />}>
               Gerador
             </NavPill>
-            <NavPill to="/l/$loteria/historico" loteria={loteria} cor={cfg.cor} icon={<History className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/historico" loteria={loteria} icon={<History className="h-4 w-4" />}>
               Histórico
             </NavPill>
-            <NavPill to="/l/$loteria/jogos" loteria={loteria} cor={cfg.cor} icon={<Bookmark className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/jogos" loteria={loteria} icon={<Bookmark className="h-4 w-4" />}>
               Meus jogos
             </NavPill>
-            <NavPill to="/l/$loteria/resultados" loteria={loteria} cor={cfg.cor} icon={<ClipboardCheck className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/resultados" loteria={loteria} icon={<ClipboardCheck className="h-4 w-4" />}>
               Resultados
             </NavPill>
-            <NavPill to="/l/$loteria/volante" loteria={loteria} cor={cfg.cor} icon={<Printer className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/volante" loteria={loteria} icon={<Printer className="h-4 w-4" />}>
               Volante
             </NavPill>
-            <NavPill to="/l/$loteria/ajuda" loteria={loteria} cor={cfg.cor} icon={<BookOpen className="h-4 w-4" />}>
+            <NavPill to="/l/$loteria/ajuda" loteria={loteria} icon={<BookOpen className="h-4 w-4" />}>
               Como usar
             </NavPill>
           </nav>
@@ -103,25 +123,7 @@ function LoteriaLayout() {
       </div>
 
 
-      <div className="app-panel relative hidden overflow-hidden rounded-lg p-3 md:block md:p-4">
-        <div className="absolute inset-y-0 left-0 w-1 bg-primary" />
-        <div className="flex min-w-0 items-center gap-3">
-          <img
-            src={cfg.logo}
-            alt={`Logo ${cfg.nome}`}
-            className="h-9 w-auto shrink-0 rounded-md shadow-sm md:h-11"
-          />
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground md:text-xs">
-              Modalidade
-            </p>
-            <h1 className="truncate text-lg font-bold leading-tight md:text-xl">{cfg.nome}</h1>
-          </div>
-        </div>
-      </div>
-
-
-      <Outlet />
+      <div className="lottery-content"><Outlet /></div>
     </div>
   );
 }
@@ -129,13 +131,11 @@ function LoteriaLayout() {
 function NavPill({
   to,
   loteria,
-  cor,
   icon,
   children,
 }: {
   to: "/l/$loteria/dashboard" | "/l/$loteria/gerador" | "/l/$loteria/historico" | "/l/$loteria/jogos" | "/l/$loteria/resultados" | "/l/$loteria/volante" | "/l/$loteria/ajuda";
   loteria: LoteriaId;
-  cor: string;
   icon: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -147,17 +147,10 @@ function NavPill({
       params={{ loteria }}
       className={ativoBase}
       inactiveProps={{
-        className:
-          "border-line/35 bg-surface/70 text-muted-foreground hover:bg-secondary hover:text-foreground hover:border-[color-mix(in_oklab,var(--loteria-cor)_55%,transparent)]",
-        style: { ["--loteria-cor" as string]: cor },
+        className: "border-line/35 bg-surface/70 text-muted-foreground hover:border-primary/60 hover:bg-primary/10 hover:text-foreground",
       }}
       activeProps={{
-        className: "text-foreground hover:brightness-110",
-        style: {
-          borderColor: cor,
-          backgroundColor: `${cor}33`,
-          boxShadow: `0 4px 14px ${cor}40`,
-        },
+        className: "lottery-nav-active border-primary bg-primary/20 text-foreground hover:brightness-110",
       }}
     >
       {icon}

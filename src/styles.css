@@ -193,6 +193,76 @@
   background-size: 18px 18px;
 }
 
+@utility lottery-workspace {
+  --lottery-soft: color-mix(in oklab, var(--primary) 18%, transparent);
+  --lottery-line: color-mix(in oklab, var(--primary) 62%, transparent);
+}
+
+@utility lottery-hero {
+  border: 1px solid var(--lottery-line);
+  background:
+    linear-gradient(90deg, color-mix(in oklab, var(--primary) 18%, var(--surface-strong)) 0%, var(--surface-strong) 58%, color-mix(in oklab, var(--primary) 16%, var(--surface-strong)) 100%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--primary) 24%, transparent),
+    0 18px 48px color-mix(in oklab, var(--primary) 14%, transparent);
+}
+
+@utility lottery-hero-grid {
+  background-image:
+    linear-gradient(112deg, transparent 0 54%, color-mix(in oklab, var(--primary) 18%, transparent) 54.2%, transparent 54.6%),
+    radial-gradient(circle, color-mix(in oklab, var(--primary) 42%, transparent) 1px, transparent 1px);
+  background-size: auto, 20px 20px;
+  mask-image: linear-gradient(90deg, transparent, black 55%);
+}
+
+@utility lottery-logo-frame {
+  border: 1px solid color-mix(in oklab, var(--primary) 65%, transparent);
+  background: color-mix(in oklab, var(--primary) 16%, var(--surface-strong));
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--foreground) 12%, transparent),
+    0 0 28px color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+@utility lottery-kicker {
+  color: color-mix(in oklab, var(--primary) 78%, var(--foreground));
+}
+
+@utility lottery-nav {
+  border-block: 1px solid color-mix(in oklab, var(--primary) 26%, transparent);
+  background: color-mix(in oklab, var(--surface-strong) 94%, transparent);
+  box-shadow: 0 12px 28px oklch(0.04 0.04 245 / 45%);
+  backdrop-filter: blur(20px);
+}
+
+@utility lottery-nav-active {
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--foreground) 12%, transparent),
+    0 4px 18px color-mix(in oklab, var(--primary) 28%, transparent);
+}
+
+@utility lottery-content {
+  & .app-panel,
+  & [class*="bg-card"] {
+    border-color: color-mix(in oklab, var(--primary) 30%, var(--border));
+    background-image: linear-gradient(145deg, color-mix(in oklab, var(--primary) 7%, var(--card)), var(--card));
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--primary) 12%, transparent),
+      0 16px 38px oklch(0.04 0.04 245 / 34%);
+  }
+
+  & h1,
+  & h2,
+  & h3 {
+    text-shadow: 0 2px 18px color-mix(in oklab, var(--primary) 14%, transparent);
+  }
+
+  & input,
+  & textarea,
+  & [role="combobox"] {
+    border-color: color-mix(in oklab, var(--primary) 28%, var(--border));
+  }
+}
+
 
 @utility ball {
   display: inline-flex;

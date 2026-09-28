@@ -6,3 +6,10 @@
 - [x] Redesign public and authenticated navigation
 - [x] Restyle lottery selection, authentication, and pool detail screens
 - [x] Verify desktop and mobile rendering
+
+# Estilo temático nos jogos de todas as loterias
+
+- [x] Criar cabeçalho compartilhado com banner e identidade da modalidade
+- [x] Padronizar navegação interna com cor e brilho de cada loteria
+- [x] Aplicar acabamento temático aos painéis e formulários internos
+- [ ] Verificar páginas internas no computador e celular — aguardando uma sessão ativa na prévia
