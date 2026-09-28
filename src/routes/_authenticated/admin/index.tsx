@@ -214,6 +214,49 @@ function AdminDashboard() {
                                   className="h-7 text-xs w-20"
                                 />
                               </div>
+
+                              <div className="space-y-1.5 pt-1 border-t border-border/30">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] text-muted-foreground uppercase font-black w-16 shrink-0">Sorteio</span>
+                                  <Input 
+                                    type="date"
+                                    value={editBolaoForm.data_sorteio} 
+                                    onChange={e => setEditBolaoForm({...editBolaoForm, data_sorteio: e.target.value})}
+                                    className="h-7 text-xs"
+                                  />
+                                  <Input 
+                                    type="time"
+                                    value={editBolaoForm.horario_sorteio} 
+                                    onChange={e => setEditBolaoForm({...editBolaoForm, horario_sorteio: e.target.value})}
+                                    className="h-7 text-xs w-24"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] text-muted-foreground uppercase font-black w-16 shrink-0">Vendas até</span>
+                                  <Input 
+                                    type="date"
+                                    value={editBolaoForm.prazo_vendas} 
+                                    onChange={e => setEditBolaoForm({...editBolaoForm, prazo_vendas: e.target.value})}
+                                    className="h-7 text-xs"
+                                  />
+                                  <Input 
+                                    type="time"
+                                    value={editBolaoForm.horario_encerramento} 
+                                    onChange={e => setEditBolaoForm({...editBolaoForm, horario_encerramento: e.target.value})}
+                                    className="h-7 text-xs w-24"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] text-muted-foreground uppercase font-black w-16 shrink-0">Prêmio R$</span>
+                                  <Input 
+                                    type="number"
+                                    step="0.01"
+                                    value={editBolaoForm.premio_estimado ?? ""} 
+                                    onChange={e => setEditBolaoForm({...editBolaoForm, premio_estimado: e.target.value ? parseFloat(e.target.value) : undefined})}
+                                    className="h-7 text-xs"
+                                  />
+                                </div>
+                              </div>
                             </div>
                           ) : (
                             <div className="flex flex-col">
@@ -331,7 +374,11 @@ function AdminDashboard() {
                                       concurso_numero: b.concurso_numero,
                                       total_cotas: b.total_cotas,
                                       valor_cota: b.valor_cota,
-                                      premio_estimado: b.premio_estimado
+                                      premio_estimado: b.premio_estimado,
+                                      data_sorteio: b.data_sorteio,
+                                      horario_sorteio: String(b.horario_sorteio ?? "").slice(0, 5),
+                                      prazo_vendas: String(b.prazo_vendas ?? "").slice(0, 10),
+                                      horario_encerramento: String(b.horario_encerramento ?? "").slice(0, 5),
                                     });
                                   }}
                                 >
