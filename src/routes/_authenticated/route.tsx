@@ -103,7 +103,7 @@ function AuthedLayout() {
                 </div>
               )}
 
-              <NotificationBell />
+              <div className="md:hidden"><NotificationBell /></div>
               <Button asChild variant="ghost" size="icon" className="md:hidden" aria-label="Loterias">
                 <Link to="/loterias">
                   <Home className="h-5 w-5" />
