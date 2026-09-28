@@ -63,7 +63,7 @@ function LoteriaLayout() {
 
   return (
     <div className="space-y-6">
-      <div className="sticky top-[96px] z-20 -mx-4 border-b border-border/50 bg-card/85 px-3 py-2 backdrop-blur md:-mx-8 md:top-[61px] md:px-8">
+      <div className="app-header sticky top-[96px] z-20 -mx-4 px-3 py-2 md:-mx-8 md:top-[65px] md:px-8">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
           <div className="flex items-center justify-between gap-2 md:hidden">
             <div className="flex min-w-0 items-center gap-2">
@@ -103,7 +103,8 @@ function LoteriaLayout() {
       </div>
 
 
-      <div className="hidden rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur md:block md:p-4">
+      <div className="app-panel relative hidden overflow-hidden rounded-lg p-3 md:block md:p-4">
+        <div className="absolute inset-y-0 left-0 w-1 bg-primary" />
         <div className="flex min-w-0 items-center gap-3">
           <img
             src={cfg.logo}
@@ -139,7 +140,7 @@ function NavPill({
   children: React.ReactNode;
 }) {
   const ativoBase =
-    "inline-flex w-full shrink-0 items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full border-2 px-2 py-1.5 text-[11px] font-semibold shadow-md transition md:w-auto md:justify-start md:gap-2 md:px-4 md:py-2 md:text-sm";
+    "inline-flex w-full shrink-0 items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-lg border px-2 py-1.5 text-[11px] font-bold shadow-md transition md:w-auto md:justify-start md:gap-2 md:px-4 md:py-2 md:text-sm";
   return (
     <Link
       to={to}
@@ -147,11 +148,11 @@ function NavPill({
       className={ativoBase}
       inactiveProps={{
         className:
-          "border-border/70 bg-secondary/60 text-foreground hover:bg-secondary hover:border-[color-mix(in_oklab,var(--loteria-cor)_45%,transparent)]",
+          "border-line/35 bg-surface/70 text-muted-foreground hover:bg-secondary hover:text-foreground hover:border-[color-mix(in_oklab,var(--loteria-cor)_55%,transparent)]",
         style: { ["--loteria-cor" as string]: cor },
       }}
       activeProps={{
-        className: "text-white hover:brightness-110",
+        className: "text-foreground hover:brightness-110",
         style: {
           borderColor: cor,
           backgroundColor: `${cor}33`,

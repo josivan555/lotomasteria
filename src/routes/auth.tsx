@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { ShieldCheck } from "lucide-react";
+import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
 
 const searchSchema = z.object({
   mode: z.enum(["login", "signup"]).optional().default("login"),
@@ -92,8 +94,16 @@ function AuthPage() {
         <Link to="/" className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           ← LotoMaster IA
         </Link>
-        <div className="rounded-2xl border border-border/60 bg-card/70 p-8 backdrop-blur">
-          <h1 className="text-2xl font-bold">{isSignup ? "Criar conta" : "Entrar"}</h1>
+        <div className="app-panel relative overflow-hidden rounded-lg p-6 sm:p-8">
+          <div className="absolute inset-x-0 top-0 h-1 bg-primary shadow-[0_0_18px_var(--primary)]" />
+          <div className="mb-6 flex items-center gap-3">
+            <img src={logoAsset.url} alt="LotoMaster IA" className="h-12 w-12 object-contain" />
+            <div>
+              <p className="text-xl font-black">Loto<span className="neon-text">Master</span></p>
+              <p className="text-[10px] font-semibold uppercase text-muted-foreground">Sonhe · escolha · ganhe</p>
+            </div>
+          </div>
+          <h1 className="text-2xl font-black">{isSignup ? "Criar conta" : "Entrar"}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isSignup ? "Comece a gerar jogos inteligentes." : "Acesse suas análises e jogos salvos."}
           </p>
@@ -137,6 +147,7 @@ function AuthPage() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
+              <ShieldCheck className="h-4 w-4" />
               {loading ? "Aguarde..." : isSignup ? "Criar conta" : "Entrar"}
             </Button>
           </form>
