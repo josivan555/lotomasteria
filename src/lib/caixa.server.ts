@@ -93,7 +93,12 @@ export async function buscarResumoTodas(): Promise<ResumoOficial[]> {
 export async function buscarConcursoOficial(
   loteria: LoteriaId,
   numero: number,
-): Promise<{ numero: number; dezenas: number[]; data_apuracao: string } | null> {
+): Promise<{
+  numero: number;
+  dezenas: number[];
+  data_apuracao: string;
+  faixas: FaixaPremio[];
+} | null> {
   try {
     const res = await fetch(
       `https://servicebus2.caixa.gov.br/portaldeloterias/api/${loteria}/${numero}`,
@@ -103,7 +108,16 @@ export async function buscarConcursoOficial(
     const j = (await res.json()) as CaixaDetalhe;
     const dz = (j.listaDezenas ?? []).map(Number).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
     if (dz.length === 0) return null;
-    return { numero: j.numero, dezenas: dz, data_apuracao: parseData(j.dataApuracao) };
+    return {
+      numero: j.numero,
+      dezenas: dz,
+      data_apuracao: parseData(j.dataApuracao),
+      faixas: (j.listaRateioPremio ?? []).map((f) => ({
+        faixa: f.descricaoFaixa,
+        ganhadores: f.numeroDeGanhadores ?? 0,
+        premio: f.valorPremio ?? 0,
+      })),
+    };
   } catch {
     return null;
   }

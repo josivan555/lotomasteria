@@ -464,6 +464,8 @@ function DetalheBolao() {
                         jogos={parte.jogos ?? []}
                         loteriaId={parte.loteria_id as LoteriaId}
                         resultadoOficial={Array.isArray(parte.resultado_oficial) ? parte.resultado_oficial : null}
+                        premioEstimado={parte.premio_estimado ?? 0}
+                        rateio={Array.isArray(parte.rateio_oficial) ? parte.rateio_oficial : null}
                       />
                     </div>
                   ))}
@@ -473,6 +475,8 @@ function DetalheBolao() {
                   jogos={(bolao.game_snapshot as any[]) ?? []}
                   loteriaId={bolao.loteria_id as LoteriaId}
                   resultadoOficial={Array.isArray(bolao.resultado_oficial) ? (bolao.resultado_oficial as number[]) : null}
+                  premioEstimado={bolao.premio_estimado ?? 0}
+                  rateio={Array.isArray((bolao as any).rateio_oficial) ? (bolao as any).rateio_oficial : null}
                 />
               )}
             </TabsContent>
