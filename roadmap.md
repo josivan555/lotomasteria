@@ -2,7 +2,7 @@
 
 - [x] Map shared layouts, controls, and route-specific styling
 - [x] Create the original lottery-universe background
-- [ ] Apply global colors, typography, surfaces, controls, and responsive behavior
-- [ ] Redesign public and authenticated navigation
-- [ ] Restyle lottery selection, authentication, and pool detail screens
+- [x] Apply global colors, typography, surfaces, controls, and responsive behavior
+- [x] Redesign public and authenticated navigation
+- [x] Restyle lottery selection, authentication, and pool detail screens
 - [ ] Verify desktop and mobile rendering

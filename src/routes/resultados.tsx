@@ -6,6 +6,7 @@ import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Trophy, Users, Coins, CalendarClock, MapPin, ChevronRight } from "lucide-react";
 import { formatBRL } from "@/lib/credits-config";
+import { PublicHeader } from "@/components/public-header";
 
 type Resumo = Awaited<ReturnType<typeof resumoOficialTodas>>;
 
@@ -58,24 +59,7 @@ function ResultadosPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-6 md:py-6">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-          <span className="ball ball-gold h-8! w-8! text-sm!">L</span>
-          LotoMaster <span className="text-primary">IA</span>
-        </Link>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/auth" search={{ mode: "login" }}>
-              Entrar
-            </Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link to="/auth" search={{ mode: "signup" }}>
-              Criar conta
-            </Link>
-          </Button>
-        </div>
-      </header>
+      <PublicHeader />
 
       <main className="mx-auto max-w-6xl px-4 pb-24 md:px-6">
         <section className="py-10">
@@ -149,7 +133,7 @@ function ResumoCard({ r }: { r: ResumoOficialDto }) {
   const principal = r.faixas[0];
 
   return (
-    <article className="flex flex-col rounded-2xl border border-border/60 bg-card/60 p-5">
+    <article className="app-panel flex flex-col rounded-lg p-5">
       <header className="flex items-center gap-3">
         <img src={cfg.logo} alt={`Logo ${cfg.nome}`} className="h-8 w-auto rounded" />
         <div>
