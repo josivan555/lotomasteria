@@ -276,47 +276,45 @@ function Landing() {
                 const esgotado = b.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(b.status) || dataSorteioPassada;
                 
                 return (
-                  <div key={b.id} className="app-panel group relative flex flex-col overflow-hidden rounded-lg hover:border-primary/50 transition-all hover:-translate-y-1">
-                    <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: b.is_combo ? '#FFD700' : cfg.cor }} />
-                    <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundColor: b.is_combo ? '#FFD700' : cfg.cor }} />
-                    
+                  <article
+                    key={b.id}
+                    data-loteria={b.is_combo ? undefined : b.loteria_id}
+                    className="lottery-choice-card group relative transition-all hover:-translate-y-1"
+                    style={b.is_combo ? ({ "--primary": "oklch(0.83 0.16 88)" } as import("react").CSSProperties) : undefined}
+                  >
                     {b.is_combo && (
-                      <div className="absolute -right-12 top-6 rotate-45 bg-gradient-to-r from-yellow-400 to-amber-600 text-black text-[9px] font-black py-1 px-12 shadow-sm z-10 border-y border-white/20">
+                      <div className="absolute -right-12 top-6 rotate-45 bg-gradient-to-r from-yellow-400 to-amber-600 text-black text-[9px] font-black py-1 px-12 shadow-sm z-20 border-y border-white/20">
                         COMBO {Array.isArray(b.combo_loterias) ? b.combo_loterias.length : ''}x
                       </div>
                     )}
-                    
-                    <div className="p-5 flex-1 flex flex-col">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex items-center gap-2">
-                          {b.is_combo ? (
-                            <div className="flex -space-x-2">
-                              {(b.combo_loterias as any[])?.slice(0, 3).map((p: any, i: number) => (
-                                <img key={i} src={LOTERIAS[p.loteria_id as LoteriaId].logo} alt="logo" className="h-6 w-auto border-2 border-background rounded-full bg-background" />
-                              ))}
-                            </div>
-                          ) : (
-                            <img src={cfg.logo} alt={cfg.nome} className="h-6 w-auto" />
-                          )}
-                          <span className="font-bold text-sm">{b.is_combo ? 'COMBO ESPECIAL' : cfg.nome}</span>
+
+                    <div className="lottery-choice-banner">
+                      <img
+                        src={b.is_combo ? LOTERIAS[(b.combo_loterias as any[])?.[0]?.loteria_id as LoteriaId]?.banner ?? cfg?.banner : cfg.banner}
+                        alt={b.is_combo ? 'Combo especial' : cfg.nome}
+                        className="h-full w-full object-cover object-left"
+                        loading="lazy"
+                      />
+                      <div className="lottery-choice-banner-title">
+                        <h2>{b.is_combo ? 'COMBO' : cfg.nome}</h2>
+                      </div>
+                    </div>
+
+                    <div className="lottery-choice-body flex-1 flex flex-col">
+                      <div className="flex justify-between items-center gap-2 mb-3">
+                        <div className="rounded-full bg-primary/15 border border-primary/40 text-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                          {b.is_combo ? 'Múltiplos Concursos' : `Concurso ${b.concurso_numero}`}
                         </div>
-                        <div className="flex flex-col items-end gap-1">
-                          <div className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                            {b.is_combo ? 'Múltiplos Concursos' : `Concurso ${b.concurso_numero}`}
-                          </div>
-                          {(b.status === 'encerrado' || b.status === 'sorteado' || b.status === 'conferido' || dataSorteioPassada) && (
-                            <span className="text-[10px] font-black uppercase text-red-500 animate-pulse bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
-                              Encerrado
-                            </span>
-                          )}
-                        </div>
+                        {(b.status === 'encerrado' || b.status === 'sorteado' || b.status === 'conferido' || dataSorteioPassada) && (
+                          <span className="text-[10px] font-black uppercase text-destructive animate-pulse bg-destructive/10 px-2 py-0.5 rounded-full border border-destructive/20">
+                            Encerrado
+                          </span>
+                        )}
                       </div>
 
-
-                      <h3 className="text-lg font-bold mb-1 group-hover:text-primary transition-colors">{b.nome}</h3>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
-                        <Clock className="h-3 w-3" />
-                        <span>Sorteio: {new Date(b.data_sorteio).toLocaleDateString('pt-BR')} às {b.horario_sorteio}</span>
+                      <h3 className="text-lg font-bold mb-1 text-foreground">{b.nome}</h3>
+                      <div className="lottery-choice-short mb-4">
+                        <Clock /> Sorteio: {new Date(b.data_sorteio).toLocaleDateString('pt-BR')} às {b.horario_sorteio}
                       </div>
 
                       <div className="rounded-xl p-4 mb-4 text-center border" style={{ backgroundColor: b.is_combo ? '#FFD70010' : `${cfg.cor}10`, borderColor: b.is_combo ? '#FFD70020' : `${cfg.cor}20` }}>
@@ -395,7 +393,7 @@ function Landing() {
                       </div>
 
                     </div>
-                  </div>
+                  </article>
                 );
               })}
             </div>
