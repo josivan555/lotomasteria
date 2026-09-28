@@ -148,7 +148,7 @@ function BoloesAbertos() {
   });
   const abertos = (boloes as any[]).filter((b) => {
     const horario = b.horario_encerramento || "23:59:59";
-    const prazo = new Date(`${b.prazo_vendas}T${horario}`);
+    const prazo = new Date(`${String(b.prazo_vendas).slice(0, 10)}T${horario}`);
     return b.cotas_disponiveis > 0 && new Date() <= prazo && !["encerrado", "sorteado", "conferido"].includes(b.status);
   });
 
