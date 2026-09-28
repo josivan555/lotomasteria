@@ -445,6 +445,8 @@
   .lottery-hub-copy h1 { font-size: 2rem; }
   .lottery-hub-copy p { font-size: 0.88rem; }
   .lottery-choice-card { min-height: 29rem; }
+  .lottery-choice-banner { height: 6.1rem; }
+  .lottery-choice-banner-title { padding: 0 1rem 0.7rem; }
 }
 
 @utility lottery-workspace {
