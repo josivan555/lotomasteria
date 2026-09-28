@@ -13,3 +13,9 @@
 - [x] Padronizar navegação interna com cor e brilho de cada loteria
 - [x] Aplicar acabamento temático aos painéis e formulários internos
 - [x] Verificar a tela de escolha das loterias no computador e celular
+
+# Nome das loterias em destaque no topo
+
+- [x] Mover o nome de cada modalidade para a faixa de arte no topo do cartão
+- [x] Destacar o nome em letras grandes, grossas e em caixa alta
+- [x] Conferir o nome em uma linha no computador e no celular

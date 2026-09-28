@@ -87,14 +87,14 @@ function LoteriasHub() {
                   className="h-full w-full object-cover object-left"
                   loading="lazy"
                 />
+                <div className="lottery-choice-banner-title">
+                  <h2>{cfg.nome}</h2>
+                </div>
               </div>
               <div className="lottery-choice-body">
-                <div>
-                  <h2>{cfg.nome}</h2>
-                  <p className="lottery-choice-short">
-                    <Clock3 /> {cfg.descricaoCurta}
-                  </p>
-                </div>
+                <p className="lottery-choice-short">
+                  <Clock3 /> {cfg.descricaoCurta}
+                </p>
 
                 <p className="lottery-choice-description">{cfg.descricaoLonga}</p>
 
