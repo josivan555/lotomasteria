@@ -178,6 +178,7 @@ function BoloesAbertos() {
                 key={b.id}
                 to="/boloes/$bolaoId"
                 params={{ bolaoId: b.id }}
+                search={{ tab: "participantes" } as any}
                 className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/60 p-5 transition-all hover:border-primary/50"
                 style={{ borderTopColor: b.is_combo ? "#FFD700" : cfg?.cor, borderTopWidth: 3 }}
               >
