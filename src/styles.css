@@ -768,7 +768,7 @@
   & strong {
     font-variant-numeric: tabular-nums;
     font-size: 0.72rem;
-    color: var(--destructive);
+    color: color-mix(in oklab, var(--destructive) 72%, var(--destructive-foreground));
     text-shadow: 0 0 12px color-mix(in oklab, var(--destructive) 35%, transparent);
   }
 }
