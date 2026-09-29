@@ -241,3 +241,110 @@ export const excluirParticipanteBolao = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const relatorioParticipantesBolao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ bolaoId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    await checkAdmin(context);
+    const { obterBolao } = await import("./boloes.functions");
+    const bolao: any = await obterBolao({ data: { id: data.bolaoId } });
+    if (!bolao) throw new Error("Bolão não encontrado.");
+
+    const { data: rows, error } = await context.supabase
+      .from("bolao_participantes")
+      .select("nome_completo, celular, quantidade_cotas, valor_total, status, created_at")
+      .eq("bolao_id", data.bolaoId)
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+
+    // Partes (bolão simples = 1 parte; combo = cada loteria)
+    const partes: any[] = bolao.is_combo
+      ? (Array.isArray(bolao.combo_loterias) ? bolao.combo_loterias : [])
+      : [{
+          loteria_id: bolao.loteria_id,
+          concurso_numero: bolao.concurso_numero,
+          data_sorteio: bolao.data_sorteio,
+          jogos: bolao.game_snapshot ?? [],
+          resultado_oficial: bolao.resultado_oficial ?? [],
+          rateio_oficial: bolao.rateio_oficial ?? [],
+        }];
+
+    let resultadoCompleto = partes.length > 0;
+    let premioTotal = 0;
+    const resumoPartes = partes.map((p) => {
+      const res: number[] = Array.isArray(p.resultado_oficial) ? p.resultado_oficial : [];
+      if (res.length === 0) resultadoCompleto = false;
+      const set = new Set(res);
+      const premioPorAcerto = new Map<number, number>();
+      for (const f of (Array.isArray(p.rateio_oficial) ? p.rateio_oficial : [])) {
+        const n = Number(String(f.faixa).match(/\d+/)?.[0]);
+        if (Number.isFinite(n) && !premioPorAcerto.has(n)) premioPorAcerto.set(n, Number(f.premio) || 0);
+      }
+      const acertosPorJogo = (Array.isArray(p.jogos) ? p.jogos : []).map(
+        (j: any) => (j.dezenas ?? []).filter((d: number) => set.has(d)).length,
+      );
+      const premiados: Record<number, number> = {};
+      let premio = 0;
+      for (const a of acertosPorJogo) {
+        const v = premioPorAcerto.get(a) ?? 0;
+        if (v > 0) { premiados[a] = (premiados[a] ?? 0) + 1; premio += v; }
+      }
+      premioTotal += premio;
+      return {
+        loteria_id: p.loteria_id as string,
+        concurso_numero: p.concurso_numero as number,
+        data_sorteio: p.data_sorteio as string,
+        resultado: res,
+        total_jogos: acertosPorJogo.length,
+        melhor_acerto: acertosPorJogo.length ? Math.max(...acertosPorJogo) : 0,
+        premiados,
+        premio,
+        sem_valores: res.length > 0 && premioPorAcerto.size === 0,
+      };
+    });
+
+    // Libera valores no dia seguinte ao sorteio (maior data entre as partes)
+    const ultimaData = partes.map((p) => String(p.data_sorteio).slice(0, 10)).sort().at(-1) ?? String(bolao.data_sorteio).slice(0, 10);
+    const liberacao = new Date(`${ultimaData}T00:00:00-03:00`);
+    liberacao.setDate(liberacao.getDate() + 1);
+    const valoresLiberados = resultadoCompleto && new Date() >= liberacao;
+
+    const totalCotas = Number(bolao.total_cotas) || 1;
+    const valorPorCota = premioTotal / totalCotas;
+
+    const grupos = new Map<string, any>();
+    for (const r of rows ?? []) {
+      const key = String(r.celular ?? "").replace(/\D/g, "") || r.nome_completo.trim().toLowerCase();
+      const g = grupos.get(key) ?? {
+        nome: r.nome_completo.trim(), celular: r.celular, cotas: 0, cotas_pagas: 0,
+        valor_pago: 0, compras: [] as { data: string; cotas: number; status: string }[],
+      };
+      g.cotas += r.quantidade_cotas;
+      if (r.status === "pago") { g.cotas_pagas += r.quantidade_cotas; g.valor_pago += Number(r.valor_total) || 0; }
+      g.compras.push({ data: r.created_at, cotas: r.quantidade_cotas, status: r.status });
+      grupos.set(key, g);
+    }
+    const participantes = [...grupos.values()]
+      .map((g) => ({ ...g, receber: valoresLiberados ? g.cotas_pagas * valorPorCota : null }))
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+
+    return {
+      bolao: {
+        id: bolao.id, nome: bolao.nome, is_combo: !!bolao.is_combo, loteria_id: bolao.loteria_id,
+        concurso_numero: bolao.concurso_numero, data_sorteio: bolao.data_sorteio,
+        horario_sorteio: bolao.horario_sorteio, prazo_vendas: bolao.prazo_vendas,
+        horario_encerramento: bolao.horario_encerramento, total_cotas: bolao.total_cotas,
+        valor_cota: Number(bolao.valor_cota), total_jogos: bolao.total_jogos,
+        premio_estimado: Number(bolao.premio_estimado ?? 0), status: bolao.status,
+      },
+      partes: resumoPartes,
+      resultadoCompleto,
+      valoresLiberados,
+      liberacao: liberacao.toISOString(),
+      premioTotal,
+      valorPorCota,
+      cotasVendidas: participantes.reduce((s, p) => s + p.cotas_pagas, 0),
+      participantes,
+    };
+  });
