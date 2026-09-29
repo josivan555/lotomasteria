@@ -637,7 +637,7 @@
 
 /* ===== Experiência interna dos bolões: painéis claros sobre universo verde ===== */
 @utility bolao-experience {
-  --background: oklch(0.13 0.055 173);
+  --background: oklch(0.975 0.01 225);
   --foreground: oklch(0.22 0.055 255);
   --card: oklch(0.985 0.008 225);
   --card-foreground: oklch(0.22 0.055 255);
@@ -654,6 +654,9 @@
   --border: oklch(0.79 0.04 230 / 72%);
   --input: oklch(0.78 0.05 230 / 82%);
   --ring: oklch(0.72 0.2 150);
+  --surface: oklch(0.97 0.012 225 / 96%);
+  --surface-strong: oklch(0.94 0.018 225 / 98%);
+  --line: oklch(0.72 0.08 220 / 58%);
   min-height: 100vh;
   background:
     radial-gradient(circle at 0 22%, color-mix(in oklab, var(--primary) 34%, transparent), transparent 18rem),
@@ -667,6 +670,15 @@
     background: linear-gradient(145deg, color-mix(in oklab, var(--card) 98%, transparent), color-mix(in oklab, var(--secondary) 94%, transparent));
     box-shadow: 0 18px 48px oklch(0.06 0.06 190 / 34%);
     backdrop-filter: blur(22px);
+  }
+
+  & > .app-header {
+    --foreground: oklch(0.97 0.015 225);
+    --muted-foreground: oklch(0.76 0.045 235);
+    --secondary: oklch(0.205 0.055 245);
+    --secondary-foreground: oklch(0.94 0.02 225);
+    --border: oklch(0.55 0.13 225 / 42%);
+    --line: oklch(0.68 0.15 220 / 55%);
   }
 }
 

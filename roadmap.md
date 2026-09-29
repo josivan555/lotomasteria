@@ -31,4 +31,4 @@
 
 - [x] Aplicar painéis claros e fundo verde temático na página do bolão
 - [x] Destacar abas, participantes, resumo de cotas e compra com verde vibrante
-- [ ] Verificar Jogos, Conferir e Participantes no computador e celular
+- [x] Verificar Jogos, Conferir e Participantes no computador e celular
