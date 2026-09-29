@@ -269,8 +269,8 @@ function Landing() {
                 
                 const agora = new Date();
                 const horario = b.horario_encerramento || '23:59:59';
-                const dataPrazo = new Date(`${b.prazo_vendas}T${horario}`);
-                const dataSorteioObj = new Date(b.data_sorteio);
+                const dataPrazo = new Date(`${String(b.prazo_vendas).slice(0, 10)}T${horario}`);
+                const dataSorteioObj = new Date(`${b.data_sorteio}T00:00:00`);
                 const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
                 const prazoEncerrado = agora > dataPrazo;
                 const esgotado = b.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(b.status) || dataSorteioPassada;
@@ -314,7 +314,7 @@ function Landing() {
 
                       <h3 className="text-lg font-bold mb-1 text-foreground">{b.nome}</h3>
                       <div className="lottery-choice-short mb-4">
-                        <Clock /> Sorteio: {new Date(b.data_sorteio).toLocaleDateString('pt-BR')} às {b.horario_sorteio}
+                        <Clock /> Sorteio: {new Date(`${b.data_sorteio}T00:00:00`).toLocaleDateString('pt-BR')} às {b.horario_sorteio}
                       </div>
 
                       <div className="rounded-xl p-4 mb-4 text-center border" style={{ backgroundColor: b.is_combo ? '#FFD70010' : `${cfg.cor}10`, borderColor: b.is_combo ? '#FFD70020' : `${cfg.cor}20` }}>
@@ -436,7 +436,7 @@ function Landing() {
                             </td>
                             <td className="px-4 py-3 text-xs font-mono">{b.is_combo ? 'Múltiplos' : b.concurso_numero}</td>
                             <td className="px-4 py-3 text-xs">
-                              {new Date(b.data_sorteio).toLocaleDateString('pt-BR')}
+                              {new Date(`${b.data_sorteio}T00:00:00`).toLocaleDateString('pt-BR')}
                             </td>
                             <td className="px-4 py-3">
                               <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${b.status === 'encerrado' ? 'bg-red-500/10 text-red-500' : 'bg-secondary text-muted-foreground'}`}>
