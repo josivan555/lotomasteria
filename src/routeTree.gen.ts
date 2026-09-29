@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResultadosRouteImport } from './routes/resultados'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -49,6 +50,11 @@ const ResultadosRoute = ResultadosRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContatoRoute = ContatoRouteImport.update({
+  id: '/contato',
+  path: '/contato',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -180,6 +186,7 @@ const AuthenticatedLLoteriaAjudaRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/resultados': typeof ResultadosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/resultados': typeof ResultadosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -234,6 +242,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/resultados': typeof ResultadosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -263,6 +272,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/contato'
     | '/dashboard'
     | '/resultados'
     | '/sitemap.xml'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/contato'
     | '/dashboard'
     | '/resultados'
     | '/sitemap.xml'
@@ -316,6 +327,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/contato'
     | '/dashboard'
     | '/resultados'
     | '/sitemap.xml'
@@ -345,6 +357,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ContatoRoute: typeof ContatoRoute
   DashboardRoute: typeof DashboardRoute
   ResultadosRoute: typeof ResultadosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -377,6 +390,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contato': {
+      id: '/contato'
+      path: '/contato'
+      fullPath: '/contato'
+      preLoaderRoute: typeof ContatoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -608,6 +628,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ContatoRoute: ContatoRoute,
   DashboardRoute: DashboardRoute,
   ResultadosRoute: ResultadosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

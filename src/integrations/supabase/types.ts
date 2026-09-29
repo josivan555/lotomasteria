@@ -150,6 +150,27 @@ export type Database = {
           },
         ]
       }
+      comentarios_contato: {
+        Row: {
+          created_at: string
+          id: string
+          mensagem: string
+          nome: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mensagem: string
+          nome: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mensagem?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       concursos: {
         Row: {
           created_at: string

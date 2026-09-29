@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, Home, Search, TicketCheck, UserRound } from "lucide-react";
+import { BarChart3, Home, MessageCircle, Search, TicketCheck, UserRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
@@ -34,6 +34,9 @@ export function PublicHeader({ showSearch = false }: { showSearch?: boolean }) {
           </Button>
           <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
             <Link to="/resultados"><BarChart3 /> Resultados</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/contato"><MessageCircle /> Contato</Link>
           </Button>
         </nav>
         <div className="flex items-center gap-2">

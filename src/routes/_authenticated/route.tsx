@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect, Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureBrowserSession } from "@/lib/session-guard";
-import { LogOut, Home, ShieldCheck, TicketCheck } from "lucide-react";
+import { LogOut, Home, ShieldCheck, TicketCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notification-bell";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -140,6 +140,15 @@ function AuthedLayout() {
                   inactiveProps={{ className: "text-muted-foreground" }}
                 >
                   <TicketCheck className="mr-1.5 h-4 w-4" /> Bolões
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+                <Link
+                  to="/contato"
+                  activeProps={{ className: "text-primary" }}
+                  inactiveProps={{ className: "text-muted-foreground" }}
+                >
+                  <MessageCircle className="mr-1.5 h-4 w-4" /> Contato
                 </Link>
               </Button>
               {profile?.isAdmin && (
