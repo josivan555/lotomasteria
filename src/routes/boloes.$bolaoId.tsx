@@ -1,7 +1,8 @@
 import { createFileRoute, useParams, Link, useSearch } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { obterBolao, comprarCotasBolao } from "@/lib/boloes.functions";
+import { obterBolao, comprarCotasBolao, bolaoShareInfo } from "@/lib/boloes.functions";
+import { OG_BANNERS } from "@/lib/og-banners";
 import { listarParticipantesBolao, atualizarParticipanteBolao, excluirParticipanteBolao } from "@/lib/admin.functions";
 import { meuPerfil } from "@/lib/loterias.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
