@@ -352,8 +352,10 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
     
     // Verificar se o prazo de vendas expirou
     const agora = new Date();
-    const horario = bolao.horario_encerramento || '23:59:59';
-    const dataPrazo = new Date(`${String(bolao.prazo_vendas).slice(0, 10)}T${horario}`);
+    // Horários do bolão são sempre no fuso de Brasília (UTC-3), independente do servidor
+    const horarioRaw = String(bolao.horario_encerramento || '23:59:59');
+    const horario = horarioRaw.length === 5 ? `${horarioRaw}:00` : horarioRaw.slice(0, 8);
+    const dataPrazo = new Date(`${String(bolao.prazo_vendas).slice(0, 10)}T${horario}-03:00`);
     
     // Buscar perfil para verificar se é admin
     const session = await supabase.auth.getSession();

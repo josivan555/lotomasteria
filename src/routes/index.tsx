@@ -300,7 +300,7 @@ function Landing() {
                 
                 const agora = new Date();
                 const horario = b.horario_encerramento || '23:59:59';
-                const dataPrazo = new Date(`${String(b.prazo_vendas).slice(0, 10)}T${horario}`);
+                const dataPrazo = new Date(`${String(b.prazo_vendas).slice(0, 10)}T${String(horario).length === 5 ? horario + ":00" : String(horario).slice(0, 8)}-03:00`);
                 const dataSorteioObj = new Date(`${b.data_sorteio}T00:00:00`);
                 const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
                 const prazoEncerrado = agora > dataPrazo;
