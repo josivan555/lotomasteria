@@ -753,7 +753,7 @@
   min-height: 1.75rem;
   align-items: center;
   gap: 0.32rem;
-  border: 1px solid color-mix(in oklab, var(--primary) 72%, transparent);
+  border: 2px solid var(--destructive);
   border-radius: 0.45rem;
   background: color-mix(in oklab, var(--primary) 16%, var(--surface-strong));
   padding: 0.28rem 0.52rem;
@@ -763,7 +763,7 @@
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
-  box-shadow: 0 0 16px color-mix(in oklab, var(--primary) 16%, transparent);
+  box-shadow: 0 0 16px color-mix(in oklab, var(--destructive) 26%, transparent);
 
   & strong {
     font-variant-numeric: tabular-nums;
