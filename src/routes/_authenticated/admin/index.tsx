@@ -12,6 +12,7 @@ import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { toast } from "sonner";
 import { useRouter, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
+import { AdminParticipantesDialog } from "@/components/admin-participantes-dialog";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
@@ -26,6 +27,7 @@ function AdminDashboard() {
   const updateBolao = useServerFn(atualizarBolao);
 
   const [editingBolaoId, setEditingBolaoId] = useState<string | null>(null);
+  const [participantesBolaoId, setParticipantesBolaoId] = useState<string | null>(null);
   const [editBolaoForm, setEditBolaoForm] = useState<any>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [searchUser, setSearchUser] = useState("");
@@ -92,6 +94,7 @@ function AdminDashboard() {
 
   return (
     <div className="space-y-6 px-4 py-6 md:px-0">
+      <AdminParticipantesDialog bolaoId={participantesBolaoId} onClose={() => setParticipantesBolaoId(null)} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-card/40 backdrop-blur border-border/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -357,11 +360,11 @@ function AdminDashboard() {
                                   size="icon" 
                                   variant="ghost" 
                                   className="h-8 w-8 text-primary hover:bg-primary/10"
-                                  asChild
+                                  title="Ver participantes"
+                                  aria-label="Ver participantes"
+                                  onClick={() => setParticipantesBolaoId(b.id)}
                                 >
-                                  <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
-                                    <Users className="h-4 w-4" />
-                                  </Link>
+                                  <Users className="h-4 w-4" />
                                 </Button>
                                 <Button 
                                   size="icon" 
