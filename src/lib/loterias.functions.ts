@@ -348,8 +348,27 @@ export const resultadoDoConcurso = createServerFn({ method: "GET" })
     z.object({ loteria: loteriaEnum, numero: z.number().int().positive() }).parse(raw),
   )
   .handler(async ({ data }) => {
-    const r = await fetchCaixa(data.loteria, data.numero);
-    if (!r || !r.listaDezenas?.length) return null;
+    let r = await fetchCaixa(data.loteria, data.numero);
+    if (!r || !r.listaDezenas?.length) {
+      await new Promise((ok) => setTimeout(ok, 800));
+      r = await fetchCaixa(data.loteria, data.numero);
+    }
+    if (!r || !r.listaDezenas?.length) {
+      // Fallback: usa o histórico já sincronizado no banco (sem valores de prêmio)
+      const { data: local } = await serverPublicClient()
+        .from("concursos")
+        .select("numero, data_apuracao, dezenas")
+        .eq("loteria", data.loteria)
+        .eq("numero", data.numero)
+        .maybeSingle();
+      if (!local || !local.dezenas?.length) return null;
+      return {
+        numero: local.numero,
+        data_apuracao: local.data_apuracao,
+        dezenas: [...local.dezenas].sort((a, b) => a - b),
+        rateio: [] as { acertos: number | null; descricao: string; ganhadores: number; premio: number }[],
+      };
+    }
     const dz = r.listaDezenas.map(Number).sort((a, b) => a - b);
     const faixasCfg = LOTERIAS[data.loteria].faixas;
     const rateio = (r.listaRateioPremio ?? []).map((f, i) => {

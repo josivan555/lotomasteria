@@ -48,6 +48,14 @@ import {
   Pin,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useEffect, useMemo, useState } from "react";
 
 /* Ícones visuais estilo infográfico para os filtros */
@@ -294,6 +302,7 @@ function Gerador() {
   const salvarLote = useServerFn(salvarJogosComCreditos);
   const saldoFn = useServerFn(meuSaldo);
   const router = useRouter();
+  const [avisoSync, setAvisoSync] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: saldo } = useQuery({ queryKey: ["saldo"], queryFn: () => saldoFn({}) });
@@ -559,22 +568,8 @@ function Gerador() {
   const semSaldo = !ilimitado && saldoAtual + 1e-9 < custoCreditos;
 
   function gerar() {
-    if (!stats) {
-      toast.warning("Histórico vazio ou desatualizado!", {
-        description:
-          "Sincronize o banco de dados com os sorteios oficiais antes de gerar jogos. Levando você para o Histórico...",
-        duration: 6000,
-      });
-      router.navigate({ to: "/l/$loteria/historico", params: { loteria } });
-      return;
-    }
-    if (historicoDesatualizado) {
-      toast.warning("Histórico desatualizado!", {
-        description:
-          "Há sorteios novos para sincronizar. Atualize o histórico para gerar jogos com estatísticas completas. Levando você para o Histórico...",
-        duration: 6000,
-      });
-      router.navigate({ to: "/l/$loteria/historico", params: { loteria } });
+    if (!stats || historicoDesatualizado) {
+      setAvisoSync(true);
       return;
     }
     if (semSaldo) {
@@ -715,6 +710,32 @@ function Gerador() {
 
   return (
     <div className="space-y-6">
+      <Dialog open={avisoSync} onOpenChange={setAvisoSync}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-primary" /> Sincronize o histórico
+            </DialogTitle>
+            <DialogDescription>
+              {!concursosAll.length
+                ? "O histórico de sorteios ainda está vazio."
+                : `Existem sorteios novos (último oficial: concurso ${ultimoOficial?.numero}; seu histórico vai até o ${ultimoSalvo}).`}{" "}
+              Para gerar jogos com estatísticas corretas, é preciso sincronizar os novos sorteios primeiro.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAvisoSync(false)}>Fechar</Button>
+            <Button
+              onClick={() => {
+                setAvisoSync(false);
+                router.navigate({ to: "/l/$loteria/historico", params: { loteria } });
+              }}
+            >
+              Ir para o Histórico
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div>
         <h2 className="text-xl font-bold md:text-2xl">Gerador Inteligente · {cfg.nome}</h2>
         <p className="text-sm text-muted-foreground">
