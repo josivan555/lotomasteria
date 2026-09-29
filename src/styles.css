@@ -747,3 +747,26 @@
   border: 1px solid color-mix(in oklab, var(--primary) 25%, var(--border));
   background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 9%, var(--card)), color-mix(in oklab, var(--primary) 18%, var(--card)));
 }
+
+@utility bolao-countdown {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.32rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 72%, transparent);
+  border-radius: 0.45rem;
+  background: color-mix(in oklab, var(--primary) 16%, var(--surface-strong));
+  padding: 0.28rem 0.52rem;
+  color: var(--primary);
+  font-size: 0.64rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 0 16px color-mix(in oklab, var(--primary) 16%, transparent);
+
+  & strong {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.72rem;
+  }
+}

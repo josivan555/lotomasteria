@@ -20,6 +20,37 @@ import { useState, useEffect } from "react";
 import { NotificationBell } from "@/components/notification-bell";
 import logoAsset from "@/assets/lotomaster-logo.png.asset.json";
 
+const CINCO_HORAS_MS = 5 * 60 * 60 * 1000;
+
+function ContagemRegressiva({ prazo }: { prazo: Date }) {
+  const [restante, setRestante] = useState(() => prazo.getTime() - Date.now());
+
+  useEffect(() => {
+    const atualizar = () => setRestante(prazo.getTime() - Date.now());
+    atualizar();
+    const timer = window.setInterval(atualizar, 1000);
+    return () => window.clearInterval(timer);
+  }, [prazo]);
+
+  if (restante <= 0 || restante > CINCO_HORAS_MS) return null;
+
+  const totalSegundos = Math.floor(restante / 1000);
+  const horas = Math.floor(totalSegundos / 3600);
+  const minutos = Math.floor((totalSegundos % 3600) / 60);
+  const segundos = totalSegundos % 60;
+  const relogio = [horas, minutos, segundos]
+    .map((valor) => valor.toString().padStart(2, "0"))
+    .join(":");
+
+  return (
+    <div className="bolao-countdown" role="timer" aria-live="off" aria-label={`Vendas encerram em ${relogio}`}>
+      <Clock className="h-3.5 w-3.5" />
+      <span>Encerra em</span>
+      <strong>{relogio}</strong>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/")({
   head: () => ({
     links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/" }],
@@ -305,7 +336,8 @@ function Landing() {
                         <div className="rounded-full bg-primary/15 border border-primary/40 text-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
                           {b.is_combo ? 'Múltiplos Concursos' : `Concurso ${b.concurso_numero}`}
                         </div>
-                        {(b.status === 'encerrado' || b.status === 'sorteado' || b.status === 'conferido' || dataSorteioPassada) && (
+                        {!esgotado && <ContagemRegressiva prazo={dataPrazo} />}
+                        {(b.status === 'encerrado' || b.status === 'sorteado' || b.status === 'conferido' || dataSorteioPassada || prazoEncerrado) && (
                           <span className="text-[10px] font-black uppercase text-destructive animate-pulse bg-destructive/10 px-2 py-0.5 rounded-full border border-destructive/20">
                             Encerrado
                           </span>
