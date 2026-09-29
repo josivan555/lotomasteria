@@ -370,11 +370,11 @@ function Landing() {
 
                       <div className="grid grid-cols-2 gap-3 mb-6">
                         <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
-                          <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Valor Cota</p>
+                          <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Valor Cota</p>
                           <p className="text-sm font-black" style={{ color: b.is_combo ? '#B8860B' : cfg.cor }}>R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
                         </div>
                         <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
-                          <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold">Disponível</p>
+                          <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Disponível</p>
                           <p className="text-sm font-black text-foreground">
                             {b.cotas_disponiveis !== undefined ? `${b.cotas_disponiveis} / ${b.total_cotas}` : b.total_cotas}
                           </p>
