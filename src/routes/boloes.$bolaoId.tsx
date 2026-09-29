@@ -1,7 +1,8 @@
 import { createFileRoute, useParams, Link, useSearch } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { obterBolao, comprarCotasBolao } from "@/lib/boloes.functions";
+import { obterBolao, comprarCotasBolao, bolaoShareInfo } from "@/lib/boloes.functions";
+import { OG_BANNERS } from "@/lib/og-banners";
 import { listarParticipantesBolao, atualizarParticipanteBolao, excluirParticipanteBolao } from "@/lib/admin.functions";
 import { meuPerfil } from "@/lib/loterias.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
@@ -21,16 +22,38 @@ import { toast } from "sonner";
 import { PublicHeader } from "@/components/public-header";
 
 export const Route = createFileRoute("/boloes/$bolaoId")({
-  head: () => ({
-    meta: [
-      { title: "Bolão | LotoMaster IA" },
-      { name: "description", content: "Consulte jogos, confira resultados e participe dos bolões LotoMaster IA." },
-      { property: "og:title", content: "Bolão | LotoMaster IA" },
-      { property: "og:description", content: "Consulte jogos, confira resultados e participe dos bolões LotoMaster IA." },
+  loader: async ({ params }) => {
+    try {
+      return await bolaoShareInfo({ data: { id: params.bolaoId } });
+    } catch {
+      return null;
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const base = "https://lotomasteria.lovable.app";
+    const info = loaderData;
+    const cfg = info ? LOTERIAS[info.loteriaId as LoteriaId] : undefined;
+    const banner = info ? OG_BANNERS[info.loteriaId as LoteriaId] : undefined;
+    const nomeLimpo = info ? info.nome.trim().replace(/^BOL[ÃA]O\s+/i, "") : "";
+    const titulo = info ? `Bolão ${nomeLimpo} — LotoMaster IA` : "Bolão | LotoMaster IA";
+    const descricao = info
+      ? `${nomeLimpo}${info.isCombo ? " (Combo especial)" : ""} · Concurso ${info.concurso} · Cota ${formatBRL(info.valorCota)} · Prêmio estimado ${formatBRL(info.premioEstimado)}. Garanta a sua cota!`
+      : "Consulte jogos, confira resultados e participe dos bolões LotoMaster IA.";
+    const meta: Array<Record<string, string>> = [
+      { title: titulo },
+      { name: "description", content: descricao },
+      { property: "og:title", content: titulo },
+      { property: "og:description", content: descricao },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+      { property: "og:url", content: `${base}/boloes/${params.bolaoId}` },
+      { name: "twitter:card", content: banner ? "summary_large_image" : "summary" },
+    ];
+    if (banner) {
+      meta.push({ property: "og:image", content: `${base}${banner}` });
+      meta.push({ name: "twitter:image", content: `${base}${banner}` });
+    }
+    return { meta };
+  },
   validateSearch: (search: Record<string, unknown>) => ({
     tab: (search.tab as string) || "jogos",
   }),
