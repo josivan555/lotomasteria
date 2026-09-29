@@ -50,8 +50,6 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
     if (banner) {
       meta.push({ property: "og:image", content: `${base}${banner}` });
       meta.push({ name: "twitter:image", content: `${base}${banner}` });
-      meta.push({ property: "og:image:width", content: "1200" });
-      meta.push({ property: "og:image:height", content: "630" });
     }
     return { meta };
   },
