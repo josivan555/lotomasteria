@@ -32,3 +32,8 @@
 - [x] Aplicar painéis claros e fundo verde temático na página do bolão
 - [x] Destacar abas, participantes, resumo de cotas e compra com verde vibrante
 - [x] Verificar Jogos, Conferir e Participantes no computador e celular
+
+# Contagem regressiva das cotas
+
+- [x] Mostrar horas, minutos e segundos nas últimas 5 horas de vendas
+- [x] Ocultar a contagem antes da janela de 5 horas e depois do encerramento
