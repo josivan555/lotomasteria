@@ -37,7 +37,7 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
     const nomeLimpo = info ? info.nome.trim().replace(/^BOL[ÃA]O\s+/i, "") : "";
     const titulo = info ? `Bolão ${nomeLimpo} — LotoMaster IA` : "Bolão | LotoMaster IA";
     const descricao = info
-      ? `${nomeLimpo}${info.isCombo ? " (Combo especial)" : ` · ${cfg?.nome ?? "Bolão"}`} · Concurso ${info.concurso} · Cota ${formatBRL(info.valorCota)} · Prêmio estimado ${formatBRL(info.premioEstimado)}. Garanta a sua cota!`
+      ? `${nomeLimpo}${info.isCombo ? " (Combo especial)" : ""} · Concurso ${info.concurso} · Cota ${formatBRL(info.valorCota)} · Prêmio estimado ${formatBRL(info.premioEstimado)}. Garanta a sua cota!`
       : "Consulte jogos, confira resultados e participe dos bolões LotoMaster IA.";
     const meta: Array<Record<string, string>> = [
       { title: titulo },
