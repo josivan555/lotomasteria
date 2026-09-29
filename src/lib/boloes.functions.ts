@@ -5,6 +5,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { LOTERIA_IDS, type LoteriaId } from "./loterias-config";
 
+// Dados leves do bolão para montar o preview de compartilhamento (og: tags).
+export const bolaoShareInfo = createServerFn({ method: "GET" })
+  .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
+  .handler(async ({ data }) => {
+    const { data: bolao, error } = await supabase
+      .from("boloes")
+      .select("nome, loteria_id, is_combo, combo_loterias, concurso_numero, premio_estimado, valor_cota")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error || !bolao) return null;
+    const partes: any[] = Array.isArray(bolao.combo_loterias) ? (bolao.combo_loterias as any[]) : [];
+    const loteriaId = bolao.is_combo && partes[0]?.loteria_id ? String(partes[0].loteria_id) : String(bolao.loteria_id);
+    return {
+      nome: String(bolao.nome),
+      loteriaId,
+      isCombo: !!bolao.is_combo,
+      concurso: Number(bolao.concurso_numero),
+      premioEstimado: Number(bolao.premio_estimado ?? 0),
+      valorCota: Number(bolao.valor_cota ?? 0),
+    };
+  });
+
 const loteriaEnum = z.enum(LOTERIA_IDS as [LoteriaId, ...LoteriaId[]]);
 
 export const criarBolao = createServerFn({ method: "POST" })
