@@ -483,14 +483,19 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
   });
 
 export const buscarReservaBolao = createServerFn({ method: "GET" })
-  .inputValidator((raw: unknown) => z.object({ codigo: z.string().min(3) }).parse(raw))
+  .inputValidator((raw: unknown) => z.object({
+    codigo: z.string().trim().min(3).max(100),
+    bolaoId: z.string().uuid().optional(),
+  }).parse(raw))
   .handler(async ({ data }) => {
     // 1. Tentar busca exata por código de referência
-    let { data: reserva, error } = await supabaseAdmin
+    let buscaPorCodigo = supabaseAdmin
       .from("bolao_participantes")
       .select("*, boloes(*)")
-      .eq("codigo_referencia", data.codigo.toUpperCase())
-      .maybeSingle();
+      .eq("codigo_referencia", data.codigo.toUpperCase());
+    if (data.bolaoId) buscaPorCodigo = buscaPorCodigo.eq("bolao_id", data.bolaoId);
+
+    let { data: reserva, error } = await buscaPorCodigo.maybeSingle();
 
     if (error) throw new Error(error.message);
 
@@ -499,10 +504,13 @@ export const buscarReservaBolao = createServerFn({ method: "GET" })
       const query = data.codigo.trim();
       // Apenas busca por nome se tiver pelo menos 3 caracteres para evitar resultados demais
       if (query.length >= 3) {
-        const { data: reservasPorNome, error: nameError } = await supabaseAdmin
+        let buscaPorNome = supabaseAdmin
           .from("bolao_participantes")
           .select("*, boloes(*)")
-          .ilike("nome_completo", `%${query}%`)
+          .ilike("nome_completo", `%${query}%`);
+        if (data.bolaoId) buscaPorNome = buscaPorNome.eq("bolao_id", data.bolaoId);
+
+        const { data: reservasPorNome, error: nameError } = await buscaPorNome
           .order("created_at", { ascending: false })
           .limit(1);
 

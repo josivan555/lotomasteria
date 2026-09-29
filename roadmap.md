@@ -37,3 +37,10 @@
 
 - [x] Mostrar horas, minutos e segundos nas últimas 5 horas de vendas
 - [x] Ocultar a contagem antes da janela de 5 horas e depois do encerramento
+
+# Abas e consulta de reserva no bolão
+
+- [x] Reordenar as abas começando por Participantes e Conferir
+- [x] Adicionar a aba Ver reserva ao próprio bolão
+- [x] Permitir buscar por nome ou código somente dentro do bolão aberto
+- [x] Direcionar reservas pendentes para o pagamento PIX
