@@ -261,6 +261,9 @@ function DetalheBolao() {
         <Button asChild variant="ghost" size="sm">
           <Link to="/"><ChevronLeft className="mr-2 h-4 w-4" /> Voltar</Link>
         </Button>
+        <Button variant="outline" size="sm" className="font-bold" onClick={handleCompartilhar}>
+          <Share2 className="mr-2 h-4 w-4" /> Compartilhar
+        </Button>
       </div>
  
       <div className="flex flex-col gap-5 lg:grid lg:grid-cols-5">
