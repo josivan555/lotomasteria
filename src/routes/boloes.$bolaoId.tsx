@@ -99,6 +99,23 @@ function DetalheBolao() {
   const prazoEncerrado = agora > dataPrazo;
   const esgotado = bolao.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada;
 
+  const handleCompartilhar = async () => {
+    const nomeLimpo = bolao.nome.trim().replace(/^BOL[ÃA]O\s+/i, "");
+    const titulo = `Bolão ${nomeLimpo} — LotoMaster IA`;
+    const texto = `${bolao.is_combo ? "Combo especial" : `Concurso ${bolao.concurso_numero}`} · Cota ${formatBRL(bolao.valor_cota)} · Prêmio estimado ${formatBRL(bolao.premio_estimado || 0)}. Garanta a sua cota!`;
+    const url = `${window.location.origin}/boloes/${bolaoId}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: titulo, text: texto, url });
+      } catch {
+        /* usuário cancelou */
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copiado! Cole no WhatsApp para compartilhar.");
+    }
+  };
+
   if (sucesso) {
     const handleDownloadImage = async () => {
       if (comprovanteRef.current === null) return;
@@ -243,6 +260,9 @@ function DetalheBolao() {
       <div className="flex justify-between items-center mb-6">
         <Button asChild variant="ghost" size="sm">
           <Link to="/"><ChevronLeft className="mr-2 h-4 w-4" /> Voltar</Link>
+        </Button>
+        <Button variant="outline" size="sm" className="font-bold" onClick={handleCompartilhar}>
+          <Share2 className="mr-2 h-4 w-4" /> Compartilhar
         </Button>
       </div>
  
