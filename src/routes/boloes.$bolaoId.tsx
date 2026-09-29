@@ -68,8 +68,9 @@ function DetalheBolao() {
   const cfg = LOTERIAS[bolao.loteria_id as LoteriaId];
   const progresso = (bolao.cotas_compradas / bolao.total_cotas) * 100;
   const agora = new Date();
-  const horario = bolao.horario_encerramento || '23:59:59';
-  const dataPrazo = new Date(`${String(bolao.prazo_vendas).slice(0, 10)}T${horario}`);
+  const horarioRaw = String(bolao.horario_encerramento || '23:59:59');
+  const horario = horarioRaw.length === 5 ? `${horarioRaw}:00` : horarioRaw.slice(0, 8);
+  const dataPrazo = new Date(`${String(bolao.prazo_vendas).slice(0, 10)}T${horario}-03:00`);
   const dataSorteioObj = new Date(`${bolao.data_sorteio}T00:00:00`);
   const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
   const prazoEncerrado = agora > dataPrazo;
