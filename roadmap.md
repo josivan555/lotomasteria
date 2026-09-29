@@ -44,3 +44,7 @@
 - [x] Adicionar a aba Ver reserva ao próprio bolão
 - [x] Permitir buscar por nome ou código somente dentro do bolão aberto
 - [x] Direcionar reservas pendentes para o pagamento PIX
+# Cartões de bolão na home
+
+- [x] Evitar que os rótulos dos botões saiam para fora do cartão
+- [x] Colocar o valor do prêmio em destaque no cartão
