@@ -143,6 +143,9 @@ function Landing() {
           <Button asChild variant="ghost" size="sm" className="px-2 sm:px-4">
             <Link to="/resultados">Resultados</Link>
           </Button>
+          <Button asChild variant="ghost" size="sm" className="px-2 sm:px-4">
+            <Link to="/contato">Contato</Link>
+          </Button>
           {!isLoggedIn ? (
             <div className="flex items-center gap-2">
               <Button asChild variant="ghost" size="sm" className="px-2 sm:px-4 hidden sm:inline-flex">
