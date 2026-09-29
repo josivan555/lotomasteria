@@ -811,3 +811,14 @@
     text-shadow: 0 0 12px color-mix(in oklab, var(--destructive) 35%, transparent);
   }
 }
+
+/* Mobile scroll performance: fixed backgrounds and backdrop blur force full repaints on each scroll frame */
+@media (max-width: 768px), (hover: none) {
+  html, body, .bolao-experience, [class*="lottery-"] {
+    background-attachment: scroll !important;
+  }
+  *, *::before, *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
