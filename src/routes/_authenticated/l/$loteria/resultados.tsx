@@ -91,7 +91,11 @@ function Resultados() {
       queryKey: ["resultado-concurso", loteria, numero],
       queryFn: () => porConcurso({ data: { loteria, numero } }),
       staleTime: 5 * 60_000,
-      enabled: !!oficial && numero <= oficial.numero,
+      retry: 2,
+      // Resultado vazio (ainda não disponível) é refeito a cada minuto
+      refetchInterval: (q: { state: { data: unknown } }) => (q.state.data ? false : 60_000),
+      // Sem o último oficial (falha na Caixa), tenta mesmo assim: o servidor usa o histórico local
+      enabled: !oficial || numero <= oficial.numero,
     })),
   });
 
