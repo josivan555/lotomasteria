@@ -26,3 +26,9 @@
 - [x] Mostrar o progresso até completar as dezenas sorteadas
 - [x] Exibir as faixas premiadas, quantidade de jogos e valor por faixa
 - [x] Exibir o prêmio principal e o total ganho pelos jogos
+
+# Tema claro dos bolões
+
+- [x] Aplicar painéis claros e fundo verde temático na página do bolão
+- [x] Destacar abas, participantes, resumo de cotas e compra com verde vibrante
+- [ ] Verificar Jogos, Conferir e Participantes no computador e celular
