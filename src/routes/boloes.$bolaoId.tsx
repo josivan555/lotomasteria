@@ -386,11 +386,11 @@ function DetalheBolao() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="bolao-shell w-full p-4 sm:p-5">
-            <TabsList className="bolao-tabs grid w-full grid-cols-2 gap-1 sm:grid-cols-4">
-              <TabsTrigger value="participantes">Participantes</TabsTrigger>
-              <TabsTrigger value="conferir">Conferir</TabsTrigger>
-              <TabsTrigger value="jogos">Jogos do Bolão</TabsTrigger>
-              <TabsTrigger value="reserva">Ver reserva</TabsTrigger>
+            <TabsList className="bolao-tabs grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-4">
+              <TabsTrigger className="min-h-9" value="participantes">Participantes</TabsTrigger>
+              <TabsTrigger className="min-h-9" value="conferir">Conferir</TabsTrigger>
+              <TabsTrigger className="min-h-9" value="jogos">Jogos do Bolão</TabsTrigger>
+              <TabsTrigger className="min-h-9" value="reserva">Ver reserva</TabsTrigger>
             </TabsList>
 
             
