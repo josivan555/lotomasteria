@@ -352,10 +352,13 @@ function Landing() {
                         <Clock /> Sorteio: {new Date(`${b.data_sorteio}T00:00:00`).toLocaleDateString('pt-BR')} às {b.horario_sorteio}
                       </div>
 
-                      <div className="rounded-xl p-4 mb-4 text-center border" style={{ backgroundColor: b.is_combo ? '#FFD70010' : `${cfg.cor}10`, borderColor: b.is_combo ? '#FFD70020' : `${cfg.cor}20` }}>
-                        <p className="text-[10px] uppercase tracking-widest font-black mb-1" style={{ color: b.is_combo ? '#B8860B' : cfg.cor }}>Prêmio Estimado Total</p>
+                      <div className="bolao-prize mb-4 text-center">
+                        <p className="bolao-prize-label">
+                          <Trophy className="h-3.5 w-3.5" />
+                          Prêmio Estimado Total
+                        </p>
 
-                        <p className="text-2xl font-black text-foreground">
+                        <p className="bolao-prize-value">
                           {b.is_combo 
                             ? `R$ ${(b.combo_loterias as any[])?.reduce((acc, p) => acc + (p.premio_estimado || 0), 0).toLocaleString('pt-BR')}`
                             : b.premio_estimado ? `R$ ${b.premio_estimado.toLocaleString('pt-BR')}` : '---'
