@@ -59,8 +59,8 @@ function DetalheBolao() {
   const progresso = (bolao.cotas_compradas / bolao.total_cotas) * 100;
   const agora = new Date();
   const horario = bolao.horario_encerramento || '23:59:59';
-  const dataPrazo = new Date(`${bolao.prazo_vendas}T${horario}`);
-  const dataSorteioObj = new Date(bolao.data_sorteio);
+  const dataPrazo = new Date(`${String(bolao.prazo_vendas).slice(0, 10)}T${horario}`);
+  const dataSorteioObj = new Date(`${bolao.data_sorteio}T00:00:00`);
   const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
   const prazoEncerrado = agora > dataPrazo;
   const esgotado = bolao.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada;
@@ -268,7 +268,7 @@ function DetalheBolao() {
               <div className="grid gap-3 text-sm border-t border-border pt-6">
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Clock className="h-4 w-4" style={{ color: cfg.cor }} />
-                  <span>Sorteio: <strong>{new Date(bolao.data_sorteio).toLocaleDateString('pt-BR')} às {bolao.horario_sorteio}</strong></span>
+                  <span>Sorteio: <strong>{new Date(`${bolao.data_sorteio}T00:00:00`).toLocaleDateString('pt-BR')} às {bolao.horario_sorteio}</strong></span>
                 </div>
 
                 {bolao.is_combo ? (
