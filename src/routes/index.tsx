@@ -391,18 +391,18 @@ function Landing() {
 
                       <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 mt-auto">
                         {esgotado ? (
-                          <div className="flex flex-col gap-2 w-full mt-auto">
+                          <div className="flex flex-col gap-2 w-full mt-auto sm:col-span-2">
                             <div className="text-center py-2 px-4 rounded-lg bg-destructive/10 text-destructive text-[10px] font-bold uppercase tracking-wider">
                               Participações Encerradas
                             </div>
                             <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
-                              <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+                              <Button className="w-full min-w-0 px-2.5 text-[13px] font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
 
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                                   Participantes
                                 </Link>
                               </Button>
-                              <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+                              <Button variant="outline" className="w-full min-w-0 px-2.5 text-[13px] font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
 
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
                                   Ver Jogos
@@ -412,12 +412,12 @@ function Landing() {
                           </div>
                         ) : (
                           <>
-                            <Button className="w-full font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+                            <Button className="w-full min-w-0 px-2.5 text-[13px] font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                                 Ver Reservas
                               </Link>
                             </Button>
-                            <Button variant="outline" className="w-full font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+                            <Button variant="outline" className="w-full min-w-0 px-2.5 text-[13px] font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
                                 Ver Jogos
                               </Link>
