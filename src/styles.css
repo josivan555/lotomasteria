@@ -757,7 +757,7 @@
   border-radius: 0.45rem;
   background: color-mix(in oklab, var(--primary) 16%, var(--surface-strong));
   padding: 0.28rem 0.52rem;
-  color: var(--destructive);
+  color: color-mix(in oklab, var(--destructive) 78%, var(--destructive-foreground));
   font-size: 0.64rem;
   font-weight: 800;
   line-height: 1;
