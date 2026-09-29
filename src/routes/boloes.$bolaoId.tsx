@@ -1,7 +1,7 @@
 import { createFileRoute, useParams, Link, useSearch } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { obterBolao, comprarCotasBolao, bolaoShareInfo } from "@/lib/boloes.functions";
+import { obterBolao, comprarCotasBolao, bolaoShareInfo, buscarReservaBolao } from "@/lib/boloes.functions";
 import { OG_BANNERS } from "@/lib/og-banners";
 import { listarParticipantesBolao, atualizarParticipanteBolao, excluirParticipanteBolao } from "@/lib/admin.functions";
 import { meuPerfil } from "@/lib/loterias.functions";
@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConferidorJogos } from "@/components/conferidor-jogos";
 
-import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, Download, Copy, Share2, Trash2, Edit2, Check, ExternalLink, TicketCheck, LockKeyhole, CreditCard } from "lucide-react";
+import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, Download, Copy, Share2, Trash2, Edit2, Check, ExternalLink, TicketCheck, CreditCard, Search, AlertCircle, QrCode } from "lucide-react";
 import { useState, useRef } from "react";
 import { toPng } from 'html-to-image';
 import { toast } from "sonner";
@@ -55,7 +55,9 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
     return { meta };
   },
   validateSearch: (search: Record<string, unknown>) => ({
-    tab: (search.tab as string) || "jogos",
+    tab: ["participantes", "conferir", "jogos", "reserva"].includes(String(search.tab))
+      ? String(search.tab)
+      : "participantes",
   }),
   component: DetalheBolao,
 });
@@ -65,6 +67,7 @@ function DetalheBolao() {
   const { tab } = useSearch({ from: "/boloes/$bolaoId" });
   const getBolao = useServerFn(obterBolao);
   const comprarCotas = useServerFn(comprarCotasBolao);
+  const [activeTab, setActiveTab] = useState(tab);
 
   const [form, setForm] = useState({ nome: "", celular: "", cotas: 1 });
   const [sucesso, setSucesso] = useState<{ ref: string; total: number; pix?: any } | null>(null);
@@ -382,11 +385,12 @@ function DetalheBolao() {
             </p>
           </div>
 
-          <Tabs defaultValue={tab} className="bolao-shell w-full p-4 sm:p-5">
-            <TabsList className="bolao-tabs w-full grid grid-cols-3">
-              <TabsTrigger value="jogos">Jogos do Bolão</TabsTrigger>
-              <TabsTrigger value="conferir">Conferir</TabsTrigger>
-              <TabsTrigger value="participantes">Participantes</TabsTrigger>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="bolao-shell w-full p-4 sm:p-5">
+            <TabsList className="bolao-tabs grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-4">
+              <TabsTrigger className="min-h-9" value="participantes">Participantes</TabsTrigger>
+              <TabsTrigger className="min-h-9" value="conferir">Conferir</TabsTrigger>
+              <TabsTrigger className="min-h-9" value="jogos">Jogos do Bolão</TabsTrigger>
+              <TabsTrigger className="min-h-9" value="reserva">Ver reserva</TabsTrigger>
             </TabsList>
 
             
@@ -539,18 +543,19 @@ function DetalheBolao() {
             <TabsContent value="participantes" className="mt-4">
               <ParticipantesList bolaoId={bolao.id} bolao={bolao} />
             </TabsContent>
+
+            <TabsContent value="reserva" className="mt-4">
+              <ConsultaReservaBolao bolaoId={bolao.id} />
+            </TabsContent>
           </Tabs>
 
         </div>
 
-        {tab !== "conferir" && (
+        {(activeTab === "participantes" || activeTab === "jogos") && (
           <div className="space-y-6 lg:col-span-2">
             <div className="app-panel sticky top-24 rounded-lg p-5 sm:p-7">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center mb-6">
                 <h2 className="flex items-center gap-3 text-xl font-black sm:text-2xl"><span className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground"><TicketCheck className="h-5 w-5" /></span>Comprar Cotas</h2>
-                <Button variant="link" size="sm" asChild className="h-auto p-0 font-bold text-primary">
-                  <Link to="/boloes/reserva"><LockKeyhole className="h-4 w-4" /> Já tenho uma reserva</Link>
-                </Button>
               </div>
               
               {esgotado ? (
@@ -656,6 +661,121 @@ function DetalheBolao() {
         )}
       </div>
     </main>
+    </div>
+  );
+}
+
+function ConsultaReservaBolao({ bolaoId }: { bolaoId: string }) {
+  const buscarReserva = useServerFn(buscarReservaBolao);
+  const [termo, setTermo] = useState("");
+  const [reserva, setReserva] = useState<any>(null);
+  const [buscando, setBuscando] = useState(false);
+
+  const consultar = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const consulta = termo.trim();
+    if (consulta.length < 3) {
+      toast.error("Digite pelo menos 3 caracteres.");
+      return;
+    }
+
+    setBuscando(true);
+    try {
+      const resultado = await buscarReserva({ data: { codigo: consulta, bolaoId } });
+      setReserva(resultado);
+      toast.success("Reserva encontrada!");
+    } catch (error) {
+      setReserva(null);
+      toast.error(error instanceof Error ? error.message : "Não foi possível localizar a reserva.");
+    } finally {
+      setBuscando(false);
+    }
+  };
+
+  if (reserva) {
+    const pago = reserva.status === "pago";
+    return (
+      <div className="space-y-4">
+        <div className="bolao-stat-strip p-5 sm:p-6">
+          <div className="mb-5 flex items-start justify-between gap-4 border-b border-border pb-5">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+                {pago ? <CheckCircle2 className="h-5 w-5" /> : <QrCode className="h-5 w-5" />}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-lg font-black">{reserva.nome_completo}</p>
+                <p className="font-mono text-xs text-muted-foreground">{reserva.codigo_referencia}</p>
+              </div>
+            </div>
+            <Badge className={pago ? "bg-primary text-primary-foreground" : "bg-amber-500 text-amber-950"}>
+              {pago ? "PAGO" : "PAGAMENTO PENDENTE"}
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <p className="text-[10px] font-black uppercase text-muted-foreground">Cotas</p>
+              <p className="mt-1 text-xl font-black">{reserva.quantidade_cotas}</p>
+            </div>
+            <div className="rounded-lg border border-primary/30 bg-primary/10 p-4">
+              <p className="text-[10px] font-black uppercase text-primary">Valor total</p>
+              <p className="mt-1 text-xl font-black text-primary">{formatBRL(reserva.valor_total)}</p>
+            </div>
+          </div>
+
+          {!pago && (
+            <Button className="mt-5 h-12 w-full font-black" asChild>
+              <Link to="/boloes/pagamento/$codigo" params={{ codigo: reserva.codigo_referencia }}>
+                Pagar minha reserva <ExternalLink className="h-4 w-4" />
+              </Link>
+            </Button>
+          )}
+          {pago && <p className="mt-5 text-center text-sm font-bold text-primary">Pagamento confirmado. Sua participação está garantida.</p>}
+        </div>
+
+        <Button variant="outline" className="w-full" onClick={() => { setReserva(null); setTermo(""); }}>
+          Fazer outra consulta
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bolao-stat-strip p-5 sm:p-7">
+      <div className="mx-auto max-w-xl">
+        <div className="mb-6 text-center">
+          <span className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground">
+            <Search className="h-5 w-5" />
+          </span>
+          <h3 className="text-xl font-black">Encontre sua reserva</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Digite seu nome completo ou o código recebido ao reservar.</p>
+        </div>
+
+        <form onSubmit={consultar} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="consulta-reserva" className="text-xs font-bold uppercase">Nome ou código da reserva</Label>
+            <Input
+              id="consulta-reserva"
+              value={termo}
+              onChange={(event) => setTermo(event.target.value)}
+              placeholder="Ex.: Maria Silva ou BOL-XXXXXXX"
+              minLength={3}
+              maxLength={100}
+              autoComplete="name"
+              className="h-12 bg-card"
+              required
+            />
+          </div>
+          <Button type="submit" className="h-12 w-full font-black" disabled={buscando}>
+            <Search className="h-4 w-4" /> {buscando ? "Buscando..." : "Buscar reserva"}
+          </Button>
+        </form>
+
+        <div className="mt-5 flex items-start gap-2 rounded-lg border border-border bg-card p-3 text-xs text-muted-foreground">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          A busca é feita somente nas reservas deste bolão.
+        </div>
+      </div>
     </div>
   );
 }
