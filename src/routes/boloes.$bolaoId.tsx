@@ -14,13 +14,23 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConferidorJogos } from "@/components/conferidor-jogos";
 
-import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, QrCode, Download, Copy, Share2, ShieldCheck, Trash2, Edit2, Check, ExternalLink } from "lucide-react";
+import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, Download, Copy, Share2, Trash2, Edit2, Check, ExternalLink, TicketCheck, LockKeyhole, CreditCard } from "lucide-react";
 import { useState, useRef } from "react";
 import { toPng } from 'html-to-image';
 import { toast } from "sonner";
 import { PublicHeader } from "@/components/public-header";
 
 export const Route = createFileRoute("/boloes/$bolaoId")({
+  head: () => ({
+    meta: [
+      { title: "Bolão | LotoMaster IA" },
+      { name: "description", content: "Consulte jogos, confira resultados e participe dos bolões LotoMaster IA." },
+      { property: "og:title", content: "Bolão | LotoMaster IA" },
+      { property: "og:description", content: "Consulte jogos, confira resultados e participe dos bolões LotoMaster IA." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   validateSearch: (search: Record<string, unknown>) => ({
     tab: (search.tab as string) || "jogos",
   }),
@@ -84,7 +94,7 @@ function DetalheBolao() {
     };
 
     return (
-      <div className="min-h-screen">
+      <div className="bolao-experience">
       <PublicHeader />
       <main className="mx-auto max-w-xl px-4 py-12 md:py-20">
         <div className="text-center mb-8">
@@ -203,7 +213,7 @@ function DetalheBolao() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="bolao-experience">
     <PublicHeader showSearch />
     <main className="mx-auto max-w-7xl px-4 py-5 md:px-6 md:py-8">
       <div className="flex justify-between items-center mb-6">
@@ -328,8 +338,8 @@ function DetalheBolao() {
             </p>
           </div>
 
-          <Tabs defaultValue={tab} className="w-full">
-            <TabsList className="bg-background/40 border border-border/40 p-1 w-full grid grid-cols-3">
+          <Tabs defaultValue={tab} className="bolao-shell w-full p-4 sm:p-5">
+            <TabsList className="bolao-tabs w-full grid grid-cols-3">
               <TabsTrigger value="jogos">Jogos do Bolão</TabsTrigger>
               <TabsTrigger value="conferir">Conferir</TabsTrigger>
               <TabsTrigger value="participantes">Participantes</TabsTrigger>
@@ -342,7 +352,7 @@ function DetalheBolao() {
                   {(bolao.combo_loterias as any[])?.map((parte, pIdx) => {
                     const cfgP = LOTERIAS[parte.loteria_id as LoteriaId];
                     return (
-                      <div key={pIdx} className="rounded-2xl border border-border/40 bg-card overflow-hidden">
+                        <div key={pIdx} className="overflow-hidden rounded-lg border border-border bg-card">
                         <div className="bg-muted/50 px-4 py-3 border-b border-border/40 flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <img src={cfgP.logo} alt={cfgP.nome} className="h-5 w-auto" />
@@ -362,7 +372,7 @@ function DetalheBolao() {
                               ? jogo.dezenas.filter((n: number) => parte.resultado_oficial.includes(n)).length
                               : null;
                             return (
-                              <div key={jIdx} className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-secondary/20 border border-border/20">
+                                <div key={jIdx} className="bolao-list-item flex flex-wrap items-center gap-2 p-3">
                                 <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfgP.cor}20`, color: cfgP.cor }}>
                                   {jIdx+1}
                                 </div>
@@ -396,7 +406,7 @@ function DetalheBolao() {
                   })}
                 </div>
               ) : (
-                <div className="rounded-2xl border border-border/40 bg-card overflow-hidden">
+                <div className="overflow-hidden rounded-lg border border-border bg-card">
                   <div className="bg-muted/50 px-4 py-2 border-b border-border/40 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     Jogos Gerados por IA
                   </div>
@@ -410,7 +420,7 @@ function DetalheBolao() {
                         : null;
 
                       return (
-                        <div key={i} className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-secondary/20 border border-border/20">
+                        <div key={i} className="bolao-list-item flex flex-wrap items-center gap-2 p-3">
                           <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfg.cor}20`, color: cfg.cor }}>
                             {i+1}
                           </div>
@@ -493,9 +503,9 @@ function DetalheBolao() {
           <div className="space-y-6 lg:col-span-2">
             <div className="app-panel sticky top-24 rounded-lg p-5 sm:p-7">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-black">Comprar Cotas</h2>
-                <Button variant="link" size="sm" asChild className="font-bold p-0 h-auto" style={{ color: cfg.cor }}>
-                  <Link to="/boloes/reserva">Já tenho uma reserva</Link>
+                <h2 className="flex items-center gap-3 text-xl font-black sm:text-2xl"><span className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground"><TicketCheck className="h-5 w-5" /></span>Comprar Cotas</h2>
+                <Button variant="link" size="sm" asChild className="h-auto p-0 font-bold text-primary">
+                  <Link to="/boloes/reserva"><LockKeyhole className="h-4 w-4" /> Já tenho uma reserva</Link>
                 </Button>
               </div>
               
@@ -517,37 +527,37 @@ function DetalheBolao() {
                   }}
                 >
                   <div className="space-y-2">
-                    <Label htmlFor="nome" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nome Completo</Label>
+                    <Label htmlFor="nome" className="text-xs font-bold uppercase text-foreground">Nome Completo</Label>
                     <Input 
                       id="nome" 
                       placeholder="Seu nome para o bolão" 
                       required 
-                      className="h-12 text-base"
+                      className="h-12 bg-card text-base"
                       value={form.nome}
                       onChange={e => setForm({...form, nome: e.target.value})}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="celular" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">WhatsApp / Celular</Label>
+                    <Label htmlFor="celular" className="text-xs font-bold uppercase text-foreground">WhatsApp / Celular</Label>
                     <Input 
                       id="celular" 
                       type="tel" 
                       placeholder="(00) 00000-0000" 
                       required 
-                      className="h-12 text-base"
+                      className="h-12 bg-card text-base"
                       value={form.celular}
                       onChange={e => setForm({...form, celular: e.target.value})}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cotas" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Quantidade de Cotas</Label>
+                    <Label htmlFor="cotas" className="text-xs font-bold uppercase text-foreground">Quantidade de Cotas</Label>
                     <div className="flex items-center gap-4">
                       <Button 
                         type="button" 
                         variant="outline" 
-                        className="h-12 w-12 rounded-xl text-xl font-bold"
+                        className="h-12 w-12 rounded-lg bg-card text-xl font-bold"
                         onClick={() => setForm({...form, cotas: Math.max(1, form.cotas - 1)})}
                       >
                         -
@@ -556,13 +566,13 @@ function DetalheBolao() {
                         id="cotas" 
                         type="number" 
                         readOnly 
-                        className="h-12 flex-1 text-center text-lg font-black"
+                        className="h-12 flex-1 bg-card text-center text-lg font-black"
                         value={form.cotas}
                       />
                       <Button 
                         type="button" 
                         variant="outline" 
-                        className="h-12 w-12 rounded-xl text-xl font-bold"
+                        className="h-12 w-12 rounded-lg bg-card text-xl font-bold"
                         onClick={() => setForm({...form, cotas: Math.min(bolao.cotas_disponiveis, form.cotas + 1)})}
                       >
                         +
@@ -573,14 +583,14 @@ function DetalheBolao() {
                     </p>
                   </div>
 
-                   <div className="mt-8 space-y-3 rounded-lg border border-line/35 bg-secondary/50 p-6">
+                   <div className="bolao-checkout-total mt-8 space-y-3 rounded-lg p-6">
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Subtotal ({form.cotas}x)</span>
                       <span>{formatBRL(form.cotas * bolao.valor_cota)}</span>
                     </div>
                     <div className="flex justify-between text-lg font-black border-t border-border pt-3">
                       <span>Total a pagar</span>
-                      <span style={{ color: cfg.cor }}>{formatBRL(form.cotas * bolao.valor_cota)}</span>
+                      <span className="text-primary">{formatBRL(form.cotas * bolao.valor_cota)}</span>
                     </div>
                   </div>
 
@@ -588,7 +598,7 @@ function DetalheBolao() {
                     className="h-14 w-full text-lg font-black" 
                     disabled={mutation.isPending}
                   >
-                    {mutation.isPending ? "Processando..." : "Confirmar e Pagar"}
+                    <CreditCard className="h-5 w-5" /> {mutation.isPending ? "Processando..." : "Confirmar e Pagar"}
                   </Button>
                   
                   <p className="text-[10px] text-center text-muted-foreground">
@@ -686,7 +696,8 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
 
     if (!isAdmin) {
       return (
-        <div key={p.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/40 bg-card/60 backdrop-blur">
+      <div key={p.id} className="bolao-list-item flex items-center justify-between gap-3 p-3 sm:p-4">
+          <div className="bolao-avatar">{String(p.nome_completo || "P").trim().charAt(0).toUpperCase()}</div>
           <div className="flex-1 min-w-0 pr-4">
             <p className="font-bold truncate">{p.nome_completo}</p>
             <p className="text-[10px] text-muted-foreground">{p.quantidade_cotas} cota(s)</p>
@@ -699,7 +710,8 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
     }
 
     return (
-      <div key={p.id} className="flex items-center justify-between p-4 rounded-2xl border border-border/40 bg-card/60 backdrop-blur">
+      <div key={p.id} className="bolao-list-item flex items-center justify-between gap-3 p-3 sm:p-4">
+        <div className="bolao-avatar">{String(p.nome_completo || "P").trim().charAt(0).toUpperCase()}</div>
         <div className="flex-1 min-w-0 pr-4">
           {editingId === p.id ? (
             <div className="flex items-center gap-2">
@@ -729,12 +741,15 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
 
         <div className="flex items-center gap-3">
           {isAdmin ? (
-            <button 
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => mutationUpdate.mutate({ id: p.id, status: p.status === 'pago' ? 'reservado' : 'pago' })}
-              className="transition-transform active:scale-95"
+              className="h-auto rounded-full p-0 transition-transform active:scale-95"
             >
               {statusBadge}
-            </button>
+            </Button>
           ) : (
             statusBadge
           )}
@@ -773,22 +788,28 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-border/40 bg-card p-6 text-center">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
+      <div className="bolao-stat-strip p-4 sm:p-5">
+        <div className="grid grid-cols-2 divide-x divide-border">
+          <div className="flex items-center gap-3 px-2 sm:px-4">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground"><Users className="h-5 w-5" /></span>
+            <div>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-black mb-1">Total de Cotas</p>
             <p className="text-2xl font-black">{bolao?.total_cotas || 0}</p>
+            </div>
           </div>
-          <div>
+          <div className="flex items-center gap-3 px-3 sm:px-6">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground"><TicketCheck className="h-5 w-5" /></span>
+            <div>
             <p className="text-[10px] uppercase tracking-widest text-primary font-black mb-1">Cotas Faltantes</p>
             <p className="text-2xl font-black text-primary">{bolao?.cotas_disponiveis || 0}</p>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="space-y-4">
       {allParticipantes.length === 0 && !isLoading ? (
-        <div className="p-8 text-center border border-dashed border-border/60 rounded-2xl bg-muted/20 text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border bg-muted/40 p-8 text-center text-muted-foreground">
           Nenhum participante ainda.
         </div>
       ) : (

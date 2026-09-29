@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep the application’s visual identity centralized in `src/styles.css`; shared UI primitives and route shells consume semantic tokens so every lottery screen stays consistent.
+- Keep public pool detail screens inside the scoped light `bolao-experience` theme so lottery workspaces can remain dark without style conflicts.
