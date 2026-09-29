@@ -94,6 +94,7 @@ function AdminDashboard() {
 
   return (
     <div className="space-y-6 px-4 py-6 md:px-0">
+      <AdminParticipantesDialog bolaoId={participantesBolaoId} onClose={() => setParticipantesBolaoId(null)} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-card/40 backdrop-blur border-border/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
