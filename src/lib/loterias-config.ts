@@ -45,6 +45,7 @@ export type LoteriaConfig = {
   tamanhoMin: number;
   tamanhoMax: number;
   cor: string;
+  corEscura: string;
   corFundo: string;
   ballVariant: "default" | "green" | "blue" | "purple";
   faixaPrincipal: number;
@@ -73,6 +74,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     tamanhoMin: 15,
     tamanhoMax: 20,
     cor: "#7a1f8f",
+    corEscura: "#5c156d",
     corFundo: "from-fuchsia-600/25 to-purple-700/10",
     ballVariant: "purple",
     faixaPrincipal: 15,
@@ -104,6 +106,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     tamanhoMin: 6,
     tamanhoMax: 20,
     cor: "#067d3f",
+    corEscura: "#04592c",
     corFundo: "from-emerald-600/25 to-green-700/10",
     ballVariant: "green",
     faixaPrincipal: 6,
@@ -132,6 +135,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     tamanhoMin: 5,
     tamanhoMax: 15,
     cor: "#236ec7",
+    corEscura: "#1a4f94",
     corFundo: "from-blue-400/25 to-blue-600/10",
     ballVariant: "blue",
     faixaPrincipal: 5,
@@ -160,6 +164,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     tamanhoMin: 50,
     tamanhoMax: 50,
     cor: "#ef7c0b",
+    corEscura: "#b85f08",
     corFundo: "from-orange-500/25 to-amber-600/10",
     ballVariant: "default",
     faixaPrincipal: 20,
@@ -188,6 +193,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     tamanhoMin: 6,
     tamanhoMax: 15,
     cor: "#a61324",
+    corEscura: "#7c0e1b",
     corFundo: "from-red-700/25 to-rose-800/10",
     ballVariant: "default",
     faixaPrincipal: 6,
@@ -216,6 +222,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     tamanhoMin: 10,
     tamanhoMax: 10,
     cor: "#d8c400",
+    corEscura: "#9c8f00",
     corFundo: "from-yellow-400/25 to-lime-600/10",
     ballVariant: "default",
     faixaPrincipal: 7,
@@ -244,6 +251,7 @@ export const LOTERIAS: Record<LoteriaId, LoteriaConfig> = {
     tamanhoMin: 7,
     tamanhoMax: 15,
     cor: "#cb852b",
+    corEscura: "#96631f",
     corFundo: "from-amber-500/25 to-yellow-700/10",
     ballVariant: "default",
     faixaPrincipal: 7,
