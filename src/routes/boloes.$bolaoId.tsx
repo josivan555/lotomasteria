@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConferidorJogos } from "@/components/conferidor-jogos";
 
 import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, Download, Copy, Share2, Trash2, Edit2, Check, ExternalLink, TicketCheck, CreditCard, Search, AlertCircle, QrCode } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, type CSSProperties } from "react";
 import { toPng } from 'html-to-image';
 import { toast } from "sonner";
 import { PublicHeader } from "@/components/public-header";
