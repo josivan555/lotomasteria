@@ -103,6 +103,7 @@ function DetalheBolao() {
   const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
   const prazoEncerrado = agora > dataPrazo;
   const esgotado = bolao.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada;
+  const ledAtivo = !esgotado;
 
   const handleCompartilhar = async () => {
     const nomeLimpo = bolao.nome.trim().replace(/^BOL[ÃA]O\s+/i, "");
