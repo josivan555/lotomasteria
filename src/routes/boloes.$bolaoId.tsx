@@ -70,6 +70,7 @@ function DetalheBolao() {
   const getBolao = useServerFn(obterBolao);
   const comprarCotas = useServerFn(comprarCotasBolao);
   const [activeTab, setActiveTab] = useState(tab);
+  const queryClient = useQueryClient();
 
   const [form, setForm] = useState({ nome: "", celular: "", cotas: 1 });
   const [sucesso, setSucesso] = useState<{ ref: string; total: number; pix?: any } | null>(null);
@@ -251,7 +252,22 @@ function DetalheBolao() {
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full">
-            <Link to="/boloes/$bolaoId" params={{ bolaoId }} search={{ tab: "participantes" }} onClick={() => { setSucesso(null); window.scrollTo(0, 0); }}>Voltar para o bolão</Link>
+            <Link
+              to="/boloes/$bolaoId"
+              params={{ bolaoId }}
+              search={{ tab: "participantes" }}
+              onClick={() => {
+                setSucesso(null);
+                setActiveTab("participantes");
+                queryClient.invalidateQueries({ queryKey: ["bolao-participantes", bolaoId] });
+                queryClient.invalidateQueries({ queryKey: ["bolao", bolaoId] });
+                setTimeout(() => {
+                  document.getElementById("bolao-abas")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 80);
+              }}
+            >
+              Voltar para o bolão
+            </Link>
           </Button>
         </div>
       </main>
@@ -388,7 +404,7 @@ function DetalheBolao() {
             </p>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="bolao-shell w-full p-4 sm:p-5">
+          <Tabs id="bolao-abas" value={activeTab} onValueChange={setActiveTab} className="bolao-shell w-full scroll-mt-4 p-4 sm:p-5">
             <TabsList className="bolao-tabs grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-4">
               <TabsTrigger className="min-h-9" value="participantes">Participantes</TabsTrigger>
               <TabsTrigger className="min-h-9" value="conferir">Conferir</TabsTrigger>
