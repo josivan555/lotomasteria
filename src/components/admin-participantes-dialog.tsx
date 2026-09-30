@@ -1,7 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, Loader2, Trophy, Users } from "lucide-react";
-import { relatorioParticipantesBolao } from "@/lib/admin.functions";
+import { Download, Loader2, UserPlus, Trophy, Users } from "lucide-react";
+import { relatorioParticipantesBolao, adicionarParticipanteManual } from "@/lib/admin.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -195,5 +198,43 @@ function Info({ label, value }: { label: string; value: string }) {
       <div className="text-[10px] uppercase text-muted-foreground">{label}</div>
       <div className="font-bold">{value}</div>
     </div>
+  );
+}
+
+function AdicionarManual({ bolaoId, valorCota }: { bolaoId: string; valorCota: number }) {
+  const qc = useQueryClient();
+  const add = useServerFn(adicionarParticipanteManual);
+  const [nome, setNome] = useState("");
+  const [celular, setCelular] = useState("");
+  const [cotas, setCotas] = useState(1);
+  const [pago, setPago] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const enviar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (nome.trim().length < 2) return toast.error("Informe o nome do participante.");
+    setSalvando(true);
+    try {
+      await add({ data: { bolaoId, nome: nome.trim(), celular: celular.trim(), cotas, pago } });
+      toast.success(`${nome.trim()} adicionado com ${cotas} cota(s).`);
+      setNome(""); setCelular(""); setCotas(1);
+      qc.invalidateQueries();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally { setSalvando(false); }
+  };
+  return (
+    <form onSubmit={enviar} className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
+      <p className="flex items-center gap-2 text-sm font-semibold"><UserPlus className="h-4 w-4 text-primary" /> Adicionar participante manualmente (sem PIX)</p>
+      <div className="grid gap-2 sm:grid-cols-[1fr_10rem_6rem]">
+        <Input placeholder="Nome completo" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={100} />
+        <Input placeholder="Celular (opcional)" value={celular} onChange={(e) => setCelular(e.target.value)} maxLength={30} />
+        <Input type="number" min={1} value={cotas} onChange={(e) => setCotas(Math.max(1, Number(e.target.value) || 1))} aria-label="Cotas" />
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+        <label className="flex items-center gap-2"><input type="checkbox" checked={pago} onChange={(e) => setPago(e.target.checked)} /> Já pagou</label>
+        <span className="text-muted-foreground">Total: {brl(cotas * valorCota)}</span>
+        <Button type="submit" size="sm" disabled={salvando}>{salvando ? <Loader2 className="h-4 w-4 animate-spin" /> : "Adicionar"}</Button>
+      </div>
+    </form>
   );
 }
