@@ -394,7 +394,7 @@ function DetalheBolao() {
               <TabsTrigger className="min-h-9" value="conferir">Conferir</TabsTrigger>
               <TabsTrigger
                 className={ledAtivo ? "bolao-tab-led min-h-9" : "min-h-9"}
-                style={{ "--led-cor": cfg.cor } as React.CSSProperties}
+                style={{ "--led-cor": cfg.cor } as CSSProperties}
                 value="comprar"
               >
                 Comprar Cotas
