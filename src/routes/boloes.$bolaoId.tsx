@@ -391,7 +391,13 @@ function DetalheBolao() {
             <TabsList className="bolao-tabs grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-4">
               <TabsTrigger className="min-h-9" value="participantes">Participantes</TabsTrigger>
               <TabsTrigger className="min-h-9" value="conferir">Conferir</TabsTrigger>
-              <TabsTrigger className="min-h-9" value="comprar">Comprar Cotas</TabsTrigger>
+              <TabsTrigger
+                className={ledAtivo ? "bolao-tab-led min-h-9" : "min-h-9"}
+                style={{ "--led-cor": cfg.cor } as React.CSSProperties}
+                value="comprar"
+              >
+                Comprar Cotas
+              </TabsTrigger>
               <TabsTrigger className="min-h-9" value="reserva">Ver reserva</TabsTrigger>
             </TabsList>
 
