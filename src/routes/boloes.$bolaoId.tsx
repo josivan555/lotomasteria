@@ -148,8 +148,8 @@ function DetalheBolao() {
           <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-500/10 text-green-500">
             <CheckCircle2 className="h-10 w-10" />
           </div>
-          <h1 className="text-3xl font-black mb-2">Reserva Realizada!</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-black mb-2 text-white">Reserva Realizada!</h1>
+          <p className="text-white/85">
             Guarde seu comprovante de reserva.
           </p>
         </div>
@@ -251,7 +251,7 @@ function DetalheBolao() {
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full">
-            <Link to="/boloes/$bolaoId" params={{ bolaoId }} search={{ tab: "participantes" }}>Voltar para o bolão</Link>
+            <Link to="/boloes/$bolaoId" params={{ bolaoId }} search={{ tab: "participantes" }} onClick={() => { setSucesso(null); window.scrollTo(0, 0); }}>Voltar para o bolão</Link>
           </Button>
         </div>
       </main>
