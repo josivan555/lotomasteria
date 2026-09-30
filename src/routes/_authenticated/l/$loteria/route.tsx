@@ -13,7 +13,6 @@ import { formatCreditos } from "@/lib/credits-config";
 import { meuSaldo } from "@/lib/credits.functions";
 
 import { isLoteriaId, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria")({
   beforeLoad: ({ params }) => {
