@@ -690,6 +690,48 @@
   box-shadow: 0 18px 48px oklch(0.06 0.06 190 / 28%);
 }
 
+@property --bolao-led-ang {
+  syntax: "<angle>";
+  initial-value: 0turn;
+  inherits: false;
+}
+
+@keyframes bolao-led-spin {
+  to {
+    --bolao-led-ang: 1turn;
+  }
+}
+
+/* Borda LED animada no botao Comprar Cotas, na cor da loteria */
+@utility bolao-tab-led {
+  position: relative;
+  z-index: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    z-index: -1;
+    border-radius: 0.7rem;
+    padding: 2px;
+    background: conic-gradient(
+      from var(--bolao-led-ang),
+      transparent 0turn 0.6turn,
+      color-mix(in oklab, var(--led-cor, var(--primary)) 55%, transparent) 0.78turn,
+      var(--led-cor, var(--primary)) 0.9turn,
+      #fff 0.96turn,
+      transparent 1turn
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    filter: drop-shadow(0 0 5px var(--led-cor, var(--primary)));
+    animation: bolao-led-spin 2.8s linear infinite;
+    pointer-events: none;
+  }
+}
+
 @utility bolao-tabs {
   height: 3.2rem;
   border: 0;
@@ -708,6 +750,14 @@
     background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 88%, var(--card)), var(--primary));
     color: var(--primary-foreground);
     box-shadow: 0 8px 18px color-mix(in oklab, var(--primary) 25%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bolao-tab-led::before {
+    animation: none;
+    background: var(--led-cor, var(--primary));
+    filter: none;
   }
 }
 
