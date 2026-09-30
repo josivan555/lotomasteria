@@ -5,7 +5,7 @@ import {
   notFound,
   useParams,
 } from "@tanstack/react-router";
-import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, Coins, BookOpen } from "lucide-react";
+import { BarChart3, Bookmark, ClipboardCheck, Dice5, History, Printer, Coins, BookOpen, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -13,7 +13,6 @@ import { formatCreditos } from "@/lib/credits-config";
 import { meuSaldo } from "@/lib/credits.functions";
 
 import { isLoteriaId, LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/l/$loteria")({
   beforeLoad: ({ params }) => {
@@ -29,22 +28,23 @@ function SaldoBadge() {
   const saldo = data?.balance ?? 0;
   const ilimitado = data?.unlimited ?? false;
   return (
-    <Button
-      asChild
-      variant="default"
-      size="sm"
-      className="h-9 shrink-0 gap-1.5 rounded-full border border-gold px-3 shadow-lg shadow-gold/25 md:h-9 md:gap-2 md:px-4"
+    <Link
+      to="/creditos"
+      className="group flex h-11 shrink-0 items-stretch overflow-hidden rounded-full border-2 border-gold shadow-lg shadow-gold/40 transition-transform hover:scale-[1.03] md:h-12"
     >
-      <Link to="/creditos" className="justify-center md:min-w-[5.5rem]">
-        <Coins className="h-4 w-4 text-gold" />
-        <span className="flex flex-col items-start leading-none">
-          <span className="hidden text-[10px] opacity-90 sm:block">Créditos</span>
-          <span className="text-sm font-bold md:text-base">
-            {ilimitado ? "∞" : formatCreditos(saldo)}
-          </span>
+      <span className="flex items-center gap-1.5 bg-background px-3">
+        <Coins className="h-5 w-5 text-gold" />
+        <span className="text-sm font-bold text-foreground md:text-base">
+          {ilimitado ? "∞" : formatCreditos(saldo)}
         </span>
-      </Link>
-    </Button>
+      </span>
+      <span className="flex items-center gap-1 bg-gold px-3 text-background md:px-4">
+        <span className="text-xs font-extrabold leading-tight md:text-sm">
+          Comprar<br className="hidden sm:block" /> Créditos
+        </span>
+        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+      </span>
+    </Link>
   );
 }
 

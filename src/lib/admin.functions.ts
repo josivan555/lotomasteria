@@ -348,3 +348,38 @@ export const relatorioParticipantesBolao = createServerFn({ method: "POST" })
       participantes,
     };
   });
+
+export const adicionarParticipanteManual = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({
+      bolaoId: z.string().uuid(),
+      nome: z.string().trim().min(2).max(100),
+      celular: z.string().trim().max(30).optional().default(""),
+      cotas: z.number().int().min(1).max(10000),
+      pago: z.boolean().default(true),
+    }).parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    await checkAdmin(context);
+    const { data: bolao, error: bErr } = await context.supabase
+      .from("boloes").select("total_cotas, valor_cota").eq("id", data.bolaoId).single();
+    if (bErr || !bolao) throw new Error("Bolão não encontrado.");
+    const { data: rows } = await context.supabase
+      .from("bolao_participantes").select("quantidade_cotas").eq("bolao_id", data.bolaoId);
+    const usadas = (rows ?? []).reduce((s: number, r: any) => s + r.quantidade_cotas, 0);
+    const livres = bolao.total_cotas - usadas;
+    if (data.cotas > livres) throw new Error(`Apenas ${livres} cota(s) disponível(is).`);
+    const { error } = await context.supabase.from("bolao_participantes").insert({
+      bolao_id: data.bolaoId,
+      nome_completo: data.nome,
+      celular: data.celular,
+      quantidade_cotas: data.cotas,
+      valor_total: data.cotas * Number(bolao.valor_cota),
+      status: data.pago ? "pago" : "reservado",
+      payment_method: "manual",
+      codigo_referencia: `BOL-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
