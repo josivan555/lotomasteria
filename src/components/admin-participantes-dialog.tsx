@@ -133,6 +133,8 @@ export function AdminParticipantesDialog({ bolaoId, onClose }: { bolaoId: string
 
         {r && (
           <div className="space-y-4">
+            <AdicionarManual bolaoId={bolaoId!} valorCota={r.bolao.valor_cota} />
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
               <Info label="Sorteio" value={`${dataBR(r.bolao.data_sorteio)} ${hora(r.bolao.horario_sorteio)}`} />
               <Info label="Cotas pagas" value={`${r.cotasVendidas}/${r.bolao.total_cotas}`} />
