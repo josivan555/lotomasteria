@@ -141,7 +141,7 @@ function DetalheBolao() {
     };
 
     return (
-      <div className="bolao-experience">
+      <div className="bolao-experience" style={{ "--bolao-accent": cfg.corEscura, "--bolao-accent-fg": "#ffffff" } as CSSProperties}>
       <PublicHeader />
       <main className="mx-auto max-w-xl px-4 py-12 md:py-20">
         <div className="text-center mb-8">
@@ -260,7 +260,7 @@ function DetalheBolao() {
   }
 
   return (
-    <div className="bolao-experience">
+    <div className="bolao-experience" style={{ "--bolao-accent": cfg.corEscura, "--bolao-accent-fg": "#ffffff" } as CSSProperties}>
     <PublicHeader showSearch />
     <main className="mx-auto max-w-7xl px-4 py-5 md:px-6 md:py-8">
       <div className="flex justify-between items-center mb-6">

@@ -643,8 +643,8 @@
   --card-foreground: oklch(0.22 0.055 255);
   --popover: oklch(0.99 0.006 225);
   --popover-foreground: oklch(0.22 0.055 255);
-  --primary: oklch(0.8 0.225 145);
-  --primary-foreground: oklch(0.16 0.055 165);
+  --primary: var(--bolao-accent, oklch(0.8 0.225 145));
+  --primary-foreground: var(--bolao-accent-fg, oklch(0.16 0.055 165));
   --secondary: oklch(0.955 0.018 225);
   --secondary-foreground: oklch(0.25 0.05 250);
   --muted: oklch(0.94 0.018 225);
