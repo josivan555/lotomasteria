@@ -218,7 +218,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
         </select>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {listados.map((jogo) => {
           const premiado = completo && jogo.acertos >= Math.min(...cfg.faixas);
           const premioJogo = completo ? (premiosPorFaixa.get(jogo.acertos) ?? 0) : 0;
@@ -226,22 +226,22 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
             <div
               key={jogo.indice}
               className={cn(
-                "flex flex-wrap items-center gap-3 rounded-xl border border-border/30 border-l-4 bg-secondary/20 p-3",
+                "flex flex-wrap items-center gap-3 rounded-xl border border-border/50 border-l-4 bg-card p-3 sm:p-4",
                 premiado ? "border-l-primary bg-primary/5" : "border-l-border/40",
               )}
             >
-              <div className="w-10 shrink-0 font-mono text-[11px] text-muted-foreground">
-                #{jogo.indice.toString().padStart(2, "0")}
+              <div className="grid h-9 min-w-11 shrink-0 place-items-center rounded-lg border border-primary/35 bg-primary/12 px-2 font-mono text-sm font-black text-primary shadow-sm">
+                {jogo.indice.toString().padStart(2, "0")}
               </div>
               <div className="flex flex-1 flex-wrap gap-1.5">
                 {jogo.dezenas.map((n) => (
                   <div
                     key={n}
                     className={cn(
-                      "flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-bold",
+                      "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-black sm:h-9 sm:w-9",
                       selected.has(n)
                         ? "border-transparent bg-primary text-primary-foreground"
-                        : "border-border/60 bg-background text-muted-foreground",
+                        : "border-border bg-secondary/35 text-foreground",
                     )}
                   >
                     {n.toString().padStart(2, "0")}

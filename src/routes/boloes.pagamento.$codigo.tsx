@@ -74,8 +74,8 @@ function PagamentoReserva() {
     <div className="mx-auto max-w-2xl px-4 py-12 md:py-20">
       <div className="mb-8 flex items-center justify-between">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/boloes/reserva">
-            <ChevronLeft className="mr-2 h-4 w-4" /> Voltar
+          <Link to="/boloes/$bolaoId" params={{ bolaoId: bolao.id }} search={{ tab: "participantes" }}>
+            <ChevronLeft className="mr-2 h-4 w-4" /> Voltar para o bolão
           </Link>
         </Button>
         <Badge variant={isPago ? "default" : "outline"} className={isPago ? "bg-green-500 hover:bg-green-600" : "animate-pulse"}>
@@ -171,7 +171,7 @@ function PagamentoReserva() {
                   <Link to="/boloes/reserva">Ver Minha Reserva</Link>
                 </Button>
                 <Button variant="ghost" asChild>
-                  <Link to="/">Voltar para Início</Link>
+                  <Link to="/boloes/$bolaoId" params={{ bolaoId: bolao.id }} search={{ tab: "participantes" }}>Voltar para o bolão</Link>
                 </Button>
               </div>
             </div>

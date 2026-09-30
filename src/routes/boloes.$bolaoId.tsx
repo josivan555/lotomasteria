@@ -55,8 +55,10 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
     return { meta };
   },
   validateSearch: (search: Record<string, unknown>) => ({
-    tab: ["participantes", "conferir", "jogos", "reserva"].includes(String(search.tab))
-      ? String(search.tab)
+    tab: String(search.tab) === "jogos"
+      ? "comprar"
+      : ["participantes", "conferir", "comprar", "reserva"].includes(String(search.tab))
+        ? String(search.tab)
       : "participantes",
   }),
   component: DetalheBolao,
@@ -248,7 +250,7 @@ function DetalheBolao() {
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full">
-            <Link to="/">Voltar para a página inicial</Link>
+            <Link to="/boloes/$bolaoId" params={{ bolaoId }} search={{ tab: "participantes" }}>Voltar para o bolão</Link>
           </Button>
         </div>
       </main>
@@ -271,7 +273,7 @@ function DetalheBolao() {
  
       <div className="flex flex-col gap-5 lg:grid lg:grid-cols-5">
 
-        <div className="space-y-5 lg:col-span-3">
+        <div className="space-y-5 lg:col-span-5">
           <div className="app-panel relative overflow-hidden rounded-lg">
             <div className="absolute inset-x-0 top-0 h-28 bg-cover bg-center opacity-55" style={{ backgroundImage: `linear-gradient(90deg, var(--surface-strong), transparent), url(${cfg.banner})` }} />
             <div className="relative p-5 sm:p-7">
@@ -389,125 +391,49 @@ function DetalheBolao() {
             <TabsList className="bolao-tabs grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-4">
               <TabsTrigger className="min-h-9" value="participantes">Participantes</TabsTrigger>
               <TabsTrigger className="min-h-9" value="conferir">Conferir</TabsTrigger>
-              <TabsTrigger className="min-h-9" value="jogos">Jogos do Bolão</TabsTrigger>
+              <TabsTrigger className="min-h-9" value="comprar">Comprar Cotas</TabsTrigger>
               <TabsTrigger className="min-h-9" value="reserva">Ver reserva</TabsTrigger>
             </TabsList>
 
-            
-            <TabsContent value="jogos" className="mt-4 space-y-4">
-              {bolao.is_combo ? (
-                <div className="space-y-8">
-                  {(bolao.combo_loterias as any[])?.map((parte, pIdx) => {
-                    const cfgP = LOTERIAS[parte.loteria_id as LoteriaId];
-                    return (
-                        <div key={pIdx} className="overflow-hidden rounded-lg border border-border bg-card">
-                        <div className="bg-muted/50 px-4 py-3 border-b border-border/40 flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <img src={cfgP.logo} alt={cfgP.nome} className="h-5 w-auto" />
-                            <span className="text-xs font-black uppercase tracking-widest">{cfgP.nome} - Concurso {parte.concurso_numero}</span>
-                          </div>
-                          {parte.resultado_oficial?.length > 0 && (
-                            <div className="flex gap-1">
-                              {parte.resultado_oficial.map((n: number) => (
-                                <div key={n} className="w-5 h-5 rounded-full bg-primary text-[8px] flex items-center justify-center text-white font-bold">{n}</div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-4 space-y-3">
-                          {parte.jogos?.map((jogo: any, jIdx: number) => {
-                            const acertos = parte.resultado_oficial?.length > 0
-                              ? jogo.dezenas.filter((n: number) => parte.resultado_oficial.includes(n)).length
-                              : null;
-                            return (
-                                <div key={jIdx} className="bolao-list-item flex flex-wrap items-center gap-2 p-3">
-                                <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfgP.cor}20`, color: cfgP.cor }}>
-                                  {jIdx+1}
-                                </div>
-                                <div className="flex flex-wrap gap-1.5 flex-1">
-                                  {jogo.dezenas.map((n: number) => {
-                                    const isSorteada = parte.resultado_oficial?.includes(n);
-                                    return (
-                                      <div 
-                                        key={n} 
-                                        className={`w-7 h-7 rounded-full border flex items-center justify-center text-[11px] font-bold transition-all ${
-                                          isSorteada ? "text-white scale-110 shadow-lg" : "bg-background border-border/60"
-                                        }`}
-                                        style={isSorteada ? { backgroundColor: cfgP.cor, borderColor: cfgP.cor } : {}}
-                                      >
-                                        {n.toString().padStart(2, '0')}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                                {acertos !== null && (
-                                  <div className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 border border-green-500/20">
-                                    {acertos} ACERTOS
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
+            <TabsContent value="comprar" className="mt-4">
+              <div className="bolao-stat-strip mx-auto max-w-2xl p-5 sm:p-7">
+                <div className="mb-6 flex items-center">
+                  <h2 className="flex items-center gap-3 text-xl font-black sm:text-2xl"><span className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground"><TicketCheck className="h-5 w-5" /></span>Comprar Cotas</h2>
                 </div>
-              ) : (
-                <div className="overflow-hidden rounded-lg border border-border bg-card">
-                  <div className="bg-muted/50 px-4 py-2 border-b border-border/40 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                    Jogos Gerados por IA
-                  </div>
-                  <div className="p-4 space-y-3">
-                    {(bolao.game_snapshot as any[])?.map((jogo, i) => {
-                      const dezenasJogo = Array.isArray(jogo.dezenas) ? jogo.dezenas : [];
-                      const resultado = Array.isArray(bolao.resultado_oficial) ? (bolao.resultado_oficial as number[]) : [];
-                      
-                      const acertos = resultado.length > 0 
-                        ? dezenasJogo.filter((n: number) => resultado.includes(n)).length
-                        : null;
 
-                      return (
-                        <div key={i} className="bolao-list-item flex flex-wrap items-center gap-2 p-3">
-                          <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: `${cfg.cor}20`, color: cfg.cor }}>
-                            {i+1}
-                          </div>
-                          <div className="flex flex-wrap gap-1.5 flex-1">
-                            {dezenasJogo.map((n: number) => {
-                              const isSorteada = resultado.includes(n);
-                              return (
-                                <div 
-                                  key={n} 
-                                  className={`w-7 h-7 rounded-full border flex items-center justify-center text-[11px] font-bold transition-all ${
-                                    isSorteada 
-                                      ? "text-white scale-110 shadow-lg" 
-                                      : "bg-background border-border/60"
-                                  }`}
-                                  style={isSorteada ? { backgroundColor: cfg.cor, borderColor: cfg.cor } : {}}
-                                >
-                                  {n.toString().padStart(2, '0')}
-                                </div>
-                              );
-                            })}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {acertos !== null && resultado.length > 0 && (
-                              <div className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 border border-green-500/20 animate-in zoom-in duration-500">
-                                {acertos} ACERTOS
-                              </div>
-                            )}
-                            {jogo.score && (
-                              <div className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ backgroundColor: `${cfg.cor}15`, color: cfg.cor }}>
-                                SCORE {jogo.score}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                {esgotado ? (
+                  <div className="rounded-lg bg-destructive/10 p-6 text-center text-destructive">
+                    <p className="font-bold">{prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada ? "Bolão Encerrado" : "Bolão Esgotado"}</p>
+                    <p className="mt-1 text-sm">{prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada ? "Este bolão não aceita mais novas participações." : "Todas as cotas já foram vendidas. Fique atento para os próximos lançamentos!"}</p>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <form className="space-y-5" onSubmit={(event) => { event.preventDefault(); mutation.mutate({ bolaoId, ...form }); }}>
+                    <div className="space-y-2">
+                      <Label htmlFor="nome" className="text-xs font-bold uppercase text-foreground">Nome Completo</Label>
+                      <Input id="nome" placeholder="Seu nome para o bolão" required className="h-12 bg-card text-base" value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="celular" className="text-xs font-bold uppercase text-foreground">WhatsApp / Celular</Label>
+                      <Input id="celular" type="tel" placeholder="(00) 00000-0000" required className="h-12 bg-card text-base" value={form.celular} onChange={(event) => setForm({ ...form, celular: event.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cotas" className="text-xs font-bold uppercase text-foreground">Quantidade de Cotas</Label>
+                      <div className="flex items-center gap-4">
+                        <Button type="button" variant="outline" className="h-12 w-12 rounded-lg bg-card text-xl font-bold" onClick={() => setForm({ ...form, cotas: Math.max(1, form.cotas - 1) })}>−</Button>
+                        <Input id="cotas" type="number" readOnly className="h-12 flex-1 bg-card text-center text-lg font-black" value={form.cotas} />
+                        <Button type="button" variant="outline" className="h-12 w-12 rounded-lg bg-card text-xl font-bold" onClick={() => setForm({ ...form, cotas: Math.min(bolao.cotas_disponiveis, form.cotas + 1) })}>+</Button>
+                      </div>
+                      <p className="text-center text-[10px] font-medium text-muted-foreground">Máximo disponível: {bolao.cotas_disponiveis} cotas</p>
+                    </div>
+                    <div className="bolao-checkout-total mt-8 space-y-3 rounded-lg p-6">
+                      <div className="flex justify-between text-sm text-muted-foreground"><span>Subtotal ({form.cotas}x)</span><span>{formatBRL(form.cotas * bolao.valor_cota)}</span></div>
+                      <div className="flex justify-between border-t border-border pt-3 text-lg font-black"><span>Total a pagar</span><span className="text-primary">{formatBRL(form.cotas * bolao.valor_cota)}</span></div>
+                    </div>
+                    <Button className="h-14 w-full text-lg font-black" disabled={mutation.isPending}><CreditCard className="h-5 w-5" /> {mutation.isPending ? "Processando..." : "Confirmar e Pagar"}</Button>
+                    <p className="text-center text-[10px] text-muted-foreground">Ao confirmar, suas cotas serão reservadas e você seguirá para o pagamento. A reserva expira em 30 minutos sem confirmação.</p>
+                  </form>
+                )}
+              </div>
             </TabsContent>
 
             <TabsContent value="conferir" className="mt-4">
@@ -550,115 +476,6 @@ function DetalheBolao() {
           </Tabs>
 
         </div>
-
-        {(activeTab === "participantes" || activeTab === "jogos") && (
-          <div className="space-y-6 lg:col-span-2">
-            <div className="app-panel sticky top-24 rounded-lg p-5 sm:p-7">
-              <div className="flex items-center mb-6">
-                <h2 className="flex items-center gap-3 text-xl font-black sm:text-2xl"><span className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground"><TicketCheck className="h-5 w-5" /></span>Comprar Cotas</h2>
-              </div>
-              
-              {esgotado ? (
-                <div className="bg-destructive/10 text-destructive rounded-xl p-6 text-center">
-                  <p className="font-bold">{prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada ? "Bolão Encerrado" : "Bolão Esgotado"}</p>
-                  <p className="text-sm mt-1">
-                    {prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada
-                      ? "Este bolão não aceita mais novas participações." 
-                      : "Todas as cotas já foram vendidas. Fique atento para os próximos lançamentos!"}
-                  </p>
-                </div>
-              ) : (
-                <form 
-                  className="space-y-5" 
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    mutation.mutate({ bolaoId, ...form });
-                  }}
-                >
-                  <div className="space-y-2">
-                    <Label htmlFor="nome" className="text-xs font-bold uppercase text-foreground">Nome Completo</Label>
-                    <Input 
-                      id="nome" 
-                      placeholder="Seu nome para o bolão" 
-                      required 
-                      className="h-12 bg-card text-base"
-                      value={form.nome}
-                      onChange={e => setForm({...form, nome: e.target.value})}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="celular" className="text-xs font-bold uppercase text-foreground">WhatsApp / Celular</Label>
-                    <Input 
-                      id="celular" 
-                      type="tel" 
-                      placeholder="(00) 00000-0000" 
-                      required 
-                      className="h-12 bg-card text-base"
-                      value={form.celular}
-                      onChange={e => setForm({...form, celular: e.target.value})}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="cotas" className="text-xs font-bold uppercase text-foreground">Quantidade de Cotas</Label>
-                    <div className="flex items-center gap-4">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        className="h-12 w-12 rounded-lg bg-card text-xl font-bold"
-                        onClick={() => setForm({...form, cotas: Math.max(1, form.cotas - 1)})}
-                      >
-                        -
-                      </Button>
-                      <Input 
-                        id="cotas" 
-                        type="number" 
-                        readOnly 
-                        className="h-12 flex-1 bg-card text-center text-lg font-black"
-                        value={form.cotas}
-                      />
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        className="h-12 w-12 rounded-lg bg-card text-xl font-bold"
-                        onClick={() => setForm({...form, cotas: Math.min(bolao.cotas_disponiveis, form.cotas + 1)})}
-                      >
-                        +
-                      </Button>
-                    </div>
-                    <p className="text-[10px] text-center text-muted-foreground font-medium">
-                      Máximo disponível: {bolao.cotas_disponiveis} cotas
-                    </p>
-                  </div>
-
-                   <div className="bolao-checkout-total mt-8 space-y-3 rounded-lg p-6">
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>Subtotal ({form.cotas}x)</span>
-                      <span>{formatBRL(form.cotas * bolao.valor_cota)}</span>
-                    </div>
-                    <div className="flex justify-between text-lg font-black border-t border-border pt-3">
-                      <span>Total a pagar</span>
-                      <span className="text-primary">{formatBRL(form.cotas * bolao.valor_cota)}</span>
-                    </div>
-                  </div>
-
-                  <Button 
-                    className="h-14 w-full text-lg font-black" 
-                    disabled={mutation.isPending}
-                  >
-                    <CreditCard className="h-5 w-5" /> {mutation.isPending ? "Processando..." : "Confirmar e Pagar"}
-                  </Button>
-                  
-                  <p className="text-[10px] text-center text-muted-foreground">
-                    Ao clicar em confirmar, você reserva suas cotas e será direcionado para as instruções de pagamento. 
-                    Sua reserva expira em 30 minutos caso o pagamento não seja confirmado.
-                  </p>
-                </form>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </main>
     </div>

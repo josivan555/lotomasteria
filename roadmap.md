@@ -48,3 +48,10 @@
 
 - [x] Evitar que os rótulos dos botões saiam para fora do cartão
 - [x] Colocar o valor do prêmio em destaque no cartão
+
+# Compra e conferência dos bolões
+
+- [x] Substituir a aba Jogos do Bolão pela página Comprar Cotas
+- [x] Trocar os atalhos dos cartões por Comprar Cotas e Ver Participantes
+- [x] Retornar do comprovante e do pagamento ao bolão correto em Participantes
+- [x] Exibir os jogos numerados e com maior contraste dentro de Conferir

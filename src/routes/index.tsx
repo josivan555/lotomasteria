@@ -401,14 +401,14 @@ function Landing() {
                             <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
                               <Button className="w-full min-w-0 px-2.5 text-[13px] font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
 
-                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
-                                  Participantes
+                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'comprar' }}>
+                                  Comprar Cotas
                                 </Link>
                               </Button>
                               <Button variant="outline" className="w-full min-w-0 px-2.5 text-[13px] font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
 
-                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
-                                  Ver Jogos
+                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
+                                  Ver Participantes
                                 </Link>
                               </Button>
                             </div>
@@ -416,13 +416,13 @@ function Landing() {
                         ) : (
                           <>
                             <Button className="w-full min-w-0 px-2.5 text-[13px] font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
-                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
-                                Ver Reservas
+                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'comprar' }}>
+                                Comprar Cotas
                               </Link>
                             </Button>
                             <Button variant="outline" className="w-full min-w-0 px-2.5 text-[13px] font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
-                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>
-                                Ver Jogos
+                              <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
+                                Ver Participantes
                               </Link>
                             </Button>
 
@@ -485,10 +485,10 @@ function Landing() {
                           <td className="px-4 py-3 text-right">
                             <div className="flex justify-end gap-2">
                               <Button variant="ghost" size="sm" asChild>
-                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>Participantes</Link>
+                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'comprar' }}>Comprar Cotas</Link>
                               </Button>
                               <Button variant="outline" size="sm" asChild className="font-bold">
-                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'jogos' }}>Ver Jogos</Link>
+                                <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>Ver Participantes</Link>
                               </Button>
                             </div>
                           </td>
