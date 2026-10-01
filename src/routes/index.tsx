@@ -1,3 +1,4 @@
+import { capaUrl } from "@/lib/capa";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 /**
