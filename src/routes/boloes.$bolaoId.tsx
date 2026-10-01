@@ -142,7 +142,7 @@ function DetalheBolao() {
     };
 
     return (
-      <div className="bolao-experience" style={{ "--bolao-accent": cfg.corEscura, "--bolao-accent-fg": "#ffffff" } as CSSProperties}>
+      <div className="bolao-experience" data-loteria={bolao.is_combo ? undefined : bolao.loteria_id} style={{ "--bolao-accent": cfg.corEscura } as CSSProperties}>
       <PublicHeader />
       <main className="mx-auto max-w-xl px-4 py-12 md:py-20">
         <div className="text-center mb-8">
@@ -276,7 +276,7 @@ function DetalheBolao() {
   }
 
   return (
-    <div className="bolao-experience" style={{ "--bolao-accent": cfg.corEscura, "--bolao-accent-fg": "#ffffff" } as CSSProperties}>
+    <div className="bolao-experience" data-loteria={bolao.is_combo ? undefined : bolao.loteria_id} style={{ "--bolao-accent": cfg.corEscura } as CSSProperties}>
     <PublicHeader showSearch />
     <main className="mx-auto max-w-7xl px-4 py-5 md:px-6 md:py-8">
       <div className="flex justify-between items-center mb-6">
@@ -291,9 +291,9 @@ function DetalheBolao() {
       <div className="flex flex-col gap-5 lg:grid lg:grid-cols-5">
 
         <div className="space-y-5 lg:col-span-5">
-          <div className="app-panel relative overflow-hidden rounded-lg">
-            <div className="absolute inset-x-0 top-0 h-28 bg-cover bg-center opacity-55" style={{ backgroundImage: `linear-gradient(90deg, var(--surface-strong), transparent), url(${cfg.banner})` }} />
-            <div className="relative p-5 sm:p-7">
+          <div className="bolao-detail-hero app-panel relative overflow-hidden rounded-lg">
+            <div className="bolao-detail-banner bg-cover bg-center" style={{ backgroundImage: `linear-gradient(0deg, var(--surface-strong), transparent 72%), url(${cfg.banner})` }} />
+            <div className="relative p-5 pt-24 sm:p-7 sm:pt-32">
 
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">

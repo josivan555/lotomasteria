@@ -299,6 +299,126 @@
   }
 }
 
+@utility bolao-showcase-card {
+  min-height: 35rem;
+  border-width: 2px;
+  border-color: color-mix(in oklab, var(--primary) 88%, var(--foreground));
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(95% 58% at 88% 42%, color-mix(in oklab, var(--primary) 24%, transparent), transparent 68%),
+    linear-gradient(155deg, color-mix(in oklab, var(--primary) 18%, oklch(0.105 0.048 240)), oklch(0.075 0.035 240) 62%);
+  box-shadow:
+    inset 0 0 28px color-mix(in oklab, var(--primary) 12%, transparent),
+    0 14px 38px oklch(0.02 0.03 240 / 54%),
+    0 0 20px color-mix(in oklab, var(--primary) 14%, transparent);
+  &:hover {
+    border-color: var(--primary);
+    box-shadow:
+      inset 0 0 34px color-mix(in oklab, var(--primary) 16%, transparent),
+      0 20px 50px oklch(0.02 0.03 240 / 62%),
+      0 0 28px color-mix(in oklab, var(--primary) 22%, transparent);
+  }
+  & .lottery-choice-banner {
+    height: 10.75rem;
+    border-bottom-width: 2px;
+  }
+  & .lottery-choice-banner::before {
+    background: linear-gradient(transparent 28%, oklch(0.06 0.035 240 / 92%));
+  }
+  & .lottery-choice-banner-title h2 {
+    font-size: clamp(1.85rem, 4vw, 2.55rem);
+    text-shadow: 0 3px 4px oklch(0.02 0.02 240 / 92%), 0 0 18px color-mix(in oklab, var(--primary) 66%, transparent);
+  }
+}
+
+@utility bolao-status-pill {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  border: 1px solid var(--primary);
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+  padding: 0.35rem 0.85rem;
+  color: color-mix(in oklab, var(--primary) 76%, var(--foreground));
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px color-mix(in oklab, var(--primary) 26%, transparent);
+}
+
+@utility bolao-ended-pill {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--destructive);
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--destructive) 12%, transparent);
+  padding: 0.35rem 0.75rem;
+  color: color-mix(in oklab, var(--destructive) 82%, var(--foreground));
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px color-mix(in oklab, var(--destructive) 24%, transparent);
+}
+
+@utility bolao-metric {
+  border: 1px solid color-mix(in oklab, var(--primary) 62%, transparent);
+  border-radius: 0.9rem;
+  background: oklch(0.075 0.035 240 / 72%);
+  padding: 0.7rem;
+  text-align: center;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 7%, transparent);
+}
+
+@utility bolao-progress-track {
+  height: 0.58rem;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--primary) 22%, oklch(0.12 0.04 230));
+}
+
+@utility bolao-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--primary) 72%, oklch(0.95 0.1 135)), var(--primary));
+  box-shadow: 0 0 14px var(--primary);
+  transition: width 500ms ease;
+}
+
+@utility bolao-closed-banner {
+  display: flex;
+  min-height: 2.8rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid color-mix(in oklab, var(--destructive) 78%, transparent);
+  border-radius: 0.8rem;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--destructive) 28%, oklch(0.08 0.04 240)), color-mix(in oklab, var(--destructive) 14%, oklch(0.08 0.04 240)));
+  color: color-mix(in oklab, var(--destructive) 78%, var(--foreground));
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+@utility bolao-primary-action {
+  border: 1px solid color-mix(in oklab, var(--primary) 75%, var(--foreground));
+  background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 88%, var(--foreground)), var(--primary));
+  color: var(--primary-foreground);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 36%, transparent), 0 0 18px color-mix(in oklab, var(--primary) 34%, transparent);
+}
+
+@utility bolao-secondary-action {
+  border-color: color-mix(in oklab, var(--primary) 78%, transparent);
+  background: oklch(0.07 0.035 240 / 62%);
+  color: color-mix(in oklab, var(--primary) 76%, var(--foreground));
+  &:hover {
+    background: color-mix(in oklab, var(--primary) 15%, oklch(0.07 0.035 240));
+    color: var(--foreground);
+  }
+}
+
 @utility lottery-choice-banner {
   position: relative;
   display: flex;
@@ -637,40 +757,40 @@
   color: color-mix(in srgb, var(--bl) 45%, white);
 }
 
-/* ===== Experiência interna dos bolões: painéis claros sobre universo verde ===== */
+/* ===== Experiência interna dos bolões: universo escuro na cor de cada modalidade ===== */
 @utility bolao-experience {
-  --background: oklch(0.975 0.01 225);
-  --foreground: oklch(0.22 0.055 255);
-  --card: oklch(0.985 0.008 225);
-  --card-foreground: oklch(0.22 0.055 255);
-  --popover: oklch(0.99 0.006 225);
-  --popover-foreground: oklch(0.22 0.055 255);
+  --background: oklch(0.075 0.035 240);
+  --foreground: oklch(0.97 0.015 225);
+  --card: oklch(0.115 0.045 240);
+  --card-foreground: oklch(0.97 0.015 225);
+  --popover: oklch(0.105 0.04 240);
+  --popover-foreground: oklch(0.97 0.015 225);
   --primary: var(--bolao-accent, oklch(0.8 0.225 145));
-  --primary-foreground: var(--bolao-accent-fg, oklch(0.16 0.055 165));
-  --secondary: oklch(0.955 0.018 225);
-  --secondary-foreground: oklch(0.25 0.05 250);
-  --muted: oklch(0.94 0.018 225);
-  --muted-foreground: oklch(0.5 0.045 245);
-  --accent: oklch(0.88 0.11 155);
-  --accent-foreground: oklch(0.2 0.065 165);
-  --border: oklch(0.79 0.04 230 / 72%);
-  --input: oklch(0.78 0.05 230 / 82%);
+  --primary-foreground: oklch(0.98 0.01 225);
+  --secondary: oklch(0.17 0.05 240);
+  --secondary-foreground: oklch(0.94 0.02 225);
+  --muted: oklch(0.15 0.038 240);
+  --muted-foreground: oklch(0.77 0.04 230);
+  --accent: color-mix(in oklab, var(--primary) 55%, oklch(0.86 0.18 95));
+  --accent-foreground: oklch(0.98 0.01 225);
+  --border: color-mix(in oklab, var(--primary) 44%, oklch(0.32 0.05 230));
+  --input: color-mix(in oklab, var(--primary) 36%, oklch(0.31 0.05 230));
   --ring: oklch(0.72 0.2 150);
-  --surface: oklch(0.97 0.012 225 / 96%);
-  --surface-strong: oklch(0.94 0.018 225 / 98%);
-  --line: oklch(0.72 0.08 220 / 58%);
+  --surface: oklch(0.12 0.045 240 / 96%);
+  --surface-strong: oklch(0.08 0.038 240 / 98%);
+  --line: color-mix(in oklab, var(--primary) 58%, transparent);
   min-height: 100vh;
   background:
     radial-gradient(circle at 0 22%, color-mix(in oklab, var(--primary) 34%, transparent), transparent 18rem),
     radial-gradient(circle at 100% 58%, color-mix(in oklab, var(--primary) 28%, transparent), transparent 22rem),
-    linear-gradient(135deg, oklch(0.11 0.05 205 / 88%), oklch(0.18 0.1 165 / 84%)),
+    linear-gradient(135deg, oklch(0.055 0.03 240 / 94%), color-mix(in oklab, var(--primary) 18%, oklch(0.07 0.035 240) / 94%)),
     url("./assets/lottery-universe-bg.jpg") center top / cover fixed;
   color: var(--foreground);
 
   & .app-panel {
     border-color: color-mix(in oklab, var(--border) 84%, transparent);
-    background: linear-gradient(145deg, color-mix(in oklab, var(--card) 98%, transparent), color-mix(in oklab, var(--secondary) 94%, transparent));
-    box-shadow: 0 18px 48px oklch(0.06 0.06 190 / 34%);
+    background: linear-gradient(145deg, color-mix(in oklab, var(--primary) 9%, var(--card)), var(--card));
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--primary) 18%, transparent), 0 18px 48px oklch(0.02 0.04 230 / 48%);
     backdrop-filter: blur(22px);
   }
 
@@ -682,6 +802,20 @@
     --border: oklch(0.55 0.13 225 / 42%);
     --line: oklch(0.68 0.15 220 / 55%);
   }
+}
+
+@utility bolao-detail-hero {
+  border-width: 2px;
+  border-color: color-mix(in oklab, var(--primary) 78%, transparent);
+  box-shadow: 0 0 28px color-mix(in oklab, var(--primary) 18%, transparent), 0 20px 48px oklch(0.02 0.04 230 / 52%);
+}
+
+@utility bolao-detail-banner {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 11rem;
+  border-bottom: 2px solid color-mix(in oklab, var(--primary) 78%, transparent);
+  opacity: 0.92;
 }
 
 @utility bolao-shell {
@@ -766,7 +900,7 @@
 @utility bolao-stat-strip {
   border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
   border-radius: 0.85rem;
-  background: color-mix(in oklab, var(--card) 92%, var(--secondary));
+  background: linear-gradient(145deg, color-mix(in oklab, var(--primary) 8%, var(--card)), var(--card));
 }
 
 /* Destaque do premio dos cartoes de bolao */
@@ -780,7 +914,7 @@
   border-radius: 0.95rem;
   background:
     radial-gradient(120% 150% at 50% -10%, color-mix(in oklab, var(--primary) 30%, transparent), transparent 65%),
-    linear-gradient(155deg, color-mix(in oklab, var(--primary) 16%, var(--card)), color-mix(in oklab, var(--primary) 5%, var(--card)));
+    linear-gradient(155deg, color-mix(in oklab, var(--primary) 18%, oklch(0.085 0.04 240)), oklch(0.07 0.035 240));
   padding: 0.85rem 1rem 0.95rem;
   box-shadow:
     0 12px 30px color-mix(in oklab, var(--primary) 18%, transparent),
@@ -802,9 +936,9 @@
     font-weight: 900;
     line-height: 1.05;
     letter-spacing: -0.02em;
-    color: var(--foreground);
+    color: color-mix(in oklab, var(--foreground) 86%, oklch(0.93 0.16 95));
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 0 24px color-mix(in oklab, var(--primary) 50%, transparent);
+    text-shadow: 0 2px 2px oklch(0.02 0.03 240 / 80%), 0 0 24px color-mix(in oklab, var(--primary) 50%, transparent);
   }
 }
 
