@@ -573,7 +573,9 @@
   .lottery-hub-copy h1 { font-size: 2rem; }
   .lottery-hub-copy p { font-size: 0.88rem; }
   .lottery-choice-card { min-height: 29rem; }
+  .lottery-choice-card.bolao-showcase-card { min-height: 0; }
   .lottery-choice-banner { height: 6.1rem; }
+  .lottery-choice-card.bolao-showcase-card .lottery-choice-banner { height: 5.4rem; }
   .lottery-choice-banner-title { padding: 0 1rem 0.7rem; }
 }
 

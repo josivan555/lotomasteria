@@ -335,7 +335,7 @@ function Landing() {
                     </div>
 
                     <div className="lottery-choice-body flex-1 flex flex-col">
-                      <div className="flex justify-between items-center gap-2 mb-3">
+                      <div className="flex justify-between items-center gap-2 mb-2">
                         <div className="bolao-status-pill">
                           {b.is_combo ? 'Múltiplos Concursos' : `Concurso ${b.concurso_numero}`}
                         </div>
@@ -348,12 +348,12 @@ function Landing() {
                         )}
                       </div>
 
-                      <h3 className="mb-1 text-xl font-black text-foreground">{b.nome}</h3>
-                      <div className="lottery-choice-short mb-4">
+                      <h3 className="mb-0.5 text-lg font-black text-foreground">{b.nome}</h3>
+                      <div className="lottery-choice-short mb-2.5">
                         <Clock /> Sorteio: {new Date(`${b.data_sorteio}T00:00:00`).toLocaleDateString('pt-BR')} às {b.horario_sorteio}
                       </div>
 
-                      <div className="bolao-prize mb-4 text-center">
+                      <div className="bolao-prize mb-2.5 text-center">
                         <p className="bolao-prize-label">
                           <Trophy className="h-3.5 w-3.5" />
                           Prêmio Estimado Total
