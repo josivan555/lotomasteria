@@ -21,6 +21,7 @@ export type ResumoOficial = {
   proximoConcurso: number | null;
   proximoData: string | null;
   estimativaProximo: number;
+  mesSorte: number | null;
 };
 
 type CaixaDetalhe = {
@@ -41,7 +42,20 @@ type CaixaDetalhe = {
     numeroDeGanhadores: number;
     valorPremio: number;
   }[];
+  nomeTimeCoracaoMesSorte?: string;
 };
+
+const MESES_NORMALIZADOS = [
+  "janeiro", "fevereiro", "marco", "abril", "maio", "junho",
+  "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+];
+
+function mesDoNome(nome?: string): number | null {
+  if (!nome) return null;
+  const normalizado = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+  const indice = MESES_NORMALIZADOS.findIndex((mes) => normalizado.includes(mes));
+  return indice >= 0 ? indice + 1 : null;
+}
 
 function parseData(dd: string): string {
   const [d, m, y] = dd.split("/");
@@ -79,6 +93,7 @@ export async function buscarResumoOficial(loteria: LoteriaId): Promise<ResumoOfi
       proximoConcurso: j.numeroConcursoProximo ?? null,
       proximoData: j.dataProximoConcurso ? parseData(j.dataProximoConcurso) : null,
       estimativaProximo: j.valorEstimadoProximoConcurso ?? 0,
+      mesSorte: loteria === "diadesorte" ? mesDoNome(j.nomeTimeCoracaoMesSorte) : null,
     };
   } catch {
     return null;
@@ -98,6 +113,7 @@ export async function buscarConcursoOficial(
   dezenas: number[];
   data_apuracao: string;
   faixas: FaixaPremio[];
+  mesSorte: number | null;
 } | null> {
   try {
     const res = await fetch(
@@ -117,6 +133,7 @@ export async function buscarConcursoOficial(
         ganhadores: f.numeroDeGanhadores ?? 0,
         premio: f.valorPremio ?? 0,
       })),
+      mesSorte: loteria === "diadesorte" ? mesDoNome(j.nomeTimeCoracaoMesSorte) : null,
     };
   } catch {
     return null;

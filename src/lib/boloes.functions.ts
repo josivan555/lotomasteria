@@ -266,7 +266,12 @@ export const obterBolao = createServerFn({ method: "GET" })
           const oficial = await buscarConcursoOficial(parte.loteria_id as LoteriaId, parte.concurso_numero);
           if (!oficial) return parte;
           mudou = true;
-          return { ...parte, resultado_oficial: oficial.dezenas, rateio_oficial: oficial.faixas };
+          return {
+            ...parte,
+            resultado_oficial: oficial.dezenas,
+            resultado_mes_oficial: oficial.mesSorte,
+            rateio_oficial: oficial.faixas,
+          };
         }),
       );
 
@@ -302,6 +307,7 @@ export const obterBolao = createServerFn({ method: "GET" })
           .select("*")
           .maybeSingle();
         bolaoAtual = atualizado ?? { ...bolao, resultado_oficial: oficial.dezenas, status: "conferido" };
+        bolaoAtual = { ...bolaoAtual, resultado_mes_oficial: oficial.mesSorte };
       } else if (bolao.status === "em_vendas" || bolao.status === "publicado") {
         const { data: atualizado } = await supabaseAdmin
           .from("boloes")
@@ -328,7 +334,9 @@ export const obterBolao = createServerFn({ method: "GET" })
             if (Array.isArray(parte.rateio_oficial) && parte.rateio_oficial.length > 0) return parte;
             if (!Array.isArray(parte.resultado_oficial) || parte.resultado_oficial.length === 0) return parte;
             const oficial = await buscarConcursoOficial(parte.loteria_id as LoteriaId, parte.concurso_numero);
-            return oficial ? { ...parte, rateio_oficial: oficial.faixas } : parte;
+            return oficial
+              ? { ...parte, resultado_mes_oficial: oficial.mesSorte, rateio_oficial: oficial.faixas }
+              : parte;
           }),
         ),
       };
@@ -338,7 +346,13 @@ export const obterBolao = createServerFn({ method: "GET" })
         bolaoAtual.loteria_id as LoteriaId,
         bolaoAtual.concurso_numero,
       );
-      if (oficial) bolaoAtual = { ...bolaoAtual, rateio_oficial: oficial.faixas };
+      if (oficial) {
+        bolaoAtual = {
+          ...bolaoAtual,
+          resultado_mes_oficial: oficial.mesSorte,
+          rateio_oficial: oficial.faixas,
+        };
+      }
     }
 
     const { data: p } = await supabaseAdmin

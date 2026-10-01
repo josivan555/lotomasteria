@@ -20,7 +20,7 @@ export function PublicHeader({ showSearch = false }: { showSearch?: boolean }) {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 md:px-6">
         <Link to="/" className="flex min-w-0 items-center gap-2.5">
           <img src={logoAsset.url} alt="LotoMaster IA" className="h-10 w-10 shrink-0 object-contain" />
-          <span className="hidden font-black sm:block">
+          <span className="hidden font-black text-header-foreground sm:block">
             Loto<span className="neon-text">Master</span>
             <small className="block text-[8px] font-semibold uppercase text-muted-foreground">Sonhe · escolha · ganhe</small>
           </span>
