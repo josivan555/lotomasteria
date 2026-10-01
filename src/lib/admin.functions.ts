@@ -87,6 +87,7 @@ export const atualizarBolao = createServerFn({ method: "POST" })
       total_cotas: z.number().optional(),
       valor_cota: z.number().optional(),
       premio_estimado: z.number().optional(),
+      capa_url: z.string().max(300).regex(/^[\w-]+\/[\w.-]+$/).nullable().optional(),
     }).parse(raw)
   )
   .handler(async ({ data, context }) => {

@@ -75,6 +75,7 @@ export type Database = {
       }
       boloes: {
         Row: {
+          capa_url: string | null
           combo_loterias: Json
           concurso_numero: number
           created_at: string | null
@@ -97,6 +98,7 @@ export type Database = {
           valor_total: number
         }
         Insert: {
+          capa_url?: string | null
           combo_loterias?: Json
           concurso_numero: number
           created_at?: string | null
@@ -119,6 +121,7 @@ export type Database = {
           valor_total: number
         }
         Update: {
+          capa_url?: string | null
           combo_loterias?: Json
           concurso_numero?: number
           created_at?: string | null

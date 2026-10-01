@@ -11,7 +11,7 @@ export const bolaoShareInfo = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { data: bolao, error } = await supabase
       .from("boloes")
-      .select("nome, loteria_id, is_combo, combo_loterias, concurso_numero, premio_estimado, valor_cota")
+      .select("nome, loteria_id, is_combo, combo_loterias, concurso_numero, premio_estimado, valor_cota, capa_url")
       .eq("id", data.id)
       .maybeSingle();
     if (error || !bolao) return null;
@@ -24,6 +24,7 @@ export const bolaoShareInfo = createServerFn({ method: "GET" })
       concurso: Number(bolao.concurso_numero),
       premioEstimado: Number(bolao.premio_estimado ?? 0),
       valorCota: Number(bolao.valor_cota ?? 0),
+      capaUrl: (bolao as any).capa_url as string | null,
     };
   });
 

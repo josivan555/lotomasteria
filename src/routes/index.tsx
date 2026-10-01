@@ -1,3 +1,4 @@
+import { capaUrl } from "@/lib/capa";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 /**
@@ -323,15 +324,21 @@ function Landing() {
                     )}
 
                     <div className="lottery-choice-banner">
-                      <img
-                        src={b.is_combo ? LOTERIAS[(b.combo_loterias as any[])?.[0]?.loteria_id as LoteriaId]?.banner ?? cfg?.banner : cfg.banner}
-                        alt={b.is_combo ? 'Combo especial' : cfg.nome}
-                        className="h-full w-full object-cover object-left"
-                        loading="lazy"
-                      />
-                      <div className="lottery-choice-banner-title">
-                        <h2>{b.is_combo ? 'COMBO' : cfg.nome}</h2>
-                      </div>
+                      {(b as any).capa_url ? (
+                        <img src={capaUrl((b as any).capa_url)!} alt={b.nome} className="h-full w-full object-cover" loading="lazy" />
+                      ) : (
+                        <>
+                          <img
+                            src={b.is_combo ? LOTERIAS[(b.combo_loterias as any[])?.[0]?.loteria_id as LoteriaId]?.banner ?? cfg?.banner : cfg.banner}
+                            alt={b.is_combo ? 'Combo especial' : cfg.nome}
+                            className="h-full w-full object-cover object-left"
+                            loading="lazy"
+                          />
+                          <div className="lottery-choice-banner-title">
+                            <h2>{b.is_combo ? 'COMBO' : cfg.nome}</h2>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     <div className="lottery-choice-body flex-1 flex flex-col">
