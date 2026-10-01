@@ -369,20 +369,20 @@ function Landing() {
 
 
 
-                      <div className="mb-4 grid grid-cols-2 gap-3">
+                      <div className="mb-2.5 grid grid-cols-2 gap-2">
                         <div className="bolao-metric">
                           <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Valor Cota</p>
-                          <p className="text-lg font-black text-primary">R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
+                          <p className="text-base font-black text-primary">R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
                         </div>
                         <div className="bolao-metric">
                           <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Disponível</p>
-                          <p className="text-lg font-black text-foreground">
+                          <p className="text-base font-black text-foreground">
                             {b.cotas_disponiveis !== undefined ? b.cotas_disponiveis : b.total_cotas}
                           </p>
                         </div>
                       </div>
 
-                      <div className="mb-3 mt-auto space-y-2">
+                      <div className="mb-2.5 mt-auto space-y-1.5">
                         <div className="bolao-progress-track">
                           <div className="bolao-progress-fill" style={{ width: `${Math.min(progresso || 0, 100)}%` }} />
                         </div>
