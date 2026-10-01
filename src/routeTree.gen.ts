@@ -9,53 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ResultadosRouteImport } from './routes/resultados'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ContatoRouteImport } from './routes/contato'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as BoloesReservaRouteImport } from './routes/boloes.reserva'
-import { Route as BoloesBolaoIdRouteImport } from './routes/boloes.$bolaoId'
-import { Route as AuthenticatedLoteriasRouteImport } from './routes/_authenticated/loterias'
-import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticated/creditos'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ContatoRouteImport } from './routes/contato'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ResultadosRouteImport } from './routes/resultados'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticated/creditos'
+import { Route as AuthenticatedLoteriasRouteImport } from './routes/_authenticated/loterias'
+import { Route as BoloesBolaoIdRouteImport } from './routes/boloes.$bolaoId'
+import { Route as BoloesReservaRouteImport } from './routes/boloes.reserva'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as BoloesPagamentoCodigoRouteImport } from './routes/boloes.pagamento.$codigo'
-import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
-import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
-import { Route as ApiPublicAtualizarResultadosRouteImport } from './routes/api/public/atualizar-resultados'
 import { Route as AuthenticatedAdminComboRouteImport } from './routes/_authenticated/admin/combo'
 import { Route as AuthenticatedLLoteriaRouteRouteImport } from './routes/_authenticated/l/$loteria/route'
+import { Route as ApiPublicAtualizarResultadosRouteImport } from './routes/api/public/atualizar-resultados'
+import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
+import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
+import { Route as BoloesPagamentoCodigoRouteImport } from './routes/boloes.pagamento.$codigo'
 import { Route as AuthenticatedLLoteriaIndexRouteImport } from './routes/_authenticated/l/$loteria/index'
-import { Route as ApiPublicCapaSplatRouteImport } from './routes/api/public/capa.$'
-import { Route as AuthenticatedLLoteriaVolanteRouteImport } from './routes/_authenticated/l/$loteria/volante'
-import { Route as AuthenticatedLLoteriaResultadosRouteImport } from './routes/_authenticated/l/$loteria/resultados'
-import { Route as AuthenticatedLLoteriaJogosRouteImport } from './routes/_authenticated/l/$loteria/jogos'
-import { Route as AuthenticatedLLoteriaHistoricoRouteImport } from './routes/_authenticated/l/$loteria/historico'
-import { Route as AuthenticatedLLoteriaGeradorRouteImport } from './routes/_authenticated/l/$loteria/gerador'
-import { Route as AuthenticatedLLoteriaDashboardRouteImport } from './routes/_authenticated/l/$loteria/dashboard'
 import { Route as AuthenticatedLLoteriaAjudaRouteImport } from './routes/_authenticated/l/$loteria/ajuda'
+import { Route as AuthenticatedLLoteriaDashboardRouteImport } from './routes/_authenticated/l/$loteria/dashboard'
+import { Route as AuthenticatedLLoteriaGeradorRouteImport } from './routes/_authenticated/l/$loteria/gerador'
+import { Route as AuthenticatedLLoteriaHistoricoRouteImport } from './routes/_authenticated/l/$loteria/historico'
+import { Route as AuthenticatedLLoteriaJogosRouteImport } from './routes/_authenticated/l/$loteria/jogos'
+import { Route as AuthenticatedLLoteriaResultadosRouteImport } from './routes/_authenticated/l/$loteria/resultados'
+import { Route as AuthenticatedLLoteriaVolanteRouteImport } from './routes/_authenticated/l/$loteria/volante'
+import { Route as ApiPublicCapaSplatRouteImport } from './routes/api/public/capa.$'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResultadosRoute = ResultadosRouteImport.update({
-  id: '/resultados',
-  path: '/resultados',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContatoRoute = ContatoRouteImport.update({
-  id: '/contato',
-  path: '/contato',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -63,28 +52,29 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const ContatoRoute = ContatoRouteImport.update({
+  id: '/contato',
+  path: '/contato',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BoloesReservaRoute = BoloesReservaRouteImport.update({
-  id: '/boloes/reserva',
-  path: '/boloes/reserva',
+const ResultadosRoute = ResultadosRouteImport.update({
+  id: '/resultados',
+  path: '/resultados',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BoloesBolaoIdRoute = BoloesBolaoIdRouteImport.update({
-  id: '/boloes/$bolaoId',
-  path: '/boloes/$bolaoId',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedLoteriasRoute = AuthenticatedLoteriasRouteImport.update({
-  id: '/loterias',
-  path: '/loterias',
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCreditosRoute = AuthenticatedCreditosRouteImport.update({
@@ -92,38 +82,26 @@ const AuthenticatedCreditosRoute = AuthenticatedCreditosRouteImport.update({
   path: '/creditos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedLoteriasRoute = AuthenticatedLoteriasRouteImport.update({
+  id: '/loterias',
+  path: '/loterias',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const BoloesBolaoIdRoute = BoloesBolaoIdRouteImport.update({
+  id: '/boloes/$bolaoId',
+  path: '/boloes/$bolaoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoloesReservaRoute = BoloesReservaRouteImport.update({
+  id: '/boloes/reserva',
+  path: '/boloes/reserva',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
-const BoloesPagamentoCodigoRoute = BoloesPagamentoCodigoRouteImport.update({
-  id: '/boloes/pagamento/$codigo',
-  path: '/boloes/pagamento/$codigo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicWebhookRoute = ApiPublicWebhookRouteImport.update({
-  id: '/api/public/webhook',
-  path: '/api/public/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicMercadopagoWebhookRoute =
-  ApiPublicMercadopagoWebhookRouteImport.update({
-    id: '/api/public/mercadopago-webhook',
-    path: '/api/public/mercadopago-webhook',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicAtualizarResultadosRoute =
-  ApiPublicAtualizarResultadosRouteImport.update({
-    id: '/api/public/atualizar-resultados',
-    path: '/api/public/atualizar-resultados',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const AuthenticatedAdminComboRoute = AuthenticatedAdminComboRouteImport.update({
   id: '/combo',
   path: '/combo',
@@ -135,51 +113,32 @@ const AuthenticatedLLoteriaRouteRoute =
     path: '/l/$loteria',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicAtualizarResultadosRoute =
+  ApiPublicAtualizarResultadosRouteImport.update({
+    id: '/api/public/atualizar-resultados',
+    path: '/api/public/atualizar-resultados',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicMercadopagoWebhookRoute =
+  ApiPublicMercadopagoWebhookRouteImport.update({
+    id: '/api/public/mercadopago-webhook',
+    path: '/api/public/mercadopago-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicWebhookRoute = ApiPublicWebhookRouteImport.update({
+  id: '/api/public/webhook',
+  path: '/api/public/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoloesPagamentoCodigoRoute = BoloesPagamentoCodigoRouteImport.update({
+  id: '/boloes/pagamento/$codigo',
+  path: '/boloes/pagamento/$codigo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLLoteriaIndexRoute =
   AuthenticatedLLoteriaIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
-  } as any)
-const ApiPublicCapaSplatRoute = ApiPublicCapaSplatRouteImport.update({
-  id: '/api/public/capa/$',
-  path: '/api/public/capa/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedLLoteriaVolanteRoute =
-  AuthenticatedLLoteriaVolanteRouteImport.update({
-    id: '/volante',
-    path: '/volante',
-    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
-  } as any)
-const AuthenticatedLLoteriaResultadosRoute =
-  AuthenticatedLLoteriaResultadosRouteImport.update({
-    id: '/resultados',
-    path: '/resultados',
-    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
-  } as any)
-const AuthenticatedLLoteriaJogosRoute =
-  AuthenticatedLLoteriaJogosRouteImport.update({
-    id: '/jogos',
-    path: '/jogos',
-    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
-  } as any)
-const AuthenticatedLLoteriaHistoricoRoute =
-  AuthenticatedLLoteriaHistoricoRouteImport.update({
-    id: '/historico',
-    path: '/historico',
-    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
-  } as any)
-const AuthenticatedLLoteriaGeradorRoute =
-  AuthenticatedLLoteriaGeradorRouteImport.update({
-    id: '/gerador',
-    path: '/gerador',
-    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
-  } as any)
-const AuthenticatedLLoteriaDashboardRoute =
-  AuthenticatedLLoteriaDashboardRouteImport.update({
-    id: '/dashboard',
-    path: '/dashboard',
     getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
   } as any)
 const AuthenticatedLLoteriaAjudaRoute =
@@ -188,6 +147,47 @@ const AuthenticatedLLoteriaAjudaRoute =
     path: '/ajuda',
     getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
   } as any)
+const AuthenticatedLLoteriaDashboardRoute =
+  AuthenticatedLLoteriaDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaGeradorRoute =
+  AuthenticatedLLoteriaGeradorRouteImport.update({
+    id: '/gerador',
+    path: '/gerador',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaHistoricoRoute =
+  AuthenticatedLLoteriaHistoricoRouteImport.update({
+    id: '/historico',
+    path: '/historico',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaJogosRoute =
+  AuthenticatedLLoteriaJogosRouteImport.update({
+    id: '/jogos',
+    path: '/jogos',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaResultadosRoute =
+  AuthenticatedLLoteriaResultadosRouteImport.update({
+    id: '/resultados',
+    path: '/resultados',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const AuthenticatedLLoteriaVolanteRoute =
+  AuthenticatedLLoteriaVolanteRouteImport.update({
+    id: '/volante',
+    path: '/volante',
+    getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
+  } as any)
+const ApiPublicCapaSplatRoute = ApiPublicCapaSplatRouteImport.update({
+  id: '/api/public/capa/$',
+  path: '/api/public/capa/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -384,39 +384,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resultados': {
-      id: '/resultados'
-      path: '/resultados'
-      fullPath: '/resultados'
-      preLoaderRoute: typeof ResultadosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contato': {
-      id: '/contato'
-      path: '/contato'
-      fullPath: '/contato'
-      preLoaderRoute: typeof ContatoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -426,32 +398,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/boloes/reserva': {
-      id: '/boloes/reserva'
-      path: '/boloes/reserva'
-      fullPath: '/boloes/reserva'
-      preLoaderRoute: typeof BoloesReservaRouteImport
+    '/contato': {
+      id: '/contato'
+      path: '/contato'
+      fullPath: '/contato'
+      preLoaderRoute: typeof ContatoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/boloes/$bolaoId': {
-      id: '/boloes/$bolaoId'
-      path: '/boloes/$bolaoId'
-      fullPath: '/boloes/$bolaoId'
-      preLoaderRoute: typeof BoloesBolaoIdRouteImport
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/loterias': {
-      id: '/_authenticated/loterias'
-      path: '/loterias'
-      fullPath: '/loterias'
-      preLoaderRoute: typeof AuthenticatedLoteriasRouteImport
+    '/resultados': {
+      id: '/resultados'
+      path: '/resultados'
+      fullPath: '/resultados'
+      preLoaderRoute: typeof ResultadosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/creditos': {
@@ -461,12 +447,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCreditosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+    '/_authenticated/loterias': {
+      id: '/_authenticated/loterias'
+      path: '/loterias'
+      fullPath: '/loterias'
+      preLoaderRoute: typeof AuthenticatedLoteriasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/boloes/$bolaoId': {
+      id: '/boloes/$bolaoId'
+      path: '/boloes/$bolaoId'
+      fullPath: '/boloes/$bolaoId'
+      preLoaderRoute: typeof BoloesBolaoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boloes/reserva': {
+      id: '/boloes/reserva'
+      path: '/boloes/reserva'
+      fullPath: '/boloes/reserva'
+      preLoaderRoute: typeof BoloesReservaRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -474,34 +474,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/boloes/pagamento/$codigo': {
-      id: '/boloes/pagamento/$codigo'
-      path: '/boloes/pagamento/$codigo'
-      fullPath: '/boloes/pagamento/$codigo'
-      preLoaderRoute: typeof BoloesPagamentoCodigoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/webhook': {
-      id: '/api/public/webhook'
-      path: '/api/public/webhook'
-      fullPath: '/api/public/webhook'
-      preLoaderRoute: typeof ApiPublicWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/mercadopago-webhook': {
-      id: '/api/public/mercadopago-webhook'
-      path: '/api/public/mercadopago-webhook'
-      fullPath: '/api/public/mercadopago-webhook'
-      preLoaderRoute: typeof ApiPublicMercadopagoWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/atualizar-resultados': {
-      id: '/api/public/atualizar-resultados'
-      path: '/api/public/atualizar-resultados'
-      fullPath: '/api/public/atualizar-resultados'
-      preLoaderRoute: typeof ApiPublicAtualizarResultadosRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/combo': {
       id: '/_authenticated/admin/combo'
@@ -517,6 +489,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLLoteriaRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/atualizar-resultados': {
+      id: '/api/public/atualizar-resultados'
+      path: '/api/public/atualizar-resultados'
+      fullPath: '/api/public/atualizar-resultados'
+      preLoaderRoute: typeof ApiPublicAtualizarResultadosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/mercadopago-webhook': {
+      id: '/api/public/mercadopago-webhook'
+      path: '/api/public/mercadopago-webhook'
+      fullPath: '/api/public/mercadopago-webhook'
+      preLoaderRoute: typeof ApiPublicMercadopagoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/webhook': {
+      id: '/api/public/webhook'
+      path: '/api/public/webhook'
+      fullPath: '/api/public/webhook'
+      preLoaderRoute: typeof ApiPublicWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boloes/pagamento/$codigo': {
+      id: '/boloes/pagamento/$codigo'
+      path: '/boloes/pagamento/$codigo'
+      fullPath: '/boloes/pagamento/$codigo'
+      preLoaderRoute: typeof BoloesPagamentoCodigoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/l/$loteria/': {
       id: '/_authenticated/l/$loteria/'
       path: '/'
@@ -524,46 +524,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLLoteriaIndexRouteImport
       parentRoute: typeof AuthenticatedLLoteriaRouteRoute
     }
-    '/api/public/capa/$': {
-      id: '/api/public/capa/$'
-      path: '/api/public/capa/$'
-      fullPath: '/api/public/capa/$'
-      preLoaderRoute: typeof ApiPublicCapaSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/l/$loteria/volante': {
-      id: '/_authenticated/l/$loteria/volante'
-      path: '/volante'
-      fullPath: '/l/$loteria/volante'
-      preLoaderRoute: typeof AuthenticatedLLoteriaVolanteRouteImport
-      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
-    }
-    '/_authenticated/l/$loteria/resultados': {
-      id: '/_authenticated/l/$loteria/resultados'
-      path: '/resultados'
-      fullPath: '/l/$loteria/resultados'
-      preLoaderRoute: typeof AuthenticatedLLoteriaResultadosRouteImport
-      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
-    }
-    '/_authenticated/l/$loteria/jogos': {
-      id: '/_authenticated/l/$loteria/jogos'
-      path: '/jogos'
-      fullPath: '/l/$loteria/jogos'
-      preLoaderRoute: typeof AuthenticatedLLoteriaJogosRouteImport
-      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
-    }
-    '/_authenticated/l/$loteria/historico': {
-      id: '/_authenticated/l/$loteria/historico'
-      path: '/historico'
-      fullPath: '/l/$loteria/historico'
-      preLoaderRoute: typeof AuthenticatedLLoteriaHistoricoRouteImport
-      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
-    }
-    '/_authenticated/l/$loteria/gerador': {
-      id: '/_authenticated/l/$loteria/gerador'
-      path: '/gerador'
-      fullPath: '/l/$loteria/gerador'
-      preLoaderRoute: typeof AuthenticatedLLoteriaGeradorRouteImport
+    '/_authenticated/l/$loteria/ajuda': {
+      id: '/_authenticated/l/$loteria/ajuda'
+      path: '/ajuda'
+      fullPath: '/l/$loteria/ajuda'
+      preLoaderRoute: typeof AuthenticatedLLoteriaAjudaRouteImport
       parentRoute: typeof AuthenticatedLLoteriaRouteRoute
     }
     '/_authenticated/l/$loteria/dashboard': {
@@ -573,12 +538,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLLoteriaDashboardRouteImport
       parentRoute: typeof AuthenticatedLLoteriaRouteRoute
     }
-    '/_authenticated/l/$loteria/ajuda': {
-      id: '/_authenticated/l/$loteria/ajuda'
-      path: '/ajuda'
-      fullPath: '/l/$loteria/ajuda'
-      preLoaderRoute: typeof AuthenticatedLLoteriaAjudaRouteImport
+    '/_authenticated/l/$loteria/gerador': {
+      id: '/_authenticated/l/$loteria/gerador'
+      path: '/gerador'
+      fullPath: '/l/$loteria/gerador'
+      preLoaderRoute: typeof AuthenticatedLLoteriaGeradorRouteImport
       parentRoute: typeof AuthenticatedLLoteriaRouteRoute
+    }
+    '/_authenticated/l/$loteria/historico': {
+      id: '/_authenticated/l/$loteria/historico'
+      path: '/historico'
+      fullPath: '/l/$loteria/historico'
+      preLoaderRoute: typeof AuthenticatedLLoteriaHistoricoRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
+    }
+    '/_authenticated/l/$loteria/jogos': {
+      id: '/_authenticated/l/$loteria/jogos'
+      path: '/jogos'
+      fullPath: '/l/$loteria/jogos'
+      preLoaderRoute: typeof AuthenticatedLLoteriaJogosRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
+    }
+    '/_authenticated/l/$loteria/resultados': {
+      id: '/_authenticated/l/$loteria/resultados'
+      path: '/resultados'
+      fullPath: '/l/$loteria/resultados'
+      preLoaderRoute: typeof AuthenticatedLLoteriaResultadosRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
+    }
+    '/_authenticated/l/$loteria/volante': {
+      id: '/_authenticated/l/$loteria/volante'
+      path: '/volante'
+      fullPath: '/l/$loteria/volante'
+      preLoaderRoute: typeof AuthenticatedLLoteriaVolanteRouteImport
+      parentRoute: typeof AuthenticatedLLoteriaRouteRoute
+    }
+    '/api/public/capa/$': {
+      id: '/api/public/capa/$'
+      path: '/api/public/capa/$'
+      fullPath: '/api/public/capa/$'
+      preLoaderRoute: typeof ApiPublicCapaSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
