@@ -144,7 +144,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, resultadoM
                 onClick={() => toggle(n)}
                 disabled={bloqueado}
                 className={cn(
-                  "h-8 w-8 shrink-0 rounded-full p-0 text-[10px] font-bold font-mono transition-all sm:h-9 sm:w-9 sm:text-[11px]",
+                  "h-11 w-11 shrink-0 rounded-full p-0 text-[15px] font-bold font-mono transition-all sm:h-12 sm:w-12 sm:text-base",
                   on
                     ? "border-primary bg-primary text-primary-foreground scale-105 shadow-lg shadow-primary/25"
                     : "border-border/60 bg-secondary/30 text-muted-foreground hover:border-primary/50 hover:text-foreground",
@@ -186,7 +186,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, resultadoM
           <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
             <span className="mr-1 text-[11px] font-bold uppercase text-muted-foreground">Sorteadas:</span>
             {sorteadasOrdenadas.map((n) => (
-              <span key={n} className="grid h-7 w-7 place-items-center rounded-full bg-primary font-mono text-[11px] font-black text-primary-foreground">
+              <span key={n} className="grid h-9 w-9 place-items-center rounded-full bg-primary font-mono text-[13px] font-black text-primary-foreground">
                 {pad(n)}
               </span>
             ))}
@@ -329,7 +329,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, resultadoM
                   <div
                     key={n}
                     className={cn(
-                      "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-black sm:h-9 sm:w-9",
+                      "flex h-10 w-10 items-center justify-center rounded-full border text-[13px] font-black sm:h-11 sm:w-11 sm:text-sm",
                       selected.has(n)
                         ? "border-transparent bg-primary text-primary-foreground"
                         : "border-border bg-secondary/35 text-foreground",
