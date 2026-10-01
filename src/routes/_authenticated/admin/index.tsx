@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useRouter, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { AdminParticipantesDialog } from "@/components/admin-participantes-dialog";
+import { AdminAdicionarParticipante } from "@/components/admin-adicionar-participante";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
@@ -174,7 +175,9 @@ function AdminDashboard() {
             </Button>
           </div>
 
-          <div className="rounded-xl border border-border/60 bg-card/40 backdrop-blur overflow-hidden">
+          <AdminAdicionarParticipante boloes={boloes} />
+
+          <div className="rounded-xl border border-border/60 bg-card/40 backdrop-blur overflow-hidden mt-4">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-muted/50 text-muted-foreground font-medium border-b border-border/40">
