@@ -6,7 +6,10 @@ import { cn } from "@/lib/utils";
 import { Sparkles, Eraser, Trophy } from "lucide-react";
 import { formatBRL } from "@/lib/credits-config";
 
-type Jogo = { dezenas: number[]; score?: number };
+type Jogo = { dezenas: number[]; score?: number; mes_sorte?: number | null; metadata?: { mes_sorte?: number | null } | null };
+
+const MESES = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+const pad = (n: number) => n.toString().padStart(2, "0");
 
 type Props = {
   jogos: Jogo[];
@@ -24,6 +27,8 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
     () => new Set(resultadoOficial ?? []),
   );
   const [ordem, setOrdem] = useState<Ordem>("order");
+  const temMes = loteriaId === "diadesorte";
+  const [mesSel, setMesSel] = useState<number | null>(null);
 
   // Sync with official result if it arrives after initial mount
   useEffect(() => {
@@ -45,9 +50,10 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
     return jogos.map((jogo, i) => {
       const dezenas = jogo.dezenas ?? [];
       const acertos = dezenas.filter((d) => selected.has(d)).length;
-      return { ...jogo, dezenas, indice: i + 1, acertos };
+      const mes = jogo.mes_sorte ?? jogo.metadata?.mes_sorte ?? null;
+      return { ...jogo, dezenas, indice: i + 1, acertos, mes, acertouMes: temMes && mesSel !== null && mes === mesSel };
     });
-  }, [jogos, selected]);
+  }, [jogos, selected, temMes, mesSel]);
 
   const listados = useMemo(() => {
     const arr = [...conferidos];
@@ -78,9 +84,16 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
     }
     return valores;
   }, [cfg.faixas, rateio]);
-  const totalGanho = completo
-    ? conferidos.reduce((total, jogo) => total + (premiosPorFaixa.get(jogo.acertos) ?? 0), 0)
-    : 0;
+  const premioMes = useMemo(() => {
+    const item = (rateio ?? []).find((r) => /m[eê]s/i.test(r.faixa));
+    return item?.premio ?? 2.5;
+  }, [rateio]);
+  const maxAcertos = selected.size ? Math.max(0, ...conferidos.map((j) => j.acertos)) : -1;
+  const qtdMes = conferidos.filter((j) => j.acertouMes).length;
+  const totalGanho =
+    (completo ? conferidos.reduce((total, jogo) => total + (premiosPorFaixa.get(jogo.acertos) ?? 0), 0) : 0) +
+    qtdMes * premioMes;
+  const sorteadasOrdenadas = [...selected].sort((a, b) => a - b);
 
   return (
     <div className="space-y-5">
@@ -114,6 +127,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
         <div className="mx-auto flex max-w-xl flex-wrap justify-center gap-1.5 sm:gap-2">
           {Array.from({ length: cfg.total }, (_, i) => i + 1).map((n) => {
             const on = selected.has(n);
+            const bloqueado = completo && !on;
             return (
               <Button
                 key={n}
@@ -121,11 +135,13 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
                 variant="outline"
                 size="icon"
                 onClick={() => toggle(n)}
+                disabled={bloqueado}
                 className={cn(
                   "h-8 w-8 shrink-0 rounded-full p-0 text-[10px] font-bold font-mono transition-all sm:h-9 sm:w-9 sm:text-[11px]",
                   on
                     ? "border-primary bg-primary text-primary-foreground scale-105 shadow-lg shadow-primary/25"
                     : "border-border/60 bg-secondary/30 text-muted-foreground hover:border-primary/50 hover:text-foreground",
+                  bloqueado && "opacity-30",
                 )}
               >
                 {n.toString().padStart(2, "0")}
@@ -134,12 +150,58 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
           })}
         </div>
 
+        {temMes && (
+          <div className="mx-auto mt-4 max-w-xl">
+            <p className="mb-2 text-center text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Mês da Sorte</p>
+            <div className="grid grid-cols-6 gap-1.5">
+              {MESES.map((m, i) => (
+                <Button
+                  key={m}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setMesSel((cur) => (cur === i + 1 ? null : i + 1))}
+                  className={cn(
+                    "h-8 px-0 text-[11px] font-black",
+                    mesSel === i + 1
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border/60 bg-secondary/30 text-muted-foreground",
+                  )}
+                >
+                  {m}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {(selected.size > 0 || mesSel !== null) && (
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
+            <span className="mr-1 text-[11px] font-bold uppercase text-muted-foreground">Sorteadas:</span>
+            {sorteadasOrdenadas.map((n) => (
+              <span key={n} className="grid h-7 w-7 place-items-center rounded-full bg-primary font-mono text-[11px] font-black text-primary-foreground">
+                {pad(n)}
+              </span>
+            ))}
+            {mesSel !== null && (
+              <span className="rounded-md bg-primary px-2 py-1 text-[11px] font-black text-primary-foreground">{MESES[mesSel - 1]}</span>
+            )}
+          </div>
+        )}
+
+        <p className="mt-3 text-center text-[11px] text-muted-foreground">
+          Ao completar {cfg.tamanho} dezenas, as demais ficam bloqueadas. Faixas com rateio variam conforme o número de ganhadores.
+        </p>
+
         <div className="mt-4 flex justify-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setSelected(new Set())}
-            disabled={selected.size === 0}
+            onClick={() => {
+              setSelected(new Set());
+              setMesSel(null);
+            }}
+            disabled={selected.size === 0 && mesSel === null}
           >
             <Eraser className="mr-2 h-3.5 w-3.5" /> Limpar
           </Button>
@@ -164,7 +226,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
               <p className="text-lg font-black text-primary">{formatBRL(premioEstimado)}</p>
             </div>
           </div>
-          {completo && totalGanho > 0 && (
+          {totalGanho > 0 && (
             <div className="text-right">
               <p className="text-[10px] font-bold uppercase text-muted-foreground">Total ganho nos jogos</p>
               <p className="text-lg font-black text-primary">{formatBRL(totalGanho)}</p>
@@ -173,7 +235,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
         </div>
       </div>
 
-      {selected.size > 0 && (
+      {(selected.size > 0 || mesSel !== null) && (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           {resumo.map((r) => (
             <div
@@ -200,6 +262,15 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
               </div>
             </div>
           ))}
+          {temMes && (
+            <div className="rounded-lg border border-border/40 bg-card p-3 text-center">
+              <div className={cn("font-mono text-xl font-black", qtdMes > 0 ? "text-primary" : "text-muted-foreground/50")}>
+                {mesSel !== null ? qtdMes : "–"}
+              </div>
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Mês da sorte</div>
+              <div className="mt-1 text-[10px] font-bold text-primary">{formatBRL(premioMes)} cada</div>
+            </div>
+          )}
         </div>
       )}
 
@@ -221,7 +292,10 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
       <div className="space-y-3">
         {listados.map((jogo) => {
           const premiado = completo && jogo.acertos >= Math.min(...cfg.faixas);
-          const premioJogo = completo ? (premiosPorFaixa.get(jogo.acertos) ?? 0) : 0;
+          const premioJogo =
+            (completo ? (premiosPorFaixa.get(jogo.acertos) ?? 0) : 0) + (jogo.acertouMes ? premioMes : 0);
+          const faixaJogo = selected.size > 0 && cfg.faixas.includes(jogo.acertos);
+          const topo = selected.size > 0 && jogo.acertos === maxAcertos && jogo.acertos > 0;
           return (
             <div
               key={jogo.indice}
@@ -233,6 +307,16 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
               <div className="grid h-9 min-w-11 shrink-0 place-items-center rounded-lg border border-primary/35 bg-primary/12 px-2 font-mono text-sm font-black text-primary shadow-sm">
                 {jogo.indice.toString().padStart(2, "0")}
               </div>
+              {temMes && jogo.mes ? (
+                <span
+                  className={cn(
+                    "rounded-md border px-2 py-1 text-[11px] font-black",
+                    jogo.acertouMes ? "border-primary bg-primary text-primary-foreground" : "border-border bg-secondary/35 text-foreground",
+                  )}
+                >
+                  {MESES[jogo.mes - 1]}
+                </span>
+              ) : null}
               <div className="flex flex-1 flex-wrap gap-1.5">
                 {jogo.dezenas.map((n) => (
                   <div
@@ -252,14 +336,17 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
                 <div
                   className={cn(
                     "font-mono text-xl font-black",
-                    premiado ? "text-primary" : "text-muted-foreground",
+                    premiado || topo ? "text-primary" : "text-muted-foreground",
                   )}
                 >
-                  {jogo.acertos}
+                  {selected.size ? jogo.acertos : "–"}
                 </div>
                 <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  {premiado ? "premiado" : "acertos"}
+                  {faixaJogo ? `${jogo.acertos} pts${premiado ? " · premiado" : ""}` : "acertos"}
                 </div>
+                {jogo.acertouMes && (
+                  <div className="text-[10px] font-black text-primary">+ mês da sorte</div>
+                )}
                 {premioJogo > 0 && (
                   <div className="mt-0.5 text-[10px] font-black text-primary">
                     {formatBRL(premioJogo)}
