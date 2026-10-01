@@ -335,7 +335,7 @@ function Landing() {
                     </div>
 
                     <div className="lottery-choice-body flex-1 flex flex-col">
-                      <div className="flex justify-between items-center gap-2 mb-3">
+                      <div className="flex justify-between items-center gap-2 mb-2">
                         <div className="bolao-status-pill">
                           {b.is_combo ? 'Múltiplos Concursos' : `Concurso ${b.concurso_numero}`}
                         </div>
@@ -348,12 +348,12 @@ function Landing() {
                         )}
                       </div>
 
-                      <h3 className="mb-1 text-xl font-black text-foreground">{b.nome}</h3>
-                      <div className="lottery-choice-short mb-4">
+                      <h3 className="mb-0.5 text-lg font-black text-foreground">{b.nome}</h3>
+                      <div className="lottery-choice-short mb-2.5">
                         <Clock /> Sorteio: {new Date(`${b.data_sorteio}T00:00:00`).toLocaleDateString('pt-BR')} às {b.horario_sorteio}
                       </div>
 
-                      <div className="bolao-prize mb-4 text-center">
+                      <div className="bolao-prize mb-2.5 text-center">
                         <p className="bolao-prize-label">
                           <Trophy className="h-3.5 w-3.5" />
                           Prêmio Estimado Total
@@ -369,20 +369,20 @@ function Landing() {
 
 
 
-                      <div className="mb-4 grid grid-cols-2 gap-3">
+                      <div className="mb-2.5 grid grid-cols-2 gap-2">
                         <div className="bolao-metric">
                           <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Valor Cota</p>
-                          <p className="text-lg font-black text-primary">R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
+                          <p className="text-base font-black text-primary">R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
                         </div>
                         <div className="bolao-metric">
                           <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Disponível</p>
-                          <p className="text-lg font-black text-foreground">
+                          <p className="text-base font-black text-foreground">
                             {b.cotas_disponiveis !== undefined ? b.cotas_disponiveis : b.total_cotas}
                           </p>
                         </div>
                       </div>
 
-                      <div className="mb-3 mt-auto space-y-2">
+                      <div className="mb-2.5 mt-auto space-y-1.5">
                         <div className="bolao-progress-track">
                           <div className="bolao-progress-fill" style={{ width: `${Math.min(progresso || 0, 100)}%` }} />
                         </div>
@@ -401,14 +401,14 @@ function Landing() {
                               Participações Encerradas
                             </div>
                             <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
-                              <Button className="bolao-primary-action w-full min-w-0 px-2.5 text-[13px] font-black order-1 sm:order-none" asChild>
+                              <Button className="bolao-primary-action h-9 w-full min-w-0 px-2.5 text-xs font-black order-1 sm:order-none" asChild>
 
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: bolaoConferidoOficial(b) ? 'conferir' : 'comprar' }}>
                                   <BarChart3 className="h-4 w-4" />
                                   {bolaoConferidoOficial(b) ? 'Ver Resultado' : 'Comprar Cotas'}
                                 </Link>
                               </Button>
-                              <Button variant="outline" className="bolao-secondary-action w-full min-w-0 px-2.5 text-[13px] font-black order-2 sm:order-none" asChild>
+                              <Button variant="outline" className="bolao-secondary-action h-9 w-full min-w-0 px-2.5 text-xs font-black order-2 sm:order-none" asChild>
 
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                                   <Users className="h-4 w-4" />
@@ -419,13 +419,13 @@ function Landing() {
                           </div>
                         ) : (
                           <>
-                            <Button className="bolao-primary-action w-full min-w-0 px-2.5 text-[13px] font-black order-1 sm:order-none" asChild>
+                            <Button className="bolao-primary-action h-9 w-full min-w-0 px-2.5 text-xs font-black order-1 sm:order-none" asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'comprar' }}>
                                 <TicketCheck className="h-4 w-4" />
                                 Comprar Cotas
                               </Link>
                             </Button>
-                            <Button variant="outline" className="bolao-secondary-action w-full min-w-0 px-2.5 text-[13px] font-black order-2 sm:order-none" asChild>
+                            <Button variant="outline" className="bolao-secondary-action h-9 w-full min-w-0 px-2.5 text-xs font-black order-2 sm:order-none" asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                                 <Users className="h-4 w-4" />
                                 Ver Participantes
