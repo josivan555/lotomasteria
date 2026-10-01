@@ -40,6 +40,7 @@
   --color-surface-strong: var(--surface-strong);
   --color-line: var(--line);
   --color-neon: var(--neon);
+  --color-header-foreground: var(--header-foreground);
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -69,6 +70,7 @@
   --surface-strong: oklch(0.125 0.048 246 / 96%);
   --line: oklch(0.68 0.15 220 / 55%);
   --neon: oklch(0.86 0.245 145);
+  --header-foreground: oklch(0.98 0.01 225);
   --hot: oklch(0.68 0.22 30);
   --cold: oklch(0.65 0.15 240);
   --chart-1: oklch(0.72 0.18 155);

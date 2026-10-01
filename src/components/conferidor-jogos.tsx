@@ -15,20 +15,21 @@ type Props = {
   jogos: Jogo[];
   loteriaId: LoteriaId;
   resultadoOficial?: number[] | null;
+  resultadoMesOficial?: number | null;
   premioEstimado?: number;
   rateio?: { faixa: string; ganhadores: number; premio: number }[] | null;
 };
 
 type Ordem = "order" | "hits-desc" | "hits-asc";
 
-export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEstimado = 0, rateio }: Props) {
+export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, resultadoMesOficial, premioEstimado = 0, rateio }: Props) {
   const cfg = LOTERIAS[loteriaId];
   const [selected, setSelected] = useState<Set<number>>(
     () => new Set(resultadoOficial ?? []),
   );
   const [ordem, setOrdem] = useState<Ordem>("order");
   const temMes = loteriaId === "diadesorte";
-  const [mesSel, setMesSel] = useState<number | null>(null);
+  const [mesSel, setMesSel] = useState<number | null>(() => resultadoMesOficial ?? null);
 
   // Sync with official result if it arrives after initial mount
   useEffect(() => {
@@ -36,6 +37,12 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
       setSelected(new Set(resultadoOficial));
     }
   }, [resultadoOficial]);
+
+  useEffect(() => {
+    if (typeof resultadoMesOficial === "number" && resultadoMesOficial >= 1 && resultadoMesOficial <= 12) {
+      setMesSel(resultadoMesOficial);
+    }
+  }, [resultadoMesOficial]);
 
   const toggle = (n: number) => {
     setSelected((prev) => {
@@ -332,7 +339,13 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
                   </div>
                 ))}
               </div>
-              <div className="min-w-[70px] text-right">
+              <div className="flex min-w-[70px] items-center justify-end gap-2 text-right">
+                {jogo.acertouMes && (
+                  <span className="shrink-0 rounded-full bg-primary px-2 py-1 text-[10px] font-black text-primary-foreground">
+                    +{formatBRL(premioMes)}
+                  </span>
+                )}
+                <div>
                 <div
                   className={cn(
                     "font-mono text-xl font-black",
@@ -344,14 +357,12 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, premioEsti
                 <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
                   {faixaJogo ? `${jogo.acertos} pts${premiado ? " · premiado" : ""}` : "acertos"}
                 </div>
-                {jogo.acertouMes && (
-                  <div className="text-[10px] font-black text-primary">+ mês da sorte</div>
-                )}
                 {premioJogo > 0 && (
                   <div className="mt-0.5 text-[10px] font-black text-primary">
                     {formatBRL(premioJogo)}
                   </div>
                 )}
+                </div>
               </div>
             </div>
           );
