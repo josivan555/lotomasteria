@@ -279,6 +279,15 @@ function AdminDashboard() {
                                         const file = e.target.files?.[0];
                                         if (!file) return;
                                         if (file.size > 5 * 1024 * 1024) { toast.error("A imagem deve ter até 5MB"); return; }
+                                        const dim = await new Promise<{ w: number; h: number } | null>(resolve => {
+                                          const url = URL.createObjectURL(file);
+                                          const img = new Image();
+                                          img.onload = () => { resolve({ w: img.naturalWidth, h: img.naturalHeight }); URL.revokeObjectURL(url); };
+                                          img.onerror = () => { resolve(null); URL.revokeObjectURL(url); };
+                                          img.src = url;
+                                        });
+                                        if (dim && dim.w < 600) { toast.error(`Arte pequena demais (${dim.w}px de largura). Envie pelo menos 1200 × 630 px.`); return; }
+                                        if (dim && (dim.w / dim.h < 1.25 || dim.w / dim.h > 3)) toast.warning("Formato fora do ideal: a arte vai ser recortada nas bordas. O recomendado é 1200 × 630 px.");
                                         const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
                                         const path = `${b.id}/${Date.now()}.${ext}`;
                                         const t = toast.loading("Enviando arte...");
@@ -294,6 +303,9 @@ function AdminDashboard() {
                                     <button type="button" className="text-[11px] font-bold text-destructive" onClick={() => setEditBolaoForm({ ...editBolaoForm, capa_url: null })}>Remover</button>
                                   )}
                                 </div>
+                                <p className="text-[10px] leading-tight text-muted-foreground sm:col-span-2">
+                                  Tamanho ideal: <span className="font-black text-foreground">1200 × 630 px</span> (16:9). É o formato que o WhatsApp mostra ao compartilhar o link. Mínimo: 800 × 420 px · até 5MB · JPG, PNG ou WEBP.
+                                </p>
                               </div>
                             </div>
                           ) : (
