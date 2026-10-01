@@ -14,6 +14,8 @@ import { useRouter, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { AdminParticipantesDialog } from "@/components/admin-participantes-dialog";
 import { AdminAdicionarParticipante } from "@/components/admin-adicionar-participante";
+import { supabase } from "@/integrations/supabase/client";
+import { capaUrl } from "@/lib/capa";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
@@ -262,6 +264,36 @@ function AdminDashboard() {
                                     className="h-7 text-xs"
                                   />
                                 </div>
+                                <div className="flex items-center gap-2 sm:col-span-2">
+                                  <span className="text-[10px] text-muted-foreground uppercase font-black w-16 shrink-0">Capa</span>
+                                  {editBolaoForm.capa_url && (
+                                    <img src={capaUrl(editBolaoForm.capa_url)!} alt="Capa" className="h-10 w-20 rounded object-cover border border-border" />
+                                  )}
+                                  <label className="cursor-pointer rounded border border-border px-2 py-1 text-[11px] font-bold hover:bg-muted">
+                                    {editBolaoForm.capa_url ? "Trocar arte" : "Enviar arte"}
+                                    <input
+                                      type="file"
+                                      accept="image/png,image/jpeg,image/webp"
+                                      className="hidden"
+                                      onChange={async e => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+                                        if (file.size > 5 * 1024 * 1024) { toast.error("A imagem deve ter até 5MB"); return; }
+                                        const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+                                        const path = `${b.id}/${Date.now()}.${ext}`;
+                                        const t = toast.loading("Enviando arte...");
+                                        const { error } = await supabase.storage.from("bolao-capas").upload(path, file, { contentType: file.type });
+                                        toast.dismiss(t);
+                                        if (error) { toast.error("Erro ao enviar: " + error.message); return; }
+                                        setEditBolaoForm((f: any) => ({ ...f, capa_url: path }));
+                                        toast.success("Arte enviada. Clique em salvar.");
+                                      }}
+                                    />
+                                  </label>
+                                  {editBolaoForm.capa_url && (
+                                    <button type="button" className="text-[11px] font-bold text-destructive" onClick={() => setEditBolaoForm({ ...editBolaoForm, capa_url: null })}>Remover</button>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           ) : (
@@ -385,6 +417,7 @@ function AdminDashboard() {
                                       horario_sorteio: String(b.horario_sorteio ?? "").slice(0, 5),
                                       prazo_vendas: String(b.prazo_vendas ?? "").slice(0, 10),
                                       horario_encerramento: String(b.horario_encerramento ?? "").slice(0, 5),
+                                      capa_url: (b as any).capa_url ?? null,
                                     });
                                   }}
                                 >
