@@ -15,13 +15,14 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
   const add = useServerFn(adicionarParticipanteManual);
 
   const padrao = boloes.find((b) => b.status === "em_vendas") ?? boloes[0];
-  const [bolaoId, setBolaoId] = useState<string>(padrao?.id ?? "");
+  const [bolaoId, setBolaoId] = useState<string>("");
+  const efetivoId = boloes.some((b) => b.id === bolaoId) ? bolaoId : (padrao?.id ?? "");
   const [nome, setNome] = useState("");
   const [celular, setCelular] = useState("");
   const [cotas, setCotas] = useState(1);
   const [pago, setPago] = useState(true);
 
-  const selecionado = boloes.find((b) => b.id === bolaoId);
+  const selecionado = boloes.find((b) => b.id === efetivoId);
   const disponiveis = selecionado ? Math.max(0, selecionado.total_cotas - selecionado.cotas_compradas) : 0;
 
   const mutation = useMutation({
@@ -41,10 +42,10 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
 
   const enviar = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!bolaoId) return toast.error("Selecione o bolão.");
+    if (!efetivoId) return toast.error("Selecione o bolão.");
     if (nome.trim().length < 2) return toast.error("Informe o nome do participante.");
     if (cotas > disponiveis) return toast.error(`Apenas ${disponiveis} cota(s) disponível(is).`);
-    mutation.mutate({ bolaoId, nome: nome.trim(), celular: celular.trim(), cotas, pago });
+    mutation.mutate({ bolaoId: efetivoId, nome: nome.trim(), celular: celular.trim(), cotas, pago });
   };
 
   return (
@@ -57,7 +58,7 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
         <label className="grid gap-1">
           <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bolão</span>
           <select
-            value={bolaoId}
+            value={efetivoId}
             onChange={(e) => setBolaoId(e.target.value)}
             className="h-9 w-full rounded-md border border-border/40 bg-background/60 px-3 text-sm outline-none cursor-pointer hover:border-primary/40 transition-colors"
             aria-label="Escolher bolão"
@@ -95,7 +96,7 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
         <span className="text-muted-foreground">
           Total: {selecionado ? brl(cotas * Number(selecionado.valor_cota)) : "—"}
         </span>
-        <Button type="submit" size="sm" disabled={mutation.isPending || !bolaoId}>
+        <Button type="submit" size="sm" disabled={mutation.isPending || !efetivoId}>
           {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Adicionar"}
         </Button>
       </div>
