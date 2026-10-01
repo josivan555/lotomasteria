@@ -313,7 +313,7 @@ function Landing() {
                   <article
                     key={b.id}
                     data-loteria={b.is_combo ? undefined : b.loteria_id}
-                    className="lottery-choice-card group relative transition-all hover:-translate-y-1"
+                    className="lottery-choice-card bolao-showcase-card group relative"
                     style={b.is_combo ? ({ "--primary": "oklch(0.83 0.16 88)" } as import("react").CSSProperties) : undefined}
                   >
                     {b.is_combo && (
@@ -336,18 +336,19 @@ function Landing() {
 
                     <div className="lottery-choice-body flex-1 flex flex-col">
                       <div className="flex justify-between items-center gap-2 mb-3">
-                        <div className="rounded-full bg-primary/15 border border-primary/40 text-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                        <div className="bolao-status-pill">
                           {b.is_combo ? 'Múltiplos Concursos' : `Concurso ${b.concurso_numero}`}
                         </div>
                         {!esgotado && <ContagemRegressiva prazo={dataPrazo} />}
                         {(b.status === 'encerrado' || b.status === 'sorteado' || b.status === 'conferido' || dataSorteioPassada || prazoEncerrado) && (
-                          <span className="text-[10px] font-black uppercase text-destructive animate-pulse bg-destructive/10 px-2 py-0.5 rounded-full border border-destructive/20">
+                          <span className="bolao-ended-pill">
+                            <Clock className="h-3.5 w-3.5" />
                             Encerrado
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-lg font-bold mb-1 text-foreground">{b.nome}</h3>
+                      <h3 className="mb-1 text-xl font-black text-foreground">{b.nome}</h3>
                       <div className="lottery-choice-short mb-4">
                         <Clock /> Sorteio: {new Date(`${b.data_sorteio}T00:00:00`).toLocaleDateString('pt-BR')} às {b.horario_sorteio}
                       </div>
@@ -368,22 +369,22 @@ function Landing() {
 
 
 
-                      <div className="grid grid-cols-2 gap-3 mb-6">
-                        <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
+                      <div className="mb-4 grid grid-cols-2 gap-3">
+                        <div className="bolao-metric">
                           <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Valor Cota</p>
-                          <p className="text-sm font-black" style={{ color: b.is_combo ? '#B8860B' : cfg.cor }}>R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
+                          <p className="text-lg font-black text-primary">R$ {b.valor_cota.toLocaleString('pt-BR')}</p>
                         </div>
-                        <div className="rounded-lg bg-secondary/30 p-2 text-center border border-border/40">
+                        <div className="bolao-metric">
                           <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Disponível</p>
-                          <p className="text-sm font-black text-foreground">
-                            {b.cotas_disponiveis !== undefined ? `${b.cotas_disponiveis} / ${b.total_cotas}` : b.total_cotas}
+                          <p className="text-lg font-black text-foreground">
+                            {b.cotas_disponiveis !== undefined ? b.cotas_disponiveis : b.total_cotas}
                           </p>
                         </div>
                       </div>
 
-                      <div className="space-y-2 mb-6 mt-auto">
-                        <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                          <div className="h-full transition-all duration-500" style={{ width: `${Math.min(progresso || 0, 100)}%`, backgroundColor: b.is_combo ? '#FFD700' : cfg.cor }} />
+                      <div className="mb-3 mt-auto space-y-2">
+                        <div className="bolao-progress-track">
+                          <div className="bolao-progress-fill" style={{ width: `${Math.min(progresso || 0, 100)}%` }} />
                         </div>
                         <div className="flex justify-between text-[10px] text-muted-foreground font-medium">
                           <span>{b.total_jogos} jogos IA {b.is_combo ? '(Combo)' : ''}</span>
@@ -395,19 +396,22 @@ function Landing() {
                       <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 mt-auto">
                         {esgotado ? (
                           <div className="flex flex-col gap-2 w-full mt-auto sm:col-span-2">
-                            <div className="text-center py-2 px-4 rounded-lg bg-destructive/10 text-destructive text-[10px] font-bold uppercase tracking-wider">
+                            <div className="bolao-closed-banner">
+                              <Users className="h-4 w-4" />
                               Participações Encerradas
                             </div>
                             <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
-                              <Button className="w-full min-w-0 px-2.5 text-[13px] font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+                              <Button className="bolao-primary-action w-full min-w-0 px-2.5 text-[13px] font-black order-1 sm:order-none" asChild>
 
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: bolaoConferidoOficial(b) ? 'conferir' : 'comprar' }}>
+                                  <BarChart3 className="h-4 w-4" />
                                   {bolaoConferidoOficial(b) ? 'Ver Resultado' : 'Comprar Cotas'}
                                 </Link>
                               </Button>
-                              <Button variant="outline" className="w-full min-w-0 px-2.5 text-[13px] font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+                              <Button variant="outline" className="bolao-secondary-action w-full min-w-0 px-2.5 text-[13px] font-black order-2 sm:order-none" asChild>
 
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
+                                  <Users className="h-4 w-4" />
                                   Ver Participantes
                                 </Link>
                               </Button>
@@ -415,13 +419,15 @@ function Landing() {
                           </div>
                         ) : (
                           <>
-                            <Button className="w-full min-w-0 px-2.5 text-[13px] font-bold shadow-md order-1 sm:order-none text-white hover:opacity-90" style={{ backgroundColor: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+                            <Button className="bolao-primary-action w-full min-w-0 px-2.5 text-[13px] font-black order-1 sm:order-none" asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'comprar' }}>
+                                <TicketCheck className="h-4 w-4" />
                                 Comprar Cotas
                               </Link>
                             </Button>
-                            <Button variant="outline" className="w-full min-w-0 px-2.5 text-[13px] font-bold order-2 sm:order-none hover:bg-opacity-10 font-black" style={{ borderColor: b.is_combo ? '#FFD70050' : `${cfg.cor}50`, color: b.is_combo ? '#B8860B' : cfg.cor }} asChild>
+                            <Button variant="outline" className="bolao-secondary-action w-full min-w-0 px-2.5 text-[13px] font-black order-2 sm:order-none" asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
+                                <Users className="h-4 w-4" />
                                 Ver Participantes
                               </Link>
                             </Button>
