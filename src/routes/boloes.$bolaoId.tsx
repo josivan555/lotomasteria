@@ -118,7 +118,10 @@ function DetalheBolao() {
     const nomeLimpo = bolao.nome.trim().replace(/^BOL[ÃA]O\s+/i, "");
     const titulo = `Bolão ${nomeLimpo} — LotoMaster IA`;
     const texto = `${bolao.is_combo ? "Combo especial" : `Concurso ${bolao.concurso_numero}`} · Cota ${formatBRL(bolao.valor_cota)} · Prêmio estimado ${formatBRL(bolao.premio_estimado || 0)}. Garanta a sua cota!`;
-    const url = `${window.location.origin}/boloes/${bolaoId}`;
+    // versão da capa no link: força o WhatsApp a buscar a prévia nova quando a arte muda
+    const capaPath = String((bolao as any).capa_url || "");
+    const versao = capaPath ? capaPath.split("/").pop()!.replace(/\.[a-z0-9]+$/i, "").slice(-8) : "";
+    const url = `${window.location.origin}/boloes/${bolaoId}${versao ? `?c=${versao}` : ""}`;
     if (navigator.share) {
       try {
         await navigator.share({ title: titulo, text: texto, url });
