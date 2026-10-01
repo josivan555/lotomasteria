@@ -1,3 +1,4 @@
+import { capaUrl } from "@/lib/capa";
 import { createFileRoute, useParams, Link, useSearch } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -33,7 +34,9 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
     const base = "https://lotomasteria.lovable.app";
     const info = loaderData;
     const cfg = info ? LOTERIAS[info.loteriaId as LoteriaId] : undefined;
-    const banner = info ? OG_BANNERS[info.loteriaId as LoteriaId] : undefined;
+    const capa = info ? capaUrl(info.capaUrl, true) : null;
+    const bannerPadrao = info ? OG_BANNERS[info.loteriaId as LoteriaId] : undefined;
+    const banner = capa ?? (bannerPadrao ? `${base}${bannerPadrao}` : undefined);
     const nomeLimpo = info ? info.nome.trim().replace(/^BOL[ÃA]O\s+/i, "") : "";
     const titulo = info ? `Bolão ${nomeLimpo} — LotoMaster IA` : "Bolão | LotoMaster IA";
     const descricao = info
@@ -49,8 +52,8 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
       { name: "twitter:card", content: banner ? "summary_large_image" : "summary" },
     ];
     if (banner) {
-      meta.push({ property: "og:image", content: `${base}${banner}` });
-      meta.push({ name: "twitter:image", content: `${base}${banner}` });
+      meta.push({ property: "og:image", content: banner });
+      meta.push({ name: "twitter:image", content: banner });
     }
     return { meta };
   },
@@ -292,7 +295,7 @@ function DetalheBolao() {
 
         <div className="space-y-5 lg:col-span-5">
           <div className="bolao-detail-hero app-panel relative overflow-hidden rounded-lg">
-            <div className="bolao-detail-banner bg-cover bg-center" style={{ backgroundImage: `linear-gradient(0deg, var(--surface-strong), transparent 72%), url(${cfg.banner})` }} />
+            <div className="bolao-detail-banner bg-cover bg-center" style={{ backgroundImage: `linear-gradient(0deg, var(--surface-strong), transparent 72%), url(${capaUrl((bolao as any).capa_url) ?? cfg.banner})` }} />
             <div className="relative p-5 pt-24 sm:p-7 sm:pt-32">
 
               <div className="flex justify-between items-start mb-6">

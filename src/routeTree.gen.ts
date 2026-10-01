@@ -29,6 +29,7 @@ import { Route as ApiPublicAtualizarResultadosRouteImport } from './routes/api/p
 import { Route as AuthenticatedAdminComboRouteImport } from './routes/_authenticated/admin/combo'
 import { Route as AuthenticatedLLoteriaRouteRouteImport } from './routes/_authenticated/l/$loteria/route'
 import { Route as AuthenticatedLLoteriaIndexRouteImport } from './routes/_authenticated/l/$loteria/index'
+import { Route as ApiPublicCapaSplatRouteImport } from './routes/api/public/capa.$'
 import { Route as AuthenticatedLLoteriaVolanteRouteImport } from './routes/_authenticated/l/$loteria/volante'
 import { Route as AuthenticatedLLoteriaResultadosRouteImport } from './routes/_authenticated/l/$loteria/resultados'
 import { Route as AuthenticatedLLoteriaJogosRouteImport } from './routes/_authenticated/l/$loteria/jogos'
@@ -140,6 +141,11 @@ const AuthenticatedLLoteriaIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedLLoteriaRouteRoute,
   } as any)
+const ApiPublicCapaSplatRoute = ApiPublicCapaSplatRouteImport.update({
+  id: '/api/public/capa/$',
+  path: '/api/public/capa/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLLoteriaVolanteRoute =
   AuthenticatedLLoteriaVolanteRouteImport.update({
     id: '/volante',
@@ -209,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/l/$loteria/jogos': typeof AuthenticatedLLoteriaJogosRoute
   '/l/$loteria/resultados': typeof AuthenticatedLLoteriaResultadosRoute
   '/l/$loteria/volante': typeof AuthenticatedLLoteriaVolanteRoute
+  '/api/public/capa/$': typeof ApiPublicCapaSplatRoute
   '/l/$loteria/': typeof AuthenticatedLLoteriaIndexRoute
 }
 export interface FileRoutesByTo {
@@ -235,6 +242,7 @@ export interface FileRoutesByTo {
   '/l/$loteria/jogos': typeof AuthenticatedLLoteriaJogosRoute
   '/l/$loteria/resultados': typeof AuthenticatedLLoteriaResultadosRoute
   '/l/$loteria/volante': typeof AuthenticatedLLoteriaVolanteRoute
+  '/api/public/capa/$': typeof ApiPublicCapaSplatRoute
   '/l/$loteria': typeof AuthenticatedLLoteriaIndexRoute
 }
 export interface FileRoutesById {
@@ -265,6 +273,7 @@ export interface FileRoutesById {
   '/_authenticated/l/$loteria/jogos': typeof AuthenticatedLLoteriaJogosRoute
   '/_authenticated/l/$loteria/resultados': typeof AuthenticatedLLoteriaResultadosRoute
   '/_authenticated/l/$loteria/volante': typeof AuthenticatedLLoteriaVolanteRoute
+  '/api/public/capa/$': typeof ApiPublicCapaSplatRoute
   '/_authenticated/l/$loteria/': typeof AuthenticatedLLoteriaIndexRoute
 }
 export interface FileRouteTypes {
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/l/$loteria/jogos'
     | '/l/$loteria/resultados'
     | '/l/$loteria/volante'
+    | '/api/public/capa/$'
     | '/l/$loteria/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/l/$loteria/jogos'
     | '/l/$loteria/resultados'
     | '/l/$loteria/volante'
+    | '/api/public/capa/$'
     | '/l/$loteria'
   id:
     | '__root__'
@@ -350,6 +361,7 @@ export interface FileRouteTypes {
     | '/_authenticated/l/$loteria/jogos'
     | '/_authenticated/l/$loteria/resultados'
     | '/_authenticated/l/$loteria/volante'
+    | '/api/public/capa/$'
     | '/_authenticated/l/$loteria/'
   fileRoutesById: FileRoutesById
 }
@@ -367,6 +379,7 @@ export interface RootRouteChildren {
   ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
   ApiPublicWebhookRoute: typeof ApiPublicWebhookRoute
   BoloesPagamentoCodigoRoute: typeof BoloesPagamentoCodigoRoute
+  ApiPublicCapaSplatRoute: typeof ApiPublicCapaSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -511,6 +524,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLLoteriaIndexRouteImport
       parentRoute: typeof AuthenticatedLLoteriaRouteRoute
     }
+    '/api/public/capa/$': {
+      id: '/api/public/capa/$'
+      path: '/api/public/capa/$'
+      fullPath: '/api/public/capa/$'
+      preLoaderRoute: typeof ApiPublicCapaSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/l/$loteria/volante': {
       id: '/_authenticated/l/$loteria/volante'
       path: '/volante'
@@ -638,6 +658,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
   ApiPublicWebhookRoute: ApiPublicWebhookRoute,
   BoloesPagamentoCodigoRoute: BoloesPagamentoCodigoRoute,
+  ApiPublicCapaSplatRoute: ApiPublicCapaSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
