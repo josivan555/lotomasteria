@@ -48,11 +48,16 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
       { property: "og:title", content: titulo },
       { property: "og:description", content: descricao },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: `${base}/boloes/${params.bolaoId}` },
+      { property: "og:site_name", content: "LotoMaster IA" },
       { name: "twitter:card", content: banner ? "summary_large_image" : "summary" },
     ];
+    void params;
     if (banner) {
       meta.push({ property: "og:image", content: banner });
+      meta.push({ property: "og:image:secure_url", content: banner });
+      meta.push({ property: "og:image:type", content: /\.png$/i.test(banner) ? "image/png" : "image/jpeg" });
+      meta.push({ property: "og:image:width", content: "1200" });
+      meta.push({ property: "og:image:height", content: "630" });
       meta.push({ name: "twitter:image", content: banner });
     }
     return { meta };
