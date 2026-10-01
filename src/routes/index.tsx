@@ -401,14 +401,14 @@ function Landing() {
                               Participações Encerradas
                             </div>
                             <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
-                              <Button className="bolao-primary-action w-full min-w-0 px-2.5 text-[13px] font-black order-1 sm:order-none" asChild>
+                              <Button className="bolao-primary-action h-9 w-full min-w-0 px-2.5 text-xs font-black order-1 sm:order-none" asChild>
 
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: bolaoConferidoOficial(b) ? 'conferir' : 'comprar' }}>
                                   <BarChart3 className="h-4 w-4" />
                                   {bolaoConferidoOficial(b) ? 'Ver Resultado' : 'Comprar Cotas'}
                                 </Link>
                               </Button>
-                              <Button variant="outline" className="bolao-secondary-action w-full min-w-0 px-2.5 text-[13px] font-black order-2 sm:order-none" asChild>
+                              <Button variant="outline" className="bolao-secondary-action h-9 w-full min-w-0 px-2.5 text-xs font-black order-2 sm:order-none" asChild>
 
                                 <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                                   <Users className="h-4 w-4" />
@@ -419,13 +419,13 @@ function Landing() {
                           </div>
                         ) : (
                           <>
-                            <Button className="bolao-primary-action w-full min-w-0 px-2.5 text-[13px] font-black order-1 sm:order-none" asChild>
+                            <Button className="bolao-primary-action h-9 w-full min-w-0 px-2.5 text-xs font-black order-1 sm:order-none" asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'comprar' }}>
                                 <TicketCheck className="h-4 w-4" />
                                 Comprar Cotas
                               </Link>
                             </Button>
-                            <Button variant="outline" className="bolao-secondary-action w-full min-w-0 px-2.5 text-[13px] font-black order-2 sm:order-none" asChild>
+                            <Button variant="outline" className="bolao-secondary-action h-9 w-full min-w-0 px-2.5 text-xs font-black order-2 sm:order-none" asChild>
                               <Link to="/boloes/$bolaoId" params={{ bolaoId: b.id }} search={{ tab: 'participantes' }}>
                                 <Users className="h-4 w-4" />
                                 Ver Participantes
