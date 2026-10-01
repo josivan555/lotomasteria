@@ -47,6 +47,10 @@ export const criarBolao = createServerFn({ method: "POST" })
         jogos: z.array(z.object({
           dezenas: z.array(z.number()),
           score: z.number().optional(),
+          metadata: z.object({
+            mes_sorte: z.number().int().min(1).max(12).optional(),
+            time_coracao: z.string().optional(),
+          }).nullable().optional(),
         })).min(1),
       })
       .parse(raw),
@@ -366,6 +370,34 @@ export const obterBolao = createServerFn({ method: "GET" })
     const reservadas = (p ?? [])
       .filter((x: any) => x.status === "reservado")
       .reduce((acc: number, curr: any) => acc + curr.quantidade_cotas, 0);
+
+    if (!(bolaoAtual as any).is_combo && bolaoAtual.loteria_id === "diadesorte") {
+      const snapshot = Array.isArray(bolaoAtual.game_snapshot) ? bolaoAtual.game_snapshot : [];
+      const semMes = snapshot.some((j: any) => !j?.mes_sorte && !j?.metadata?.mes_sorte);
+      if (semMes) {
+        const { data: jogosOriginais } = await supabaseAdmin
+          .from("jogos_salvos")
+          .select("dezenas, metadata")
+          .eq("user_id", bolaoAtual.criador_id)
+          .eq("loteria", "diadesorte");
+        const mesesPorDezenas = new Map<string, number[]>();
+        for (const jogo of jogosOriginais ?? []) {
+          const chave = [...((jogo.dezenas as number[]) ?? [])].sort((a, b) => a - b).join(",");
+          const mes = (jogo.metadata as { mes_sorte?: number } | null)?.mes_sorte;
+          if (mes) mesesPorDezenas.set(chave, [...(mesesPorDezenas.get(chave) ?? []), mes]);
+        }
+        bolaoAtual = {
+          ...bolaoAtual,
+          game_snapshot: snapshot.map((jogo: any) => {
+            if (jogo?.mes_sorte || jogo?.metadata?.mes_sorte) return jogo;
+            const chave = [...(jogo?.dezenas ?? [])].sort((a: number, b: number) => a - b).join(",");
+            const meses = mesesPorDezenas.get(chave) ?? [];
+            const mes = meses.shift();
+            return mes ? { ...jogo, metadata: { ...(jogo.metadata ?? {}), mes_sorte: mes } } : jogo;
+          }),
+        };
+      }
+    }
 
     return {
       ...bolaoAtual,

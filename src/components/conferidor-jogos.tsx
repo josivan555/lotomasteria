@@ -357,9 +357,6 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, resultadoM
                 <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
                   {faixaJogo ? `${jogo.acertos} pts${premiado ? " · premiado" : ""}` : "acertos"}
                 </div>
-                {jogo.acertouMes && (
-                  <div className="text-[10px] font-black text-primary">+ mês da sorte</div>
-                )}
                 {premioJogo > 0 && (
                   <div className="mt-0.5 text-[10px] font-black text-primary">
                     {formatBRL(premioJogo)}

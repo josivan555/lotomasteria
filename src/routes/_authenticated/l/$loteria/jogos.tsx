@@ -254,7 +254,11 @@ function Jogos() {
   const handleCriarBolao = () => {
     const gamesToInclude = vigentes
       .filter((j) => jogosSelecionados.includes(j.id))
-      .map((j) => ({ dezenas: j.dezenas, score: j.score || undefined }));
+      .map((j) => ({
+        dezenas: j.dezenas,
+        score: j.score || undefined,
+        metadata: j.metadata ?? null,
+      }));
 
     if (gamesToInclude.length === 0) {
       toast.error("Selecione pelo menos um jogo para criar o bolão.");
