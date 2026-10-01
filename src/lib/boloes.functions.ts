@@ -175,20 +175,27 @@ export const criarBolaoCombo = createServerFn({ method: "POST" })
     return bolao;
   });
 
+function temDezenas(v: any) { return Array.isArray(v) && v.length > 0; }
+export function bolaoConferidoOficial(b: any): boolean {
+  if (b?.status === "conferido") return true;
+  if (b?.is_combo) {
+    const partes = Array.isArray(b.combo_loterias) ? b.combo_loterias : [];
+    return partes.length > 0 && partes.every((p: any) => temDezenas(p?.resultado_oficial) || temDezenas(p?.resultado));
+  }
+  return temDezenas(b?.resultado_oficial);
+}
+
 export const listarBoloesPublicos = createServerFn({ method: "GET" })
   .handler(async () => {
-    const hoje = new Date().toISOString().split('T')[0];
-    
-    // Boloes ativos: publicados, em vendas, esgotados e que ainda NÃO passaram da data de sorteio
-    // (A data_sorteio >= hoje garante que eles apareçam até o dia do sorteio)
-    const { data, error } = await supabase
+    // Ativos: tudo que ainda NÃO tem conferência oficial (resultado oficial da Caixa)
+    const { data: todos, error } = await supabase
       .from("boloes")
       .select("*")
-      .in("status", ["publicado", "em_vendas", "esgotado"])
-      .gte("data_sorteio", hoje)
+      .in("status", ["publicado", "em_vendas", "esgotado", "encerrado", "sorteado"])
       .order("data_sorteio", { ascending: true });
 
     if (error) throw new Error(error.message);
+    const data = (todos ?? []).filter((b: any) => !bolaoConferidoOficial(b));
     
     const boloesComInfo = await Promise.all((data ?? []).map(async (b: any) => {
       const { data: p } = await supabaseAdmin
@@ -216,18 +223,16 @@ export const listarBoloesPublicos = createServerFn({ method: "GET" })
 
 export const listarHistoricoBoloes = createServerFn({ method: "GET" })
   .handler(async () => {
-    const hoje = new Date().toISOString().split('T')[0];
-    
-    // Histórico: bolões já sorteados, encerrados ou que a data de sorteio já passou
+    // Histórico: somente bolões com conferência oficial
     const { data, error } = await supabase
       .from("boloes")
       .select("*")
-      .or(`status.in.("encerrado","sorteado","conferido"),data_sorteio.lt.${hoje}`)
+      .in("status", ["encerrado", "sorteado", "conferido"])
       .order("data_sorteio", { ascending: false });
 
     if (error) throw new Error(error.message);
 
-    return data ?? [];
+    return (data ?? []).filter((b: any) => bolaoConferidoOficial(b));
   });
 
 export const obterBolao = createServerFn({ method: "GET" })
