@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useRouter, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { AdminParticipantesDialog } from "@/components/admin-participantes-dialog";
+import { AdminAdicionarParticipante } from "@/components/admin-adicionar-participante";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,

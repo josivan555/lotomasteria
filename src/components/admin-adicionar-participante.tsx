@@ -33,7 +33,7 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
       setCelular("");
       setCotas(1);
       qc.invalidateQueries({ queryKey: ["admin-boloes"] });
-it    },
+    },
     onError: (e) => toast.error((e as Error).message),
   });
 
