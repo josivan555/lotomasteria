@@ -15,13 +15,14 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
   const add = useServerFn(adicionarParticipanteManual);
 
   const padrao = boloes.find((b) => b.status === "em_vendas") ?? boloes[0];
-  const [bolaoId, setBolaoId] = useState<string>(padrao?.id ?? "");
+  const [bolaoId, setBolaoId] = useState<string>("");
+  const efetivoId = boloes.some((b) => b.id === bolaoId) ? bolaoId : (padrao?.id ?? "");
   const [nome, setNome] = useState("");
   const [celular, setCelular] = useState("");
   const [cotas, setCotas] = useState(1);
   const [pago, setPago] = useState(true);
 
-  const selecionado = boloes.find((b) => b.id === bolaoId);
+  const selecionado = boloes.find((b) => b.id === efetivoId);
   const disponiveis = selecionado ? Math.max(0, selecionado.total_cotas - selecionado.cotas_compradas) : 0;
 
   const mutation = useMutation({
