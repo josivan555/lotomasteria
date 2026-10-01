@@ -288,10 +288,31 @@ function AdminDashboard() {
                                         });
                                         if (dim && dim.w < 600) { toast.error(`Arte pequena demais (${dim.w}px de largura). Envie pelo menos 1200 × 630 px.`); return; }
                                         if (dim && (dim.w / dim.h < 1.25 || dim.w / dim.h > 3)) toast.warning("Formato fora do ideal: a arte vai ser recortada nas bordas. O recomendado é 1200 × 630 px.");
-                                        const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-                                        const path = `${b.id}/${Date.now()}.${ext}`;
-                                        const t = toast.loading("Enviando arte...");
-                                        const { error } = await supabase.storage.from("bolao-capas").upload(path, file, { contentType: file.type });
+                                        const t = toast.loading("Otimizando e enviando arte...");
+                                        // WhatsApp ignora imagens pesadas (> ~600KB): converte para JPEG leve, máx. 1200px de largura
+                                        const blob = await new Promise<Blob | null>(resolve => {
+                                          const url = URL.createObjectURL(file);
+                                          const img = new Image();
+                                          img.onload = () => {
+                                            const scale = Math.min(1, 1200 / img.naturalWidth);
+                                            const c = document.createElement("canvas");
+                                            c.width = Math.round(img.naturalWidth * scale);
+                                            c.height = Math.round(img.naturalHeight * scale);
+                                            const ctx = c.getContext("2d")!;
+                                            ctx.fillStyle = "#000"; ctx.fillRect(0, 0, c.width, c.height);
+                                            ctx.drawImage(img, 0, 0, c.width, c.height);
+                                            URL.revokeObjectURL(url);
+                                            const tryQ = (q: number) => c.toBlob(bl => {
+                                              if (bl && bl.size > 280 * 1024 && q > 0.5) tryQ(q - 0.1); else resolve(bl);
+                                            }, "image/jpeg", q);
+                                            tryQ(0.85);
+                                          };
+                                          img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+                                          img.src = url;
+                                        });
+                                        if (!blob) { toast.dismiss(t); toast.error("Não foi possível processar a imagem."); return; }
+                                        const path = `${b.id}/${Date.now()}.jpg`;
+                                        const { error } = await supabase.storage.from("bolao-capas").upload(path, blob, { contentType: "image/jpeg" });
                                         toast.dismiss(t);
                                         if (error) { toast.error("Erro ao enviar: " + error.message); return; }
                                         setEditBolaoForm((f: any) => ({ ...f, capa_url: path }));
