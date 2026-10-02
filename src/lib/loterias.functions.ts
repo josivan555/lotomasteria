@@ -114,68 +114,30 @@ export const ultimoResultadoCaixa = createServerFn({ method: "GET" })
     z.object({ loteria: loteriaEnum }).parse(raw),
   )
   .handler(async ({ data }) => {
+    const r = await fetchCaixa(data.loteria);
+    if (!r) return null;
+
+    const dz = r.listaDezenas.map(Number).sort((a, b) => a - b);
     const cfg = LOTERIAS[data.loteria];
-    try {
-      const res = await fetch(
-        `https://servicebus2.caixa.gov.br/portaldeloterias/api/${apiPath(data.loteria)}`,
-        { headers: { accept: "application/json" } },
-      );
-      if (!res.ok) return null;
-      const j = (await res.json()) as {
-        numero: number;
-        dataApuracao: string;
-        listaDezenas: string[];
-        valorEstimadoProximoConcurso?: number;
-        dataProximoConcurso?: string;
-        numeroConcursoProximo?: number;
-        listaRateioPremio?: { descricaoFaixa: string; numeroDeGanhadores: number; valorPremio: number }[];
-      };
-      const dz = (j.listaDezenas ?? []).map(Number).sort((a, b) => a - b);
-      const faixaAlvo = String(cfg.faixaPrincipal);
-      const faixaPrincipal =
-        (j.listaRateioPremio ?? []).find((f) => f.descricaoFaixa?.includes(faixaAlvo)) ??
-        j.listaRateioPremio?.[0];
-      return {
-        loteria: data.loteria,
-        nome: cfg.nome,
-        numero: j.numero,
-        data_apuracao: parseData(j.dataApuracao),
-        dezenas: dz,
-        soma: dz.reduce((a, b) => a + b, 0),
-        premioPrincipal: faixaPrincipal?.valorPremio ?? 0,
-        ganhadoresPrincipal: faixaPrincipal?.numeroDeGanhadores ?? 0,
-        proximoConcurso: j.numeroConcursoProximo ?? null,
-        proximoData: j.dataProximoConcurso ? parseData(j.dataProximoConcurso) : null,
-        estimativaProximo: j.valorEstimadoProximoConcurso ?? 0,
-      };
-    } catch {
-      return null;
-    }
+    const faixaAlvo = String(cfg.faixaPrincipal);
+    const faixaPrincipal =
+      (r.listaRateioPremio ?? []).find((f) => f.descricaoFaixa?.includes(faixaAlvo)) ??
+      r.listaRateioPremio?.[0];
+
+    return {
+      loteria: data.loteria,
+      nome: cfg.nome,
+      numero: r.numero,
+      data_apuracao: parseData(r.dataApuracao),
+      dezenas: dz,
+      soma: dz.reduce((a, b) => a + b, 0),
+      premioPrincipal: faixaPrincipal?.valorPremio ?? 0,
+      ganhadoresPrincipal: faixaPrincipal?.numeroDeGanhadores ?? 0,
+      proximoConcurso: null,
+      proximoData: null,
+      estimativaProximo: 0,
+    };
   });
-
-type CaixaResp = {
-  numero: number;
-  dataApuracao: string;
-  listaDezenas: string[];
-  indicadorConcursoEspecial?: number;
-  listaRateioPremio?: {
-    descricaoFaixa: string;
-    numeroDeGanhadores: number;
-    valorPremio: number;
-  }[];
-};
-
-async function fetchCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaResp | null> {
-  const base = `https://servicebus2.caixa.gov.br/portaldeloterias/api/${apiPath(loteria)}`;
-  const url = concurso ? `${base}/${concurso}` : base;
-  try {
-    const res = await fetch(url, { headers: { accept: "application/json" } });
-    if (!res.ok) return null;
-    return (await res.json()) as CaixaResp;
-  } catch {
-    return null;
-  }
-}
 
 export const sincronizarConcursos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
