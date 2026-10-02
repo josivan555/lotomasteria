@@ -264,68 +264,194 @@ function AdminDashboard() {
                                     className="h-7 text-xs"
                                   />
                                 </div>
-                                <div className="flex items-center gap-2 sm:col-span-2">
-                                  <span className="text-[10px] text-muted-foreground uppercase font-black w-16 shrink-0">Capa</span>
+                                <div className="flex flex-wrap items-center gap-2 sm:col-span-2">
+                                  <span className="text-[10px] text-muted-foreground uppercase font-black w-16 shrink-0">Mídia</span>
+
                                   {editBolaoForm.capa_url && (
-                                    <img src={capaUrl(editBolaoForm.capa_url)!} alt="Capa" className="h-10 w-20 rounded object-cover border border-border" />
+                                    capaMediaType(editBolaoForm.capa_url) === "video" ? (
+                                      <video
+                                        src={capaUrl(editBolaoForm.capa_url)!}
+                                        className="h-12 w-24 rounded object-cover border border-border bg-black"
+                                        autoPlay
+                                        loop
+                                        muted
+                                        playsInline
+                                        preload="metadata"
+                                      />
+                                    ) : (
+                                      <img
+                                        src={capaUrl(editBolaoForm.capa_url)!}
+                                        alt="Mídia da capa"
+                                        className="h-12 w-24 rounded object-cover border border-border"
+                                      />
+                                    )
                                   )}
-                                  <label className="cursor-pointer rounded border border-border px-2 py-1 text-[11px] font-bold hover:bg-muted">
-                                    {editBolaoForm.capa_url ? "Trocar arte" : "Enviar arte"}
+
+                                  <select
+                                    className="h-8 rounded border border-border bg-background px-2 text-[11px] font-bold"
+                                    value={editBolaoForm.capa_media_type || capaMediaType(editBolaoForm.capa_url)}
+                                    onChange={e => setEditBolaoForm({ ...editBolaoForm, capa_media_type: e.target.value })}
+                                  >
+                                    <option value="image">Imagem</option>
+                                    <option value="gif">GIF animado</option>
+                                    <option value="video">Vídeo</option>
+                                  </select>
+
+                                  <label className="cursor-pointer rounded border border-primary/40 bg-primary/5 px-3 py-1.5 text-[11px] font-black hover:bg-primary/10">
+                                    {editBolaoForm.capa_url ? "Trocar mídia" : "Enviar mídia"}
                                     <input
                                       type="file"
-                                      accept="image/png,image/jpeg,image/webp"
+                                      accept={
+                                        (editBolaoForm.capa_media_type || capaMediaType(editBolaoForm.capa_url)) === "video"
+                                          ? "video/mp4,video/webm"
+                                          : (editBolaoForm.capa_media_type || capaMediaType(editBolaoForm.capa_url)) === "gif"
+                                            ? "image/gif"
+                                            : "image/png,image/jpeg,image/webp"
+                                      }
                                       className="hidden"
                                       onChange={async e => {
                                         const file = e.target.files?.[0];
                                         if (!file) return;
-                                        if (file.size > 5 * 1024 * 1024) { toast.error("A imagem deve ter até 5MB"); return; }
-                                        const dim = await new Promise<{ w: number; h: number } | null>(resolve => {
-                                          const url = URL.createObjectURL(file);
-                                          const img = new Image();
-                                          img.onload = () => { resolve({ w: img.naturalWidth, h: img.naturalHeight }); URL.revokeObjectURL(url); };
-                                          img.onerror = () => { resolve(null); URL.revokeObjectURL(url); };
-                                          img.src = url;
+
+                                        const mediaType = editBolaoForm.capa_media_type || capaMediaType(editBolaoForm.capa_url);
+
+                                        if (mediaType === "video") {
+                                          if (!/^video\/(mp4|webm)$/.test(file.type)) {
+                                            toast.error("Selecione um vídeo MP4 ou WebM.");
+                                            return;
+                                          }
+                                          if (file.size > 30 * 1024 * 1024) {
+                                            toast.error("O vídeo deve ter até 30MB.");
+                                            return;
+                                          }
+                                        } else if (mediaType === "gif") {
+                                          if (file.type !== "image/gif") {
+                                            toast.error("Selecione um arquivo GIF.");
+                                            return;
+                                          }
+                                          if (file.size > 10 * 1024 * 1024) {
+                                            toast.error("O GIF deve ter até 10MB.");
+                                            return;
+                                          }
+                                        } else {
+                                          if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
+                                            toast.error("Selecione JPG, PNG ou WEBP.");
+                                            return;
+                                          }
+                                          if (file.size > 5 * 1024 * 1024) {
+                                            toast.error("A imagem deve ter até 5MB.");
+                                            return;
+                                          }
+                                        }
+
+                                        // Imagem continua com a otimização existente para compartilhamento.
+                                        if (mediaType === "image") {
+                                          const dim = await new Promise<{ w: number; h: number } | null>(resolve => {
+                                            const url = URL.createObjectURL(file);
+                                            const img = new Image();
+                                            img.onload = () => {
+                                              resolve({ w: img.naturalWidth, h: img.naturalHeight });
+                                              URL.revokeObjectURL(url);
+                                            };
+                                            img.onerror = () => {
+                                              resolve(null);
+                                              URL.revokeObjectURL(url);
+                                            };
+                                            img.src = url;
+                                          });
+
+                                          if (dim && dim.w < 600) {
+                                            toast.error(`Arte pequena demais (${dim.w}px de largura). Envie pelo menos 1200 × 630 px.`);
+                                            return;
+                                          }
+                                          if (dim && (dim.w / dim.h < 1.25 || dim.w / dim.h > 3)) {
+                                            toast.warning("Formato fora do ideal: a arte vai ser recortada nas bordas. O recomendado é 1200 × 630 px.");
+                                          }
+
+                                          const t = toast.loading("Otimizando e enviando arte...");
+                                          const blob = await new Promise<Blob | null>(resolve => {
+                                            const url = URL.createObjectURL(file);
+                                            const img = new Image();
+                                            img.onload = () => {
+                                              const scale = Math.min(1, 1200 / img.naturalWidth);
+                                              const canvas = document.createElement("canvas");
+                                              canvas.width = Math.round(img.naturalWidth * scale);
+                                              canvas.height = Math.round(img.naturalHeight * scale);
+                                              const ctx = canvas.getContext("2d")!;
+                                              ctx.fillStyle = "#000";
+                                              ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                              URL.revokeObjectURL(url);
+                                              const tryQ = (q: number) => canvas.toBlob(bl => {
+                                                if (bl && bl.size > 280 * 1024 && q > 0.5) tryQ(q - 0.1);
+                                                else resolve(bl);
+                                              }, "image/jpeg", q);
+                                              tryQ(0.85);
+                                            };
+                                            img.onerror = () => {
+                                              URL.revokeObjectURL(url);
+                                              resolve(null);
+                                            };
+                                            img.src = url;
+                                          });
+
+                                          if (!blob) {
+                                            toast.error("Não foi possível processar a imagem.");
+                                            return;
+                                          }
+
+                                          const path = `${b.id}/${Date.now()}.jpg`;
+                                          const { error } = await supabase.storage.from("bolao-capas").upload(path, blob, {
+                                            contentType: "image/jpeg",
+                                          });
+
+                                          if (error) {
+                                            toast.error("Erro ao enviar: " + error.message);
+                                            return;
+                                          }
+
+                                          setEditBolaoForm((f: any) => ({ ...f, capa_url: path, capa_media_type: "image" }));
+                                          toast.success("Imagem enviada. Clique em salvar.");
+                                          return;
+                                        }
+
+                                        // GIF e vídeo são enviados no formato original para preservar animação/reprodução.
+                                        const extension = mediaType === "gif"
+                                          ? "gif"
+                                          : file.type === "video/webm" ? "webm" : "mp4";
+                                        const path = `${b.id}/${Date.now()}.${extension}`;
+                                        const t = toast.loading(mediaType === "gif" ? "Enviando GIF..." : "Enviando vídeo...");
+                                        const { error } = await supabase.storage.from("bolao-capas").upload(path, file, {
+                                          contentType: file.type,
                                         });
-                                        if (dim && dim.w < 600) { toast.error(`Arte pequena demais (${dim.w}px de largura). Envie pelo menos 1200 × 630 px.`); return; }
-                                        if (dim && (dim.w / dim.h < 1.25 || dim.w / dim.h > 3)) toast.warning("Formato fora do ideal: a arte vai ser recortada nas bordas. O recomendado é 1200 × 630 px.");
-                                        const t = toast.loading("Otimizando e enviando arte...");
-                                        // WhatsApp ignora imagens pesadas (> ~600KB): converte para JPEG leve, máx. 1200px de largura
-                                        const blob = await new Promise<Blob | null>(resolve => {
-                                          const url = URL.createObjectURL(file);
-                                          const img = new Image();
-                                          img.onload = () => {
-                                            const scale = Math.min(1, 1200 / img.naturalWidth);
-                                            const c = document.createElement("canvas");
-                                            c.width = Math.round(img.naturalWidth * scale);
-                                            c.height = Math.round(img.naturalHeight * scale);
-                                            const ctx = c.getContext("2d")!;
-                                            ctx.fillStyle = "#000"; ctx.fillRect(0, 0, c.width, c.height);
-                                            ctx.drawImage(img, 0, 0, c.width, c.height);
-                                            URL.revokeObjectURL(url);
-                                            const tryQ = (q: number) => c.toBlob(bl => {
-                                              if (bl && bl.size > 280 * 1024 && q > 0.5) tryQ(q - 0.1); else resolve(bl);
-                                            }, "image/jpeg", q);
-                                            tryQ(0.85);
-                                          };
-                                          img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
-                                          img.src = url;
-                                        });
-                                        if (!blob) { toast.dismiss(t); toast.error("Não foi possível processar a imagem."); return; }
-                                        const path = `${b.id}/${Date.now()}.jpg`;
-                                        const { error } = await supabase.storage.from("bolao-capas").upload(path, blob, { contentType: "image/jpeg" });
                                         toast.dismiss(t);
-                                        if (error) { toast.error("Erro ao enviar: " + error.message); return; }
-                                        setEditBolaoForm((f: any) => ({ ...f, capa_url: path }));
-                                        toast.success("Arte enviada. Clique em salvar.");
+
+                                        if (error) {
+                                          toast.error("Erro ao enviar: " + error.message);
+                                          return;
+                                        }
+
+                                        setEditBolaoForm((f: any) => ({ ...f, capa_url: path, capa_media_type: mediaType }));
+                                        toast.success(mediaType === "gif" ? "GIF enviado. Clique em salvar." : "Vídeo enviado. Clique em salvar.");
                                       }}
                                     />
                                   </label>
+
                                   {editBolaoForm.capa_url && (
-                                    <button type="button" className="text-[11px] font-bold text-destructive" onClick={() => setEditBolaoForm({ ...editBolaoForm, capa_url: null })}>Remover</button>
+                                    <button
+                                      type="button"
+                                      className="text-[11px] font-bold text-destructive"
+                                      onClick={() => setEditBolaoForm({ ...editBolaoForm, capa_url: null, capa_media_type: "image" })}
+                                    >
+                                      Remover
+                                    </button>
                                   )}
                                 </div>
                                 <p className="text-[10px] leading-tight text-muted-foreground sm:col-span-2">
-                                  Tamanho ideal: <span className="font-black text-foreground">1200 × 630 px</span> (16:9). É o formato que o WhatsApp mostra ao compartilhar o link. Mínimo: 800 × 420 px · até 5MB · JPG, PNG ou WEBP.
+                                  <span className="font-black text-foreground">Imagem:</span> JPG/PNG/WEBP até 5MB ·
+                                  <span className="font-black text-foreground"> GIF:</span> até 10MB ·
+                                  <span className="font-black text-foreground"> Vídeo:</span> MP4/WebM até 30MB.
+                                  A mídia é exibida automaticamente em loop na área superior do bolão.
                                 </p>
                               </div>
                             </div>
