@@ -771,6 +771,7 @@
   --popover: oklch(0.105 0.04 240);
   --popover-foreground: oklch(0.97 0.015 225);
   --primary: var(--bolao-accent, oklch(0.8 0.225 145));
+  --bolao-accent-readable: color-mix(in oklab, var(--primary) 54%, white);
   --primary-foreground: oklch(0.98 0.01 225);
   --secondary: oklch(0.17 0.05 240);
   --secondary-foreground: oklch(0.94 0.02 225);
@@ -791,6 +792,12 @@
     linear-gradient(135deg, oklch(0.055 0.03 240 / 94%), color-mix(in oklab, var(--primary) 18%, oklch(0.07 0.035 240) / 94%)),
     url("./assets/lottery-universe-bg.jpg") center top / cover fixed;
   color: var(--foreground);
+
+  /* Keep the lottery's darker brand color on fills while lifting accent text
+     enough to remain readable over the navy pool panels. */
+  & .text-primary {
+    color: var(--bolao-accent-readable);
+  }
 
   & .app-panel {
     border-color: color-mix(in oklab, var(--border) 84%, transparent);
