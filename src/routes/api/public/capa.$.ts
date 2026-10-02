@@ -22,10 +22,22 @@ export const Route = createFileRoute("/api/public/capa/$")({
 
         const { data, error } = await supabaseAdmin.storage.from("bolao-capas").download(path);
         if (error || !data) return new Response("Not found", { status: 404 });
+        const contentType =
+          /\.gif$/i.test(path)
+            ? "image/gif"
+            : /\.png$/i.test(path)
+              ? "image/png"
+              : /\.webp$/i.test(path)
+                ? "image/webp"
+                : "image/jpeg";
+
         return new Response(data, {
+          status: 200,
           headers: {
-            "Content-Type": data.type || (/\.gif$/i.test(path) ? "image/gif" : "image/jpeg"),
+            "Content-Type": contentType,
+            "Content-Length": String(data.size),
             "Cache-Control": "public, max-age=31536000, immutable",
+            "X-Content-Type-Options": "nosniff",
           },
         });
       },
