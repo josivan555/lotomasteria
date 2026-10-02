@@ -63,41 +63,122 @@ function parseData(dd: string): string {
   return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
 }
 
-export async function buscarResumoOficial(loteria: LoteriaId): Promise<ResumoOficial | null> {
-  const cfg = LOTERIAS[loteria];
+const REQUEST_HEADERS = {
+  accept: "application/json, text/plain, */*",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/154 Safari/537.36",
+  origin: "https://loterias.caixa.gov.br",
+  referer: "https://loterias.caixa.gov.br/",
+};
+
+type AnyCaixa = Record<string, any>;
+
+function normalizarFaixas(j: AnyCaixa): FaixaPremio[] {
+  if (Array.isArray(j.listaRateioPremio)) {
+    return j.listaRateioPremio.map((f: any) => ({
+      faixa: f.descricaoFaixa ?? "",
+      ganhadores: Number(f.numeroDeGanhadores ?? 0),
+      premio: Number(f.valorPremio ?? 0),
+    }));
+  }
+  if (Array.isArray(j.premiacoes)) {
+    return j.premiacoes.map((f: any) => ({
+      faixa: f.descricao ?? f.acertos ?? String(f.faixa ?? ""),
+      ganhadores: Number(f.numeroDeGanhadores ?? f.ganhadores ?? f.vencedores ?? 0),
+      premio:
+        typeof f.valorPremio === "number"
+          ? f.valorPremio
+          : Number(String(f.premio ?? 0).replace(/\\./g, "").replace(",", ".")) || 0,
+    }));
+  }
+  return [];
+}
+
+function normalizarCaixaParaDetalhe(j: AnyCaixa): CaixaDetalhe | null {
+  const numero = Number(j.numero ?? j.concurso ?? 0);
+  const dezenasRaw = j.listaDezenas ?? j.dezenas ?? j.dezenasSorteadasOrdemSorteio ?? [];
+  const data = j.dataApuracao ?? j.data ?? "";
+  if (!numero || !Array.isArray(dezenasRaw) || dezenasRaw.length === 0 || !data) return null;
+  return {
+    numero,
+    dataApuracao: data,
+    listaDezenas: dezenasRaw.map(String),
+    acumulado: Boolean(j.acumulado),
+    valorAcumuladoConcurso_0_5: Number(j.valorAcumuladoConcurso_0_5 ?? 0),
+    valorAcumuladoProximoConcurso: Number(j.valorAcumuladoProximoConcurso ?? 0),
+    valorArrecadado: Number(j.valorArrecadado ?? 0),
+    localSorteio: j.localSorteio ?? j.local ?? "",
+    nomeMunicipioUFSorteio: j.nomeMunicipioUFSorteio ?? "",
+    dataProximoConcurso: j.dataProximoConcurso ?? j.dataProxConcurso ?? "",
+    numeroConcursoProximo:
+      Number(j.numeroConcursoProximo ?? j.proximoConcurso ?? j.proxConcurso ?? 0) || undefined,
+    valorEstimadoProximoConcurso: Number(j.valorEstimadoProximoConcurso ?? 0),
+    listaRateioPremio: normalizarFaixas(j),
+    nomeTimeCoracaoMesSorte: j.nomeTimeCoracaoMesSorte ?? j.timeCoracao ?? j.mesSorte ?? undefined,
+  };
+}
+
+async function fetchJson(url: string, timeoutMs = 7000): Promise<AnyCaixa | null> {
   try {
-    const res = await fetch(
-      `https://servicebus2.caixa.gov.br/portaldeloterias/api/${loteria}`,
-      { headers: { accept: "application/json" }, signal: AbortSignal.timeout(8000) },
-    );
+    const res = await fetch(url, {
+      headers: REQUEST_HEADERS,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
     if (!res.ok) return null;
-    const j = (await res.json()) as CaixaDetalhe;
-    const dz = (j.listaDezenas ?? []).map(Number).sort((a, b) => a - b);
-    return {
-      loteria,
-      nome: cfg.nome,
-      numero: j.numero,
-      data_apuracao: parseData(j.dataApuracao),
-      dezenas: dz,
-      soma: dz.reduce((a, b) => a + b, 0),
-      acumulou: Boolean(j.acumulado),
-      valorAcumulado: j.valorAcumuladoProximoConcurso ?? j.valorAcumuladoConcurso_0_5 ?? 0,
-      arrecadacao: j.valorArrecadado ?? 0,
-      localSorteio:
-        [j.localSorteio, j.nomeMunicipioUFSorteio].filter(Boolean).join(" · ") || null,
-      faixas: (j.listaRateioPremio ?? []).map((f) => ({
-        faixa: f.descricaoFaixa,
-        ganhadores: f.numeroDeGanhadores ?? 0,
-        premio: f.valorPremio ?? 0,
-      })),
-      proximoConcurso: j.numeroConcursoProximo ?? null,
-      proximoData: j.dataProximoConcurso ? parseData(j.dataProximoConcurso) : null,
-      estimativaProximo: j.valorEstimadoProximoConcurso ?? 0,
-      mesSorte: loteria === "diadesorte" ? mesDoNome(j.nomeTimeCoracaoMesSorte) : null,
-    };
+    return (await res.json()) as AnyCaixa;
   } catch {
     return null;
   }
+}
+
+const FALLBACK_BASES = [
+  "https://loteriascaixa-api.herokuapp.com/api",
+  "https://loterias-gutotech.herokuapp.com/api",
+  "https://loterias-caixa-gov.herokuapp.com/api",
+];
+
+async function fetchFallbackCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaDetalhe | null> {
+  const endpoint = concurso ? `${loteria}/${concurso}` : `${loteria}/latest`;
+  for (const base of FALLBACK_BASES) {
+    const raw = await fetchJson(`${base}/${endpoint}`, 6000);
+    const normalized = raw ? normalizarCaixaParaDetalhe(raw) : null;
+    if (normalized) return normalized;
+  }
+  const guidi = await fetchJson(
+    `https://api.guidi.dev.br/loteria/${loteria}/${concurso ? concurso : "ultimo"}`,
+    6000,
+  );
+  return guidi ? normalizarCaixaParaDetalhe(guidi) : null;
+}
+
+export async function buscarResumoOficial(loteria: LoteriaId): Promise<ResumoOficial | null> {
+  const cfg = LOTERIAS[loteria];
+  const official = await fetchJson(
+    `https://servicebus2.caixa.gov.br/portaldeloterias/api/${loteria}`,
+    7000,
+  );
+  const officialData = official ? normalizarCaixaParaDetalhe(official) : null;
+  const data = officialData ?? (await fetchFallbackCaixa(loteria));
+  if (!data) return null;
+
+  const dz = (data.listaDezenas ?? []).map(Number).sort((a, b) => a - b);
+  return {
+    loteria,
+    nome: cfg.nome,
+    numero: data.numero,
+    data_apuracao: parseData(data.dataApuracao),
+    dezenas: dz,
+    soma: dz.reduce((a, b) => a + b, 0),
+    acumulou: Boolean(data.acumulado),
+    valorAcumulado: data.valorAcumuladoProximoConcurso ?? data.valorAcumuladoConcurso_0_5 ?? 0,
+    arrecadacao: data.valorArrecadado ?? 0,
+    localSorteio:
+      [data.localSorteio, data.nomeMunicipioUFSorteio].filter(Boolean).join(" · ") || null,
+    faixas: data.listaRateioPremio ?? [],
+    proximoConcurso: data.numeroConcursoProximo ?? null,
+    proximoData: data.dataProximoConcurso ? parseData(data.dataProximoConcurso) : null,
+    estimativaProximo: data.valorEstimadoProximoConcurso ?? 0,
+    mesSorte: loteria === "diadesorte" ? mesDoNome(data.nomeTimeCoracaoMesSorte) : null,
+  };
 }
 
 export async function buscarResumoTodas(): Promise<ResumoOficial[]> {
