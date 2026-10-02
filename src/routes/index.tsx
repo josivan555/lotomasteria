@@ -325,7 +325,25 @@ function Landing() {
 
                     <div className="lottery-choice-banner">
                       {(b as any).capa_url ? (
-                        <img src={capaUrl((b as any).capa_url)!} alt={b.nome} className="h-full w-full object-cover" loading="lazy" />
+                        capaMediaType((b as any).capa_url) === "video" ? (
+                          <video
+                            src={capaUrl((b as any).capa_url)!}
+                            className="absolute inset-0 h-full w-full object-cover"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            preload="metadata"
+                            aria-label={b.nome}
+                          />
+                        ) : (
+                          <img
+                            src={capaUrl((b as any).capa_url)!}
+                            alt={b.nome}
+                            className="absolute inset-0 h-full w-full object-cover"
+                            loading="lazy"
+                          />
+                        )
                       ) : (
                         <>
                           <img
