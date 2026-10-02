@@ -138,16 +138,30 @@ const FALLBACK_BASES = [
 
 async function fetchFallbackCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaDetalhe | null> {
   const endpoint = concurso ? `${loteria}/${concurso}` : `${loteria}/latest`;
+  const candidates: CaixaDetalhe[] = [];
+
   for (const base of FALLBACK_BASES) {
     const raw = await fetchJson(`${base}/${endpoint}`, 6000);
     const normalized = raw ? normalizarCaixaParaDetalhe(raw) : null;
-    if (normalized) return normalized;
+    if (!normalized) continue;
+    if (concurso && normalized.numero !== concurso) continue;
+    candidates.push(normalized);
   }
+
   const guidi = await fetchJson(
     `https://api.guidi.dev.br/loteria/${loteria}/${concurso ? concurso : "ultimo"}`,
     6000,
   );
-  return guidi ? normalizarCaixaParaDetalhe(guidi) : null;
+  const guidiNormalized = guidi ? normalizarCaixaParaDetalhe(guidi) : null;
+  if (guidiNormalized && (!concurso || guidiNormalized.numero === concurso)) {
+    candidates.push(guidiNormalized);
+  }
+
+  if (!candidates.length) return null;
+
+  return candidates.reduce((maisRecente, atual) =>
+    atual.numero > maisRecente.numero ? atual : maisRecente,
+  );
 }
 
 export async function buscarResumoOficial(loteria: LoteriaId): Promise<ResumoOficial | null> {
