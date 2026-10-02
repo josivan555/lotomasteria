@@ -109,6 +109,17 @@ function AuthedLayout() {
                   <Home className="h-5 w-5" />
                 </Link>
               </Button>
+              {profile?.isAdmin && (
+                <Button asChild variant="ghost" size="icon" className="md:hidden" aria-label="Painel Admin">
+                  <Link
+                    to="/admin"
+                    activeProps={{ className: "text-primary" }}
+                    inactiveProps={{ className: "text-muted-foreground" }}
+                  >
+                    <ShieldCheck className="h-5 w-5" />
+                  </Link>
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
