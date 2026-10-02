@@ -196,27 +196,27 @@ export async function buscarConcursoOficial(
   faixas: FaixaPremio[];
   mesSorte: number | null;
 } | null> {
-  try {
-    const res = await fetch(
-      `https://servicebus2.caixa.gov.br/portaldeloterias/api/${loteria}/${numero}`,
-      { headers: { accept: "application/json" }, signal: AbortSignal.timeout(8000) },
-    );
-    if (!res.ok) return null;
-    const j = (await res.json()) as CaixaDetalhe;
-    const dz = (j.listaDezenas ?? []).map(Number).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
-    if (dz.length === 0) return null;
-    return {
-      numero: j.numero,
-      dezenas: dz,
-      data_apuracao: parseData(j.dataApuracao),
-      faixas: (j.listaRateioPremio ?? []).map((f) => ({
-        faixa: f.descricaoFaixa,
-        ganhadores: f.numeroDeGanhadores ?? 0,
-        premio: f.valorPremio ?? 0,
-      })),
-      mesSorte: loteria === "diadesorte" ? mesDoNome(j.nomeTimeCoracaoMesSorte) : null,
-    };
-  } catch {
-    return null;
-  }
+  const official = await fetchJson(
+    `https://servicebus2.caixa.gov.br/portaldeloterias/api/${loteria}/${numero}`,
+    7000,
+  );
+  const data = (official ? normalizarCaixaParaDetalhe(official) : null) ??
+    (await fetchFallbackCaixa(loteria, numero));
+
+  if (!data) return null;
+
+  const dz = (data.listaDezenas ?? [])
+    .map(Number)
+    .filter((n) => !Number.isNaN(n))
+    .sort((a, b) => a - b);
+
+  if (dz.length === 0) return null;
+
+  return {
+    numero: data.numero,
+    dezenas: dz,
+    data_apuracao: parseData(data.dataApuracao),
+    faixas: data.listaRateioPremio ?? [],
+    mesSorte: loteria === "diadesorte" ? mesDoNome(data.nomeTimeCoracaoMesSorte) : null,
+  };
 }
