@@ -34,7 +34,7 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
     const base = "https://lotomasteria.lovable.app";
     const info = loaderData;
     const cfg = info ? LOTERIAS[info.loteriaId as LoteriaId] : undefined;
-    const capa = info ? capaUrl(info.capaUrl, true) : null;
+    const capa = info && capaMediaType(info.capaUrl) !== "video" ? capaUrl(info.capaUrl, true) : null;
     const bannerPadrao = info ? OG_BANNERS[info.loteriaId as LoteriaId] : undefined;
     const banner = capa ?? (bannerPadrao ? `${base}${bannerPadrao}` : undefined);
     const nomeLimpo = info ? info.nome.trim().replace(/^BOL[ÃA]O\s+/i, "") : "";
