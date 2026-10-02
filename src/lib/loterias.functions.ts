@@ -211,37 +211,25 @@ async function fetchCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaR
   const base = `https://servicebus2.caixa.gov.br/portaldeloterias/api/${loteria}`;
   const url = concurso ? `${base}/${concurso}` : base;
 
-  // 1) Tenta primeiro a fonte oficial.
+  // 1) Fonte oficial.
   const official = await fetchJsonExterno(url, 7000);
   const officialResult = official ? normalizarCaixaResp(official) : null;
-
-  // Para concurso específico, somente aceitamos exatamente o concurso solicitado.
   if (concurso && officialResult?.numero === concurso) return officialResult;
 
-  // 2) Consulta TODOS os espelhos e escolhe o mais recente.
+  // 2) Espelhos consultados EM PARALELO (antes eram em sequência e somavam até ~30s).
   const endpoint = concurso ? `${loteria}/${concurso}` : `${loteria}/latest`;
+  const urls = [
+    ...RESULTADO_FALLBACK_BASES.map((b) => `${b}/${endpoint}`),
+    `https://api.guidi.dev.br/loteria/${loteria}/${concurso ? concurso : "ultimo"}`,
+  ];
+  const raws = await Promise.all(urls.map((u) => fetchJsonExterno(u, 5000)));
   const candidates: CaixaResp[] = [];
-
-  if (officialResult && (!concurso || officialResult.numero === concurso)) {
-    candidates.push(officialResult);
-  }
-
-  for (const fallbackBase of RESULTADO_FALLBACK_BASES) {
-    const raw = await fetchJsonExterno(`${fallbackBase}/${endpoint}`, 6000);
+  if (officialResult && (!concurso || officialResult.numero === concurso)) candidates.push(officialResult);
+  for (const raw of raws) {
     const result = raw ? normalizarCaixaResp(raw) : null;
     if (!result) continue;
     if (concurso && result.numero !== concurso) continue;
     candidates.push(result);
-  }
-
-  // 3) Último fallback: API Guidi.
-  const guidi = await fetchJsonExterno(
-    `https://api.guidi.dev.br/loteria/${loteria}/${concurso ? concurso : "ultimo"}`,
-    6000,
-  );
-  const guidiResult = guidi ? normalizarCaixaResp(guidi) : null;
-  if (guidiResult && (!concurso || guidiResult.numero === concurso)) {
-    candidates.push(guidiResult);
   }
 
   if (!candidates.length) return null;
@@ -270,11 +258,20 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
     const alvo = latest.numero;
 
     // Numeros ja salvos (para pular buracos e sincronizar do mais recente para o mais antigo)
-    const { data: existentes } = await supabaseAdmin
-      .from("concursos")
-      .select("numero")
-      .eq("loteria", data.loteria);
-    const salvos = new Set((existentes ?? []).map((r) => r.numero));
+    // Paginado: o banco devolve no máximo 1000 linhas por consulta, e loterias
+    // com mais concursos eram baixadas de novo a cada sincronização.
+    const salvos = new Set<number>();
+    for (let from = 0; ; from += 1000) {
+      const { data: pag, error: e } = await supabaseAdmin
+        .from("concursos")
+        .select("numero")
+        .eq("loteria", data.loteria)
+        .order("numero", { ascending: false })
+        .range(from, from + 999);
+      if (e) throw new Error(e.message);
+      (pag ?? []).forEach((r) => salvos.add(r.numero));
+      if (!pag || pag.length < 1000) break;
+    }
 
     // Alvos: do concurso mais recente para tras, pulando os que ja temos
     const pendentes: number[] = [];
@@ -297,7 +294,7 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
     }[] = [];
 
     // Busca em lotes paralelos para acelerar
-    const CHUNK = 8;
+    const CHUNK = 6;
     for (let i = 0; i < pendentes.length; i += CHUNK) {
       const lote = pendentes.slice(i, i + CHUNK);
       const resultados = await Promise.all(
@@ -381,7 +378,7 @@ export const detectarEspeciais = createServerFn({ method: "POST" })
 
     const alvo = candidatos.slice(0, data.limite);
     let especiais = 0;
-    const CHUNK = 8;
+    const CHUNK = 6;
     for (let i = 0; i < alvo.length; i += CHUNK) {
       const lote = alvo.slice(i, i + CHUNK);
       const resultados = await Promise.all(lote.map((r) => fetchCaixa(data.loteria, r.numero)));
