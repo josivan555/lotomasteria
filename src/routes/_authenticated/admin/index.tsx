@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Users, Ticket, ShieldCheck, Clock, CheckCircle2, AlertCircle, Trash2, Edit2, Check, X, Search, UserCircle2, Layers } from "lucide-react";
+import { Users, Ticket, ShieldCheck, Clock, CheckCircle2, AlertCircle, Trash2, Edit2, Check, X, Search, UserCircle2, Layers, History } from "lucide-react";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { toast } from "sonner";
 import { useRouter, Link } from "@tanstack/react-router";
@@ -34,6 +34,7 @@ function AdminDashboard() {
   const [editBolaoForm, setEditBolaoForm] = useState<any>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [searchUser, setSearchUser] = useState("");
+  const [abaBoloes, setAbaBoloes] = useState<"ativos" | "historico">("ativos");
 
   const { data: boloes = [], isLoading: loadingBoloes } = useQuery({
     queryKey: ["admin-boloes"],
@@ -87,6 +88,18 @@ function AdminDashboard() {
       b.concurso_numero.toString().includes(searchTerm)
     );
   }, [boloes, searchTerm]);
+
+  // Bolões conferidos saem da lista principal e ficam disponíveis no Histórico.
+  const bolõesVisiveis = useMemo(() => {
+    return filteredBoloes.filter((b: any) =>
+      abaBoloes === "historico" ? b.status === "conferido" : b.status !== "conferido"
+    );
+  }, [filteredBoloes, abaBoloes]);
+
+  const totalHistorico = useMemo(
+    () => boloes.filter((b: any) => b.status === "conferido").length,
+    [boloes]
+  );
 
   const filteredUsuarios = useMemo(() => {
     return usuarios.filter((u: any) => 
@@ -179,6 +192,38 @@ function AdminDashboard() {
 
           <AdminAdicionarParticipante boloes={boloes} />
 
+          <div className="mt-5 flex flex-wrap items-center gap-2 border-b border-border/40 pb-3">
+            <button
+              type="button"
+              onClick={() => setAbaBoloes("ativos")}
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all ${abaBoloes === "ativos" ? "bg-primary text-primary-foreground shadow-sm" : "bg-background/40 text-muted-foreground hover:bg-muted/50"}`}
+            >
+              <Ticket className="h-3.5 w-3.5" />
+              Bolões Ativos
+              <span className="rounded-full bg-background/30 px-1.5 py-0.5 text-[9px]">
+                {boloes.filter((b: any) => b.status !== "conferido").length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setAbaBoloes("historico")}
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all ${abaBoloes === "historico" ? "bg-primary text-primary-foreground shadow-sm" : "bg-background/40 text-muted-foreground hover:bg-muted/50"}`}
+            >
+              <History className="h-3.5 w-3.5" />
+              Histórico
+              <span className="rounded-full bg-background/30 px-1.5 py-0.5 text-[9px]">
+                {totalHistorico}
+              </span>
+            </button>
+
+            {abaBoloes === "historico" && (
+              <span className="ml-1 text-[10px] font-bold text-muted-foreground">
+                Bolões com status <strong className="text-foreground">Conferido</strong>
+              </span>
+            )}
+          </div>
+
           <div className="rounded-xl border border-border/60 bg-card/40 backdrop-blur overflow-hidden mt-4">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
@@ -194,9 +239,9 @@ function AdminDashboard() {
                 <tbody className="divide-y divide-border/40">
                   {loadingBoloes ? (
                     <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs uppercase tracking-widest font-black">Carregando bolões...</td></tr>
-                  ) : filteredBoloes.length === 0 ? (
+                  ) : bolõesVisiveis.length === 0 ? (
                     <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground text-xs uppercase tracking-widest font-black">Nenhum bolão encontrado.</td></tr>
-                  ) : filteredBoloes.map((b: any) => {
+                  ) : bolõesVisiveis.map((b: any) => {
                     const cfg = LOTERIAS[b.loteria_id as LoteriaId] || LOTERIAS.lotofacil;
                     const st = statusMap[b.status] || statusMap.encerrado;
                     const StatusIcon = st.icon;
