@@ -577,6 +577,7 @@ function AdminDashboard() {
                                       prazo_vendas: String(b.prazo_vendas ?? "").slice(0, 10),
                                       horario_encerramento: String(b.horario_encerramento ?? "").slice(0, 5),
                                       capa_url: (b as any).capa_url ?? null,
+                                      capa_media_type: capaMediaType((b as any).capa_url),
                                     });
                                   }}
                                 >
