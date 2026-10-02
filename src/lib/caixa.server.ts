@@ -37,11 +37,7 @@ type CaixaDetalhe = {
   dataProximoConcurso?: string;
   numeroConcursoProximo?: number;
   valorEstimadoProximoConcurso?: number;
-  listaRateioPremio?: {
-    descricaoFaixa: string;
-    numeroDeGanhadores: number;
-    valorPremio: number;
-  }[];
+  listaRateioPremio?: FaixaPremio[];
   nomeTimeCoracaoMesSorte?: string;
 };
 
