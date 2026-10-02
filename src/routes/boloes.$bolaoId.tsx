@@ -1,4 +1,4 @@
-import { capaUrl } from "@/lib/capa";
+import { capaUrl, capaMediaType } from "@/lib/capa";
 import { createFileRoute, useParams, Link, useSearch } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
