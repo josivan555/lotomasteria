@@ -171,7 +171,15 @@ export async function buscarResumoOficial(loteria: LoteriaId): Promise<ResumoOfi
     7000,
   );
   const officialData = official ? normalizarCaixaParaDetalhe(official) : null;
-  const data = officialData ?? (await fetchFallbackCaixa(loteria));
+  const fallbackData = await fetchFallbackCaixa(loteria);
+
+  // A fonte oficial tem prioridade em igualdade, mas nunca permitimos que
+  // uma resposta antiga esconda um concurso mais novo disponível no fallback.
+  const data =
+    officialData && fallbackData
+      ? (officialData.numero >= fallbackData.numero ? officialData : fallbackData)
+      : (officialData ?? fallbackData);
+
   if (!data) return null;
 
   const dz = (data.listaDezenas ?? []).map(Number).sort((a, b) => a - b);
