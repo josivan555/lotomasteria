@@ -211,22 +211,45 @@ async function fetchCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaR
   const base = `https://servicebus2.caixa.gov.br/portaldeloterias/api/${loteria}`;
   const url = concurso ? `${base}/${concurso}` : base;
 
+  // 1) Tenta primeiro a fonte oficial.
   const official = await fetchJsonExterno(url, 7000);
   const officialResult = official ? normalizarCaixaResp(official) : null;
-  if (officialResult) return officialResult;
 
+  // Para concurso específico, somente aceitamos exatamente o concurso solicitado.
+  if (concurso && officialResult?.numero === concurso) return officialResult;
+
+  // 2) Consulta TODOS os espelhos e escolhe o mais recente.
   const endpoint = concurso ? `${loteria}/${concurso}` : `${loteria}/latest`;
+  const candidates: CaixaResp[] = [];
+
+  if (officialResult && (!concurso || officialResult.numero === concurso)) {
+    candidates.push(officialResult);
+  }
+
   for (const fallbackBase of RESULTADO_FALLBACK_BASES) {
     const raw = await fetchJsonExterno(`${fallbackBase}/${endpoint}`, 6000);
     const result = raw ? normalizarCaixaResp(raw) : null;
-    if (result) return result;
+    if (!result) continue;
+    if (concurso && result.numero !== concurso) continue;
+    candidates.push(result);
   }
 
+  // 3) Último fallback: API Guidi.
   const guidi = await fetchJsonExterno(
     `https://api.guidi.dev.br/loteria/${loteria}/${concurso ? concurso : "ultimo"}`,
     6000,
   );
-  return guidi ? normalizarCaixaResp(guidi) : null;
+  const guidiResult = guidi ? normalizarCaixaResp(guidi) : null;
+  if (guidiResult && (!concurso || guidiResult.numero === concurso)) {
+    candidates.push(guidiResult);
+  }
+
+  if (!candidates.length) return null;
+
+  // Para "latest", nunca aceite uma fonte atrasada só porque respondeu primeiro.
+  return candidates.reduce((maisRecente, atual) =>
+    atual.numero > maisRecente.numero ? atual : maisRecente,
+  );
 }
 
 export const sincronizarConcursos = createServerFn({ method: "POST" })
