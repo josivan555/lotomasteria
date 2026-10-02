@@ -15,7 +15,7 @@ import { useState, useMemo } from "react";
 import { AdminParticipantesDialog } from "@/components/admin-participantes-dialog";
 import { AdminAdicionarParticipante } from "@/components/admin-adicionar-participante";
 import { supabase } from "@/integrations/supabase/client";
-import { capaUrl } from "@/lib/capa";
+import { capaUrl, capaMediaType } from "@/lib/capa";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
