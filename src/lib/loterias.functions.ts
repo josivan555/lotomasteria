@@ -139,6 +139,96 @@ export const ultimoResultadoCaixa = createServerFn({ method: "GET" })
     };
   });
 
+type CaixaResp = {
+  numero: number;
+  dataApuracao: string;
+  listaDezenas: string[];
+  indicadorConcursoEspecial?: number;
+  listaRateioPremio?: {
+    descricaoFaixa: string;
+    numeroDeGanhadores: number;
+    valorPremio: number;
+  }[];
+};
+
+const REQUEST_HEADERS = {
+  accept: "application/json, text/plain, */*",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/154 Safari/537.36",
+  origin: "https://loterias.caixa.gov.br",
+  referer: "https://loterias.caixa.gov.br/",
+};
+
+type CaixaAny = Record<string, any>;
+
+function normalizarCaixaResp(j: CaixaAny): CaixaResp | null {
+  const numero = Number(j.numero ?? j.concurso ?? 0);
+  const dezenas = j.listaDezenas ?? j.dezenas ?? j.dezenasSorteadasOrdemSorteio ?? [];
+  const data = j.dataApuracao ?? j.data ?? "";
+  if (!numero || !Array.isArray(dezenas) || !dezenas.length || !data) return null;
+
+  const rateio = Array.isArray(j.listaRateioPremio)
+    ? j.listaRateioPremio
+    : Array.isArray(j.premiacoes)
+      ? j.premiacoes.map((f: any) => ({
+          descricaoFaixa: f.descricao ?? f.acertos ?? String(f.faixa ?? ""),
+          numeroDeGanhadores: Number(f.numeroDeGanhadores ?? f.ganhadores ?? f.vencedores ?? 0),
+          valorPremio:
+            typeof f.valorPremio === "number"
+              ? f.valorPremio
+              : Number(String(f.premio ?? 0).replace(/\\./g, "").replace(",", ".")) || 0,
+        }))
+      : [];
+
+  return {
+    numero,
+    dataApuracao: data,
+    listaDezenas: dezenas.map(String),
+    indicadorConcursoEspecial: j.indicadorConcursoEspecial,
+    listaRateioPremio: rateio,
+  };
+}
+
+async function fetchJsonExterno(url: string, timeoutMs = 7000): Promise<CaixaAny | null> {
+  try {
+    const res = await fetch(url, {
+      headers: REQUEST_HEADERS,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    if (!res.ok) return null;
+    return await res.json() as CaixaAny;
+  } catch {
+    return null;
+  }
+}
+
+const RESULTADO_FALLBACK_BASES = [
+  "https://loteriascaixa-api.herokuapp.com/api",
+  "https://loterias-gutotech.herokuapp.com/api",
+  "https://loterias-caixa-gov.herokuapp.com/api",
+];
+
+async function fetchCaixa(loteria: LoteriaId, concurso?: number): Promise<CaixaResp | null> {
+  const base = `https://servicebus2.caixa.gov.br/portaldeloterias/api/${loteria}`;
+  const url = concurso ? `${base}/${concurso}` : base;
+
+  const official = await fetchJsonExterno(url, 7000);
+  const officialResult = official ? normalizarCaixaResp(official) : null;
+  if (officialResult) return officialResult;
+
+  const endpoint = concurso ? `${loteria}/${concurso}` : `${loteria}/latest`;
+  for (const fallbackBase of RESULTADO_FALLBACK_BASES) {
+    const raw = await fetchJsonExterno(`${fallbackBase}/${endpoint}`, 6000);
+    const result = raw ? normalizarCaixaResp(raw) : null;
+    if (result) return result;
+  }
+
+  const guidi = await fetchJsonExterno(
+    `https://api.guidi.dev.br/loteria/${loteria}/${concurso ? concurso : "ultimo"}`,
+    6000,
+  );
+  return guidi ? normalizarCaixaResp(guidi) : null;
+}
+
 export const sincronizarConcursos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) =>
