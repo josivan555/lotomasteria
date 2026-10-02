@@ -303,7 +303,31 @@ function DetalheBolao() {
 
         <div className="space-y-5 lg:col-span-5">
           <div className="bolao-detail-hero app-panel relative overflow-hidden rounded-lg">
-            <div className="bolao-detail-banner bg-cover bg-center" style={{ backgroundImage: `linear-gradient(0deg, var(--surface-strong), transparent 72%), url(${capaUrl((bolao as any).capa_url) ?? cfg.banner})` }} />
+            {capaMediaType((bolao as any).capa_url) === "video" ? (
+              <>
+                <video
+                  src={capaUrl((bolao as any).capa_url)!}
+                  className="bolao-detail-banner object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  aria-label={bolao.nome}
+                />
+                <div
+                  className="bolao-detail-banner pointer-events-none"
+                  style={{ background: "linear-gradient(0deg, var(--surface-strong), transparent 72%)" }}
+                />
+              </>
+            ) : (
+              <div
+                className="bolao-detail-banner bg-cover bg-center"
+                style={{
+                  backgroundImage: `linear-gradient(0deg, var(--surface-strong), transparent 72%), url(${capaUrl((bolao as any).capa_url) ?? cfg.banner})`
+                }}
+              />
+            )}
             <div className="relative p-5 pt-24 sm:p-7 sm:pt-32">
 
               <div className="flex justify-between items-start mb-6">
