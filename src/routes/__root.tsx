@@ -88,8 +88,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "LotoMaster IA — Análise inteligente para Lotofácil" },
       { name: "twitter:description", content: "Análise estatística inteligente do histórico completo da Lotofácil: frequência, atraso, tendência, score IA e geração de jogos com filtros avançados." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/G5LPNSulNHfeYWLywLBocql659f2/social-images/social-1785236240434-ChatGPT_Image_28_de_jul._de_2026,_07_56_51.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/G5LPNSulNHfeYWLywLBocql659f2/social-images/social-1785236240434-ChatGPT_Image_28_de_jul._de_2026,_07_56_51.webp" },
+      // A imagem de compartilhamento é definida pela rota da página.
+      // Isso evita que a imagem global substitua o preview específico do bolão.
     ],
     links: [
       { rel: "stylesheet", href: appCss },
