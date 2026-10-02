@@ -42,13 +42,17 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
     const descricao = info
       ? `${nomeLimpo}${info.isCombo ? " (Combo especial)" : ""} · Concurso ${info.concurso} · Cota ${formatBRL(info.valorCota)} · Prêmio estimado ${formatBRL(info.premioEstimado)}. Garanta a sua cota!`
       : "Consulte jogos, confira resultados e participe dos bolões LotoMaster IA.";
+    const paginaUrl = `${base}/boloes/${params.bolaoId}`;
     const meta: Array<Record<string, string>> = [
       { title: titulo },
       { name: "description", content: descricao },
+      { name: "robots", content: "index,follow,max-image-preview:large" },
+      { property: "og:url", content: paginaUrl },
       { property: "og:title", content: titulo },
       { property: "og:description", content: descricao },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "LotoMaster IA" },
+      { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: banner ? "summary_large_image" : "summary" },
     ];
     void params;
@@ -63,8 +67,9 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
 
       // O WhatsApp exige uma imagem real para o preview. GIF pode ser usado
       // como og:image; vídeo não pode, então usamos o banner padrão da loteria.
-      meta.push({ property: "og:image", content: banner });
-      meta.push({ property: "og:image:secure_url", content: banner });
+      const previewUrl = `${banner}${banner.includes("?") ? "&" : "?"}v=${encodeURIComponent(String(info?.concurso ?? params.bolaoId))}`;
+      meta.push({ property: "og:image", content: previewUrl });
+      meta.push({ property: "og:image:secure_url", content: previewUrl });
       meta.push({ property: "og:image:type", content: ogImageType });
       meta.push({ property: "og:image:width", content: "1200" });
       meta.push({ property: "og:image:height", content: "630" });
