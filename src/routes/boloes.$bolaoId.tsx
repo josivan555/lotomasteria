@@ -53,12 +53,24 @@ export const Route = createFileRoute("/boloes/$bolaoId")({
     ];
     void params;
     if (banner) {
+      const mediaType = info ? capaMediaType(info.capaUrl) : "image";
+      const ogImageType =
+        mediaType === "gif"
+          ? "image/gif"
+          : /\.png(?:[?#]|$)/i.test(banner)
+            ? "image/png"
+            : "image/jpeg";
+
+      // O WhatsApp exige uma imagem real para o preview. GIF pode ser usado
+      // como og:image; vídeo não pode, então usamos o banner padrão da loteria.
       meta.push({ property: "og:image", content: banner });
       meta.push({ property: "og:image:secure_url", content: banner });
-      meta.push({ property: "og:image:type", content: /\.png$/i.test(banner) ? "image/png" : "image/jpeg" });
+      meta.push({ property: "og:image:type", content: ogImageType });
       meta.push({ property: "og:image:width", content: "1200" });
       meta.push({ property: "og:image:height", content: "630" });
+      meta.push({ property: "og:image:alt", content: titulo });
       meta.push({ name: "twitter:image", content: banner });
+      meta.push({ name: "twitter:image:alt", content: titulo });
     }
     return { meta };
   },
