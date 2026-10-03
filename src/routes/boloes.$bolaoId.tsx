@@ -245,6 +245,10 @@ function DetalheBolao() {
           </div>
         </div>
 
+        <div className="mb-8">
+          <PixPagamento codigo={sucesso.ref} bolaoId={bolaoId} cor={cfg.cor} />
+        </div>
+
         <div className="grid grid-cols-2 gap-3 mb-8">
           <Button 
             variant="outline" 
@@ -274,11 +278,6 @@ function DetalheBolao() {
         </div>
 
         <div className="space-y-4">
-          <Button className="w-full h-14 text-lg font-black bg-green-600 hover:bg-green-700 text-white" asChild>
-            <Link to="/boloes/pagamento/$codigo" params={{ codigo: sucesso.ref }}>
-              Ir para Pagamento <ExternalLink className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
           <Button asChild variant="ghost" className="w-full">
             <Link
               to="/boloes/$bolaoId"
