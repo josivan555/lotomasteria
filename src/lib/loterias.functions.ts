@@ -133,9 +133,9 @@ export const ultimoResultadoCaixa = createServerFn({ method: "GET" })
       soma: dz.reduce((a, b) => a + b, 0),
       premioPrincipal: faixaPrincipal?.valorPremio ?? 0,
       ganhadoresPrincipal: faixaPrincipal?.numeroDeGanhadores ?? 0,
-      proximoConcurso: null,
-      proximoData: null,
-      estimativaProximo: 0,
+      proximoConcurso: r.proximoConcurso ?? null,
+      proximoData: r.dataProximoConcurso ? parseData(r.dataProximoConcurso) : null,
+      estimativaProximo: r.valorEstimadoProximoConcurso ?? 0,
     };
   });
 
@@ -144,6 +144,9 @@ type CaixaResp = {
   dataApuracao: string;
   listaDezenas: string[];
   indicadorConcursoEspecial?: number;
+  proximoConcurso?: number;
+  dataProximoConcurso?: string;
+  valorEstimadoProximoConcurso?: number;
   listaRateioPremio?: {
     descricaoFaixa: string;
     numeroDeGanhadores: number;
@@ -184,6 +187,10 @@ function normalizarCaixaResp(j: CaixaAny): CaixaResp | null {
     dataApuracao: data,
     listaDezenas: dezenas.map(String),
     indicadorConcursoEspecial: j.indicadorConcursoEspecial,
+    proximoConcurso:
+      Number(j.numeroConcursoProximo ?? j.proximoConcurso ?? j.proxConcurso ?? 0) || undefined,
+    dataProximoConcurso: j.dataProximoConcurso ?? j.dataProxConcurso ?? undefined,
+    valorEstimadoProximoConcurso: Number(j.valorEstimadoProximoConcurso ?? 0) || undefined,
     listaRateioPremio: rateio,
   };
 }

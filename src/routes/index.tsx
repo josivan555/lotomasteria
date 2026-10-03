@@ -54,6 +54,12 @@ function ContagemRegressiva({ prazo }: { prazo: Date }) {
 
 export const Route = createFileRoute("/")({
   head: () => ({
+    meta: [
+      { property: "og:image", content: "https://lotomasteria.lovable.app/og-home.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: "https://lotomasteria.lovable.app/og-home.jpg" },
+    ],
     links: [{ rel: "canonical", href: "https://lotomasteria.lovable.app/" }],
     scripts: [
       {
