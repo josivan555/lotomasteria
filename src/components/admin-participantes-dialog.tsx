@@ -114,6 +114,7 @@ async function baixarPDF(r: Relatorio, ocultarCelulares: boolean) {
 }
 
 export function AdminParticipantesDialog({ bolaoId, onClose }: { bolaoId: string | null; onClose: () => void }) {
+  const [ocultarCel, setOcultarCel] = useState(false);
   const fetchRel = useServerFn(relatorioParticipantesBolao);
   const { data: r, isLoading, error } = useQuery({
     queryKey: ["admin-relatorio-participantes", bolaoId],
@@ -183,9 +184,15 @@ export function AdminParticipantesDialog({ bolaoId, onClose }: { bolaoId: string
               </table>
             </div>
 
-            <Button className="w-full" onClick={() => baixarPDF(r)} disabled={r.participantes.length === 0}>
-              <Download className="h-4 w-4 mr-2" /> Baixar lista em PDF
-            </Button>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                <input type="checkbox" checked={ocultarCel} onChange={(e) => setOcultarCel(e.target.checked)} />
+                Ocultar celulares no PDF (para compartilhar no grupo)
+              </label>
+              <Button className="w-full" onClick={() => baixarPDF(r, ocultarCel)} disabled={r.participantes.length === 0}>
+                <Download className="h-4 w-4 mr-2" /> Baixar lista em PDF
+              </Button>
+            </div>
           </div>
         )}
       </DialogContent>
