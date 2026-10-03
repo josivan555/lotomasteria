@@ -14,9 +14,14 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
   const qc = useQueryClient();
   const add = useServerFn(adicionarParticipanteManual);
 
-  const padrao = boloes.find((b) => b.status === "em_vendas") ?? boloes[0];
+  const [mostrarEncerrados, setMostrarEncerrados] = useState(false);
+  const boloesFiltrados = mostrarEncerrados
+    ? boloes
+    : boloes.filter((b) => !["encerrado", "sorteado", "conferido"].includes(b.status));
+
+  const padrao = boloesFiltrados.find((b) => b.status === "em_vendas") ?? boloesFiltrados[0];
   const [bolaoId, setBolaoId] = useState<string>("");
-  const efetivoId = boloes.some((b) => b.id === bolaoId) ? bolaoId : (padrao?.id ?? "");
+  const efetivoId = boloesFiltrados.some((b) => b.id === bolaoId) ? bolaoId : (padrao?.id ?? "");
   const [nome, setNome] = useState("");
   const [celular, setCelular] = useState("");
   const [cotas, setCotas] = useState(1);
