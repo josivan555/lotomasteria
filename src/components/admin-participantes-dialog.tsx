@@ -22,7 +22,7 @@ const dataHoraBR = (iso: string) =>
 const hora = (h?: string | null) => String(h ?? "").slice(0, 5);
 const nomeLoteria = (id: string) => LOTERIAS[id as LoteriaId]?.nome ?? id;
 
-async function baixarPDF(r: Relatorio) {
+async function baixarPDF(r: Relatorio, ocultarCelulares: boolean) {
   const { default: jsPDF } = await import("jspdf");
   const { default: autoTable } = await import("jspdf-autotable");
   const doc = new jsPDF();
@@ -82,7 +82,7 @@ async function baixarPDF(r: Relatorio) {
     head: [["#", "Participante", "Cotas", "Compra(s)", "Situação", "Vai receber"]],
     body: r.participantes.map((p, i) => [
       String(i + 1),
-      p.nome,
+      ocultarCelulares ? p.nome : `${p.nome}\n${p.celular || "—"}`,
       String(p.cotas),
       p.compras.map((c: any) => `${dataHoraBR(c.data)} (${c.cotas})`).join("\n"),
       p.cotas_pagas === p.cotas ? "Pago" : p.cotas_pagas > 0 ? `Pago ${p.cotas_pagas}/${p.cotas}` : "Reservado",
@@ -114,6 +114,7 @@ async function baixarPDF(r: Relatorio) {
 }
 
 export function AdminParticipantesDialog({ bolaoId, onClose }: { bolaoId: string | null; onClose: () => void }) {
+  const [ocultarCel, setOcultarCel] = useState(false);
   const fetchRel = useServerFn(relatorioParticipantesBolao);
   const { data: r, isLoading, error } = useQuery({
     queryKey: ["admin-relatorio-participantes", bolaoId],
@@ -183,9 +184,15 @@ export function AdminParticipantesDialog({ bolaoId, onClose }: { bolaoId: string
               </table>
             </div>
 
-            <Button className="w-full" onClick={() => baixarPDF(r)} disabled={r.participantes.length === 0}>
-              <Download className="h-4 w-4 mr-2" /> Baixar lista em PDF
-            </Button>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                <input type="checkbox" checked={ocultarCel} onChange={(e) => setOcultarCel(e.target.checked)} />
+                Ocultar celulares no PDF (para compartilhar no grupo)
+              </label>
+              <Button className="w-full" onClick={() => baixarPDF(r, ocultarCel)} disabled={r.participantes.length === 0}>
+                <Download className="h-4 w-4 mr-2" /> Baixar lista em PDF
+              </Button>
+            </div>
           </div>
         )}
       </DialogContent>
