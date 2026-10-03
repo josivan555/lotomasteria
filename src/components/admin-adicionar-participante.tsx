@@ -43,7 +43,20 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
     onError: (e) => toast.error((e as Error).message),
   });
 
-  if (boloes.length === 0) return null;
+  if (boloesFiltrados.length === 0 && !mostrarEncerrados) {
+    return (
+      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-2">
+        <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+          <UserPlus className="h-4 w-4 text-primary" /> Adicionar participante manualmente (sem PIX)
+        </p>
+        <p className="text-xs text-muted-foreground">Nenhum bolão ativo no momento.</p>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={mostrarEncerrados} onChange={(e) => setMostrarEncerrados(e.target.checked)} />
+          Mostrar bolões encerrados
+        </label>
+      </div>
+    );
+  }
 
   const enviar = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +74,17 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
 
       <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
         <label className="grid gap-1">
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bolão</span>
+          <span className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bolão</span>
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground normal-case tracking-normal">
+              <input
+                type="checkbox"
+                checked={mostrarEncerrados}
+                onChange={(e) => setMostrarEncerrados(e.target.checked)}
+              />
+              Mostrar encerrados
+            </span>
+          </span>
           <select
             value={efetivoId}
             onChange={(e) => setBolaoId(e.target.value)}
