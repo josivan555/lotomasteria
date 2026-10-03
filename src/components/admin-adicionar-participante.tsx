@@ -14,15 +14,20 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
   const qc = useQueryClient();
   const add = useServerFn(adicionarParticipanteManual);
 
-  const padrao = boloes.find((b) => b.status === "em_vendas") ?? boloes[0];
+  const [mostrarEncerrados, setMostrarEncerrados] = useState(false);
+  const boloesFiltrados = mostrarEncerrados
+    ? boloes
+    : boloes.filter((b) => !["encerrado", "sorteado", "conferido"].includes(b.status));
+
+  const padrao = boloesFiltrados.find((b) => b.status === "em_vendas") ?? boloesFiltrados[0];
   const [bolaoId, setBolaoId] = useState<string>("");
-  const efetivoId = boloes.some((b) => b.id === bolaoId) ? bolaoId : (padrao?.id ?? "");
+  const efetivoId = boloesFiltrados.some((b) => b.id === bolaoId) ? bolaoId : (padrao?.id ?? "");
   const [nome, setNome] = useState("");
   const [celular, setCelular] = useState("");
   const [cotas, setCotas] = useState(1);
   const [pago, setPago] = useState(true);
 
-  const selecionado = boloes.find((b) => b.id === efetivoId);
+  const selecionado = boloesFiltrados.find((b) => b.id === efetivoId);
   const disponiveis = selecionado ? Math.max(0, selecionado.total_cotas - selecionado.cotas_compradas) : 0;
 
   const mutation = useMutation({
@@ -38,7 +43,20 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
     onError: (e) => toast.error((e as Error).message),
   });
 
-  if (boloes.length === 0) return null;
+  if (boloesFiltrados.length === 0 && !mostrarEncerrados) {
+    return (
+      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-2">
+        <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+          <UserPlus className="h-4 w-4 text-primary" /> Adicionar participante manualmente (sem PIX)
+        </p>
+        <p className="text-xs text-muted-foreground">Nenhum bolão ativo no momento.</p>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={mostrarEncerrados} onChange={(e) => setMostrarEncerrados(e.target.checked)} />
+          Mostrar bolões encerrados
+        </label>
+      </div>
+    );
+  }
 
   const enviar = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,14 +74,24 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
 
       <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
         <label className="grid gap-1">
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bolão</span>
+          <span className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bolão</span>
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground normal-case tracking-normal">
+              <input
+                type="checkbox"
+                checked={mostrarEncerrados}
+                onChange={(e) => setMostrarEncerrados(e.target.checked)}
+              />
+              Mostrar encerrados
+            </span>
+          </span>
           <select
             value={efetivoId}
             onChange={(e) => setBolaoId(e.target.value)}
             className="h-9 w-full rounded-md border border-border/40 bg-background/60 px-3 text-sm outline-none cursor-pointer hover:border-primary/40 transition-colors"
             aria-label="Escolher bolão"
           >
-            {boloes.map((b) => {
+            {boloesFiltrados.map((b) => {
               const cfg = LOTERIAS[b.loteria_id as LoteriaId] || LOTERIAS.lotofacil;
               return (
                 <option key={b.id} value={b.id}>

@@ -504,6 +504,11 @@ function AdminDashboard() {
                             <div className="flex flex-col">
                               <span className="font-black text-foreground uppercase tracking-tight">{b.nome}</span>
                               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Concurso {b.concurso_numero}</span>
+                              {b.data_sorteio && (
+                                <span className="text-[10px] font-bold text-primary/80 uppercase tracking-widest">
+                                  Sorteio: {String(b.data_sorteio).slice(0, 10).split("-").reverse().join("/")}
+                                </span>
+                              )}
                             </div>
                           )}
                         </td>
