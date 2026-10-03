@@ -1,3 +1,4 @@
+import { PixPagamento } from "@/components/pix-pagamento";
 import { capaUrl, capaMediaType } from "@/lib/capa";
 import { createFileRoute, useParams, Link, useSearch } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -179,7 +180,7 @@ function DetalheBolao() {
           </div>
           <h1 className="text-3xl font-black mb-2 text-white">Reserva Realizada!</h1>
           <p className="text-white/85">
-            Guarde seu comprovante de reserva.
+            Pague o PIX abaixo para confirmar suas cotas.
           </p>
         </div>
 
@@ -233,7 +234,7 @@ function DetalheBolao() {
                 </div>
 
                 <p className="text-[10px] text-muted-foreground leading-tight uppercase tracking-widest mt-4">
-                  Utilize este código para confirmar seu pagamento na área de "Minhas Reservas" ou clicando no botão abaixo.
+                  Guarde este código. Com ele você encontra sua reserva na aba "Ver reserva".
                 </p>
               </div>
           </div>
