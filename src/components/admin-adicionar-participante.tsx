@@ -27,7 +27,7 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
   const [cotas, setCotas] = useState(1);
   const [pago, setPago] = useState(true);
 
-  const selecionado = boloes.find((b) => b.id === efetivoId);
+  const selecionado = boloesFiltrados.find((b) => b.id === efetivoId);
   const disponiveis = selecionado ? Math.max(0, selecionado.total_cotas - selecionado.cotas_compradas) : 0;
 
   const mutation = useMutation({
@@ -68,7 +68,7 @@ export function AdminAdicionarParticipante({ boloes }: { boloes: any[] }) {
             className="h-9 w-full rounded-md border border-border/40 bg-background/60 px-3 text-sm outline-none cursor-pointer hover:border-primary/40 transition-colors"
             aria-label="Escolher bolão"
           >
-            {boloes.map((b) => {
+            {boloesFiltrados.map((b) => {
               const cfg = LOTERIAS[b.loteria_id as LoteriaId] || LOTERIAS.lotofacil;
               return (
                 <option key={b.id} value={b.id}>
