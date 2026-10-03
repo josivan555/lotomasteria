@@ -22,7 +22,7 @@ const dataHoraBR = (iso: string) =>
 const hora = (h?: string | null) => String(h ?? "").slice(0, 5);
 const nomeLoteria = (id: string) => LOTERIAS[id as LoteriaId]?.nome ?? id;
 
-async function baixarPDF(r: Relatorio) {
+async function baixarPDF(r: Relatorio, ocultarCelulares: boolean) {
   const { default: jsPDF } = await import("jspdf");
   const { default: autoTable } = await import("jspdf-autotable");
   const doc = new jsPDF();
@@ -82,7 +82,7 @@ async function baixarPDF(r: Relatorio) {
     head: [["#", "Participante", "Cotas", "Compra(s)", "Situação", "Vai receber"]],
     body: r.participantes.map((p, i) => [
       String(i + 1),
-      p.nome,
+      ocultarCelulares ? p.nome : `${p.nome}\n${p.celular || "—"}`,
       String(p.cotas),
       p.compras.map((c: any) => `${dataHoraBR(c.data)} (${c.cotas})`).join("\n"),
       p.cotas_pagas === p.cotas ? "Pago" : p.cotas_pagas > 0 ? `Pago ${p.cotas_pagas}/${p.cotas}` : "Reservado",
