@@ -291,6 +291,18 @@ export const relatorioParticipantesBolao = createServerFn({ method: "POST" })
         const v = premioPorAcerto.get(a) ?? 0;
         if (v > 0) { premiados[a] = (premiados[a] ?? 0) + 1; premio += v; }
       }
+      // Dia de Sorte: prêmio do Mês da Sorte
+      let acertosMes = 0;
+      const mesOficial = Number(p.resultado_mes_oficial ?? bolao.resultado_mes_oficial) || 0;
+      if (p.loteria_id === "diadesorte" && mesOficial && res.length > 0) {
+        const faixaMes = (Array.isArray(p.rateio_oficial) ? p.rateio_oficial : []).find((f: any) => /m[eê]s/i.test(String(f.faixa)));
+        const premioMes = Number(faixaMes?.premio) || 2.5;
+        for (const j of (Array.isArray(p.jogos) ? p.jogos : [])) {
+          const m = Number(j?.mes_sorte ?? j?.metadata?.mes_sorte) || 0;
+          if (m === mesOficial) acertosMes++;
+        }
+        premio += acertosMes * premioMes;
+      }
       premioTotal += premio;
       return {
         loteria_id: p.loteria_id as string,
