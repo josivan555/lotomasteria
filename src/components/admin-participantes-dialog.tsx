@@ -152,6 +152,7 @@ export function AdminParticipantesDialog({ bolaoId, onClose }: { bolaoId: string
                     <Trophy className="h-4 w-4 text-primary" />
                     <b>{nomeLoteria(p.loteria_id)}</b> — melhor jogo: {p.melhor_acerto} acertos
                     {Object.entries(p.premiados).map(([a, q]) => <Badge key={a} variant="secondary">{q}× {a} acertos</Badge>)}
+                    {p.acertos_mes > 0 && <Badge variant="secondary">{p.acertos_mes}× mês da sorte</Badge>}
                     {p.sem_valores && <span className="text-muted-foreground">(valores da Caixa indisponíveis)</span>}
                   </p>
                 ))}

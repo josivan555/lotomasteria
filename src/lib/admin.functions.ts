@@ -312,6 +312,7 @@ export const relatorioParticipantesBolao = createServerFn({ method: "POST" })
         total_jogos: acertosPorJogo.length,
         melhor_acerto: acertosPorJogo.length ? Math.max(...acertosPorJogo) : 0,
         premiados,
+        acertos_mes: acertosMes,
         premio,
         sem_valores: res.length > 0 && premioPorAcerto.size === 0,
       };
