@@ -41,6 +41,8 @@ export const Route = createFileRoute("/resultados")({
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://lotomasteria.lovable.app/resultados" },
+      { property: "og:image", content: "https://lotomasteria.lovable.app/og-home.jpg" },
+      { name: "twitter:image", content: "https://lotomasteria.lovable.app/og-home.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Resultados Lotofácil, Mega-Sena e Quina · LotoMaster IA" },
       {
