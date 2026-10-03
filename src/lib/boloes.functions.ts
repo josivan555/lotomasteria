@@ -479,51 +479,19 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // 3. Gerar PIX via Mercado Pago
-    let pixData = null;
-    try {
-      const accessToken = process.env['MERCADOPAGO_ACCESS_TOKEN'];
-      if (accessToken) {
-        const response = await fetch('https://api.mercadopago.com/v1/payments', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'X-Idempotency-Key': participante.id,
-          },
-          body: JSON.stringify({
-            transaction_amount: valorTotal,
-            description: `Bolão LotoMaster - ${bolao.nome}`,
-            payment_method_id: 'pix',
-            external_reference: participante.id,
-            notification_url: `${process.env['SITE_URL'] || 'https://lotomasteria.lovable.app'}/api/public/webhook`,
-            payer: {
-              email: `${participante.id.substring(0, 8)}@lotomasteria.app`,
-              first_name: data.nome.split(' ')[0],
-              last_name: data.nome.split(' ').slice(1).join(' ') || 'Cliente',
-            },
-          }),
-        });
-
-        if (response.ok) {
-          const mpResult = await response.json();
-          pixData = {
-            qrCode: mpResult.point_of_interaction.transaction_data.qr_code,
-            qrCodeBase64: mpResult.point_of_interaction.transaction_data.qr_code_base64,
-            paymentId: mpResult.id,
-          };
-          
-          // Salvar o ID do pagamento e os dados do PIX no participante
-          await supabaseAdmin
-            .from('bolao_participantes')
-            .update({ 
-              payment_id: mpResult.id.toString(),
-              pix_data: pixData 
-            })
-            .eq('id', participante.id);
-        }
-      }
-    } catch (mpError) {
-      console.error('Erro ao gerar PIX MP:', mpError);
+    const { gerarPixReserva } = await import("./pix-bolao.server");
+    const { pix: pixData } = await gerarPixReserva({
+      reservaId: participante.id,
+      valor: valorTotal,
+      descricao: `Bolão LotoMaster - ${bolao.nome}`,
+      nome: data.nome,
+      idempotencyKey: participante.id,
+    });
+    if (pixData) {
+      await supabaseAdmin
+        .from("bolao_participantes")
+        .update({ payment_id: String(pixData.paymentId), pix_data: pixData })
+        .eq("id", participante.id);
     }
 
     return {
@@ -575,67 +543,41 @@ export const buscarReservaBolao = createServerFn({ method: "GET" })
       throw new Error("Reserva não encontrada. Verifique o código ou nome informado.");
     }
 
-    // 3. Verificar se o PIX está expirado (30 minutos) e reemitir se necessário
+    if (reserva.status !== "reservado") return reserva;
+    const { gerarPixReserva, pagamentoAprovado } = await import("./pix-bolao.server");
+
+    // 3. Confirmar direto no Mercado Pago (caso o aviso automático não tenha chegado)
+    if (reserva.payment_id && (await pagamentoAprovado(reserva.payment_id, reserva.id))) {
+      const { data: paga } = await supabaseAdmin
+        .from("bolao_participantes")
+        .update({ status: "pago", payment_method: "mercadopago_pix" })
+        .eq("id", reserva.id)
+        .select("*, boloes(*)")
+        .single();
+      if (paga) return paga;
+    }
+
+    // 4. Gerar PIX se não existe, ou reemitir se expirou (30 min)
     const TRINTA_MINUTOS = 30 * 60 * 1000;
-    const criadoEm = new Date(reserva.created_at || new Date()).getTime();
-    const agora = new Date().getTime();
-    const isExpirado = (agora - criadoEm) > TRINTA_MINUTOS;
-
-    if (reserva.status === 'reservado' && isExpirado) {
-      console.log(`PIX da reserva ${reserva.id} expirado. Reemitindo...`);
-      
-      try {
-        const accessToken = process.env['MERCADOPAGO_ACCESS_TOKEN'];
-        if (accessToken) {
-          const response = await fetch('https://api.mercadopago.com/v1/payments', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-              'X-Idempotency-Key': `${reserva.id}-${Math.floor(agora / TRINTA_MINUTOS)}`,
-            },
-            body: JSON.stringify({
-              transaction_amount: reserva.valor_total,
-              description: `Bolão LotoMaster (Reemissão) - ${reserva.boloes?.nome}`,
-              payment_method_id: 'pix',
-              external_reference: reserva.id,
-              notification_url: `${process.env['SITE_URL'] || 'https://lotomasteria.lovable.app'}/api/public/webhook`,
-              date_of_expiration: new Date(agora + TRINTA_MINUTOS).toISOString(),
-              payer: {
-                email: `${reserva.id.substring(0, 8)}@lotomasteria.app`,
-                first_name: reserva.nome_completo.split(' ')[0],
-                last_name: reserva.nome_completo.split(' ').slice(1).join(' ') || 'Cliente',
-              },
-            }),
-          });
-
-          if (response.ok) {
-            const mpResult = await response.json();
-            const newPixData = {
-              qrCode: mpResult.point_of_interaction.transaction_data.qr_code,
-              qrCodeBase64: mpResult.point_of_interaction.transaction_data.qr_code_base64,
-              paymentId: mpResult.id,
-            };
-            
-            // Atualizar no banco e na memória
-            const { data: updatedReserva, error: updateError } = await supabaseAdmin
-              .from('bolao_participantes')
-              .update({ 
-                payment_id: mpResult.id.toString(),
-                pix_data: newPixData,
-                created_at: new Date().toISOString() // Resetar o contador de expiração
-              })
-              .eq('id', reserva.id)
-              .select("*, boloes(*)")
-              .single();
-
-            if (!updateError && updatedReserva) {
-              return updatedReserva;
-            }
-          }
-        }
-      } catch (e) {
-        console.error('Erro ao reemitir PIX:', e);
+    const agora = Date.now();
+    const criadoEm = new Date(reserva.created_at || agora).getTime();
+    const semPix = !(reserva.pix_data as any)?.qrCode;
+    if (semPix || agora - criadoEm > TRINTA_MINUTOS) {
+      const { pix } = await gerarPixReserva({
+        reservaId: reserva.id,
+        valor: Number(reserva.valor_total),
+        descricao: `Bolão LotoMaster - ${reserva.boloes?.nome ?? ""}`,
+        nome: reserva.nome_completo,
+        idempotencyKey: `${reserva.id}-${Math.floor(agora / TRINTA_MINUTOS)}`,
+      });
+      if (pix) {
+        const { data: atualizada } = await supabaseAdmin
+          .from("bolao_participantes")
+          .update({ payment_id: String(pix.paymentId), pix_data: pix, created_at: new Date().toISOString() })
+          .eq("id", reserva.id)
+          .select("*, boloes(*)")
+          .single();
+        if (atualizada) return atualizada;
       }
     }
 
