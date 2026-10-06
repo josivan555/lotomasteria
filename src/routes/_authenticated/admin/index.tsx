@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarTodosBoloes, listarUsuarios, atualizarStatusBolao, excluirBolao, atualizarBolao } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { AdminParticipantesDialog } from "@/components/admin-participantes-dialo
 import { AdminAdicionarParticipante } from "@/components/admin-adicionar-participante";
 import { supabase } from "@/integrations/supabase/client";
 import { capaUrl, capaMediaType } from "@/lib/capa";
+import { bolaoConferidoOficial } from "@/lib/bolao-conferencia";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 
 function AdminDashboard() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const getBoloes = useServerFn(listarTodosBoloes);
   const getUsuarios = useServerFn(listarUsuarios);
   const updateStatus = useServerFn(atualizarStatusBolao);
@@ -89,15 +91,15 @@ function AdminDashboard() {
     );
   }, [boloes, searchTerm]);
 
-  // Bolões conferidos saem da lista principal e ficam disponíveis no Histórico.
+  // Apenas a conferência oficial completa permite mover o bolão para o Histórico.
   const bolõesVisiveis = useMemo(() => {
     return filteredBoloes.filter((b: any) =>
-      abaBoloes === "historico" ? b.status === "conferido" : b.status !== "conferido"
+      abaBoloes === "historico" ? bolaoConferidoOficial(b) : !bolaoConferidoOficial(b)
     );
   }, [filteredBoloes, abaBoloes]);
 
   const totalHistorico = useMemo(
-    () => boloes.filter((b: any) => b.status === "conferido").length,
+    () => boloes.filter((b: any) => bolaoConferidoOficial(b)).length,
     [boloes]
   );
 
@@ -174,6 +176,7 @@ function AdminDashboard() {
                   const data = await res.json();
                   if (res.ok) {
                     toast.success(data.message || "Resultados atualizados!");
+                    await queryClient.invalidateQueries({ queryKey: ["admin-boloes"] });
                     router.invalidate();
                   } else {
                     toast.error(data.error || "Erro ao atualizar resultados.");
@@ -201,7 +204,7 @@ function AdminDashboard() {
               <Ticket className="h-3.5 w-3.5" />
               Bolões Ativos
               <span className="rounded-full bg-background/30 px-1.5 py-0.5 text-[9px]">
-                {boloes.filter((b: any) => b.status !== "conferido").length}
+                {boloes.length - totalHistorico}
               </span>
             </button>
 
@@ -219,7 +222,7 @@ function AdminDashboard() {
 
             {abaBoloes === "historico" && (
               <span className="ml-1 text-[10px] font-bold text-muted-foreground">
-                Bolões com status <strong className="text-foreground">Conferido</strong>
+                Bolões com <strong className="text-foreground">conferência automática concluída</strong>
               </span>
             )}
           </div>

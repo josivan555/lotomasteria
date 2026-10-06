@@ -4,6 +4,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabase } from "@/integrations/supabase/client";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { LOTERIA_IDS, type LoteriaId } from "./loterias-config";
+import { bolaoConferidoOficial } from "./bolao-conferencia";
+export { bolaoConferidoOficial } from "./bolao-conferencia";
 
 // Dados leves do bolão para montar o preview de compartilhamento (og: tags).
 export const bolaoShareInfo = createServerFn({ method: "GET" })
@@ -180,23 +182,13 @@ export const criarBolaoCombo = createServerFn({ method: "POST" })
     return bolao;
   });
 
-function temDezenas(v: any) { return Array.isArray(v) && v.length > 0; }
-export function bolaoConferidoOficial(b: any): boolean {
-  if (b?.status === "conferido") return true;
-  if (b?.is_combo) {
-    const partes = Array.isArray(b.combo_loterias) ? b.combo_loterias : [];
-    return partes.length > 0 && partes.every((p: any) => temDezenas(p?.resultado_oficial) || temDezenas(p?.resultado));
-  }
-  return temDezenas(b?.resultado_oficial);
-}
-
 export const listarBoloesPublicos = createServerFn({ method: "GET" })
   .handler(async () => {
     // Ativos: tudo que ainda NÃO tem conferência oficial (resultado oficial da Caixa)
     const { data: todos, error } = await supabase
       .from("boloes")
       .select("*")
-      .in("status", ["publicado", "em_vendas", "esgotado", "encerrado", "sorteado"])
+      .in("status", ["publicado", "em_vendas", "esgotado", "encerrado", "sorteado", "conferido"])
       .order("data_sorteio", { ascending: true });
 
     if (error) throw new Error(error.message);
@@ -232,7 +224,7 @@ export const listarHistoricoBoloes = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("boloes")
       .select("*")
-      .in("status", ["encerrado", "sorteado", "conferido"])
+      .in("status", ["publicado", "em_vendas", "esgotado", "encerrado", "sorteado", "conferido"])
       .order("data_sorteio", { ascending: false });
 
     if (error) throw new Error(error.message);
