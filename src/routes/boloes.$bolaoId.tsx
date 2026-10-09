@@ -690,6 +690,7 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [editCotas, setEditCotas] = useState("");
 
   const { data: perfil } = useQuery({
     queryKey: ["perfil"],
@@ -730,6 +731,8 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
     mutationFn: (payload: any) => updatePart({ data: payload }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bolao-participantes", bolaoId] });
+      queryClient.invalidateQueries({ queryKey: ["bolao", bolaoId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-boloes"] });
       setPage(1); // Reset to first page to see updates
       setEditingId(null);
       toast.success("Participante atualizado");
@@ -775,26 +778,27 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
     }
 
     return (
-      <div key={p.id} className="bolao-list-item flex items-center justify-between gap-3 p-3 sm:p-4">
+      <div key={p.id} className={`bolao-list-item flex gap-3 p-3 sm:p-4 ${editingId === p.id ? "flex-wrap items-start" : "items-center justify-between"}`}>
         <div className="bolao-avatar">{String(p.nome_completo || "P").trim().charAt(0).toUpperCase()}</div>
         <div className="flex-1 min-w-0 pr-4">
           {editingId === p.id ? (
-            <div className="flex items-center gap-2">
-              <Input 
-                size={20}
-                value={editName}
-                onChange={e => setEditName(e.target.value)}
-                className="h-8 text-sm"
-                autoFocus
-              />
-              <Button 
-                size="icon" 
-                variant="ghost" 
-                className="h-8 w-8 text-green-500"
-                onClick={() => mutationUpdate.mutate({ id: p.id, nome_completo: editName })}
-              >
-                <Check className="h-4 w-4" />
-              </Button>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label htmlFor={`edit-name-${p.id}`}>Nome completo</Label>
+                <Input id={`edit-name-${p.id}`} value={editName} onChange={e => setEditName(e.target.value)} className="bolao-customer-input h-10 text-sm" autoFocus />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor={`edit-cotas-${p.id}`}>Quantidade de cotas</Label>
+                <Input id={`edit-cotas-${p.id}`} type="number" min={1} step={1} value={editCotas} onChange={e => setEditCotas(e.target.value)} className="bolao-customer-input h-10 text-sm" />
+                <p className="text-xs text-muted-foreground">Valor total: {formatBRL(Number(editCotas) * Number(bolao.valor_cota))}</p>
+                <p className="text-xs text-muted-foreground">O status de pagamento será mantido. Confira o pagamento das cotas adicionais.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" disabled={mutationUpdate.isPending || editName.trim().length < 2 || !Number.isInteger(Number(editCotas)) || Number(editCotas) < 1} onClick={() => mutationUpdate.mutate({ id: p.id, nome_completo: editName, quantidade_cotas: Number(editCotas) })}>
+                  <Check className="h-4 w-4" />{mutationUpdate.isPending ? "Salvando..." : "Salvar"}
+                </Button>
+                <Button size="sm" variant="outline" disabled={mutationUpdate.isPending} onClick={() => setEditingId(null)}>Cancelar</Button>
+              </div>
             </div>
           ) : (
             <>
@@ -828,6 +832,7 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
                 onClick={() => {
                   setEditingId(p.id);
                   setEditName(p.nome_completo);
+                  setEditCotas(String(p.quantidade_cotas));
                 }}
               >
                 <Edit2 className="h-3.5 w-3.5" />

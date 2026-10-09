@@ -208,7 +208,8 @@ export const atualizarParticipanteBolao = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => 
     z.object({ 
       id: z.string().uuid(),
-      nome_completo: z.string().optional(),
+      nome_completo: z.string().trim().min(2).max(100).optional(),
+      quantidade_cotas: z.number().int().min(1).max(10000).optional(),
       status: z.enum(["reservado", "pago"]).optional(),
     }).parse(raw)
   )
@@ -218,6 +219,22 @@ export const atualizarParticipanteBolao = createServerFn({ method: "POST" })
     const updateData: any = {};
     if (data.nome_completo !== undefined) updateData.nome_completo = data.nome_completo;
     if (data.status !== undefined) updateData.status = data.status;
+
+    if (data.quantidade_cotas !== undefined) {
+      const { data: participante, error: participanteError } = await context.supabase
+        .from("bolao_participantes").select("bolao_id, quantidade_cotas").eq("id", data.id).single();
+      if (participanteError || !participante) throw new Error("Participante não encontrado.");
+      const { data: bolao, error: bolaoError } = await context.supabase
+        .from("boloes").select("total_cotas, valor_cota").eq("id", participante.bolao_id).single();
+      if (bolaoError || !bolao) throw new Error("Bolão não encontrado.");
+      const { data: outros, error: cotasError } = await context.supabase
+        .from("bolao_participantes").select("quantidade_cotas").eq("bolao_id", participante.bolao_id).neq("id", data.id);
+      if (cotasError) throw new Error(cotasError.message);
+      const limite = bolao.total_cotas - (outros ?? []).reduce((total, p) => total + p.quantidade_cotas, 0);
+      if (data.quantidade_cotas > limite) throw new Error(`Este participante pode ter no máximo ${limite} cota(s).`);
+      updateData.quantidade_cotas = data.quantidade_cotas;
+      updateData.valor_total = data.quantidade_cotas * Number(bolao.valor_cota);
+    }
 
     const { error } = await context.supabase
       .from("bolao_participantes")
