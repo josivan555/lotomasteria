@@ -1160,3 +1160,21 @@
   flex-shrink: 0;
 }
 .bolao-experience .bolao-detail-info strong { color: #ffdc62; }
+
+/* Campos de identificação com superfície branca no checkout público. */
+.bolao-experience input.bolao-customer-input {
+  background: #ffffff;
+  color: #172033;
+  border-color: #cbd5e1;
+  caret-color: #172033;
+  color-scheme: light;
+}
+.bolao-experience input.bolao-customer-input::placeholder {
+  color: #526176;
+  opacity: 1;
+}
+.bolao-experience input.bolao-customer-input:focus-visible {
+  border-color: #e5ad24;
+  outline: 2px solid #f7c948;
+  outline-offset: 2px;
+}

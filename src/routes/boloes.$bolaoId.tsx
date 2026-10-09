@@ -492,11 +492,11 @@ function DetalheBolao() {
                   <form className="space-y-5" onSubmit={(event) => { event.preventDefault(); mutation.mutate({ bolaoId, ...form }); }}>
                     <div className="space-y-2">
                       <Label htmlFor="nome" className="text-xs font-bold uppercase text-foreground">Nome Completo</Label>
-                      <Input id="nome" placeholder="Seu nome para o bolão" required className="h-12 bg-card text-base" value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} />
+                      <Input id="nome" placeholder="Seu nome para o bolão" required className="bolao-customer-input h-12 text-base" value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="celular" className="text-xs font-bold uppercase text-foreground">WhatsApp / Celular</Label>
-                      <Input id="celular" type="tel" placeholder="(00) 00000-0000" required className="h-12 bg-card text-base" value={form.celular} onChange={(event) => setForm({ ...form, celular: event.target.value })} />
+                      <Input id="celular" type="tel" placeholder="(00) 00000-0000" required className="bolao-customer-input h-12 text-base" value={form.celular} onChange={(event) => setForm({ ...form, celular: event.target.value })} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="cotas" className="text-xs font-bold uppercase text-foreground">Quantidade de Cotas</Label>
