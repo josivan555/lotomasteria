@@ -373,9 +373,9 @@ function DetalheBolao() {
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">Estimativa de Prêmio</p>
                   <p className="text-lg font-black text-foreground">{formatBRL(bolao.premio_estimado || 0)}</p>
                 </div>
-                <div className="rounded-lg border border-primary/45 bg-primary/10 p-4">
-                  <p className="text-[10px] uppercase tracking-wider font-bold mb-1" style={{ color: cfg.cor }}>Valor da Cota</p>
-                  <p className="text-lg sm:text-xl font-black" style={{ color: cfg.cor }}>{formatBRL(bolao.valor_cota)}</p>
+                <div className="bolao-quota-price rounded-lg border border-primary/45 bg-primary/10 p-4">
+                  <p className="text-[10px] uppercase tracking-wider font-bold mb-1">Valor da Cota</p>
+                  <p className="text-lg sm:text-xl font-black">{formatBRL(bolao.valor_cota)}</p>
                 </div>
               </div>
 
@@ -393,8 +393,8 @@ function DetalheBolao() {
               </div>
 
               <div className="grid gap-3 text-sm border-t border-border pt-6">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Clock className="h-4 w-4" style={{ color: cfg.cor }} />
+                <div className="bolao-detail-info flex items-center gap-3">
+                  <Clock className="h-4 w-4" />
                   <span>Sorteio: <strong>{new Date(`${bolao.data_sorteio}T00:00:00`).toLocaleDateString('pt-BR')} às {bolao.horario_sorteio}</strong></span>
                 </div>
 
@@ -432,12 +432,12 @@ function DetalheBolao() {
                 )}
 
 
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Users className="h-4 w-4" style={{ color: cfg.cor }} />
+                <div className="bolao-detail-info flex items-center gap-3">
+                  <Users className="h-4 w-4" />
                   <span>Bolão com <strong>{bolao.total_jogos} jogos</strong> otimizados por IA</span>
                 </div>
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Trophy className="h-4 w-4" style={{ color: cfg.cor }} />
+                <div className="bolao-detail-info flex items-center gap-3">
+                  <Trophy className="h-4 w-4" />
                   <span>Participação proporcional por cota</span>
                 </div>
               </div>

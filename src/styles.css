@@ -1147,3 +1147,16 @@
 @media (prefers-reduced-motion: reduce) {
   .bolao-experience .bolao-menu-item { transition: none; }
 }
+
+/* Contraste dos textos destacados no resumo público do bolão. */
+.bolao-experience .bolao-quota-price {
+  border-color: #f7c94880;
+  background: linear-gradient(135deg, #f7c94812, #f7c94806);
+}
+.bolao-experience .bolao-quota-price p { color: #ffdc62; }
+.bolao-experience .bolao-detail-info { color: #f1f5f9; }
+.bolao-experience .bolao-detail-info > svg {
+  color: #ffcf33;
+  flex-shrink: 0;
+}
+.bolao-experience .bolao-detail-info strong { color: #ffdc62; }
