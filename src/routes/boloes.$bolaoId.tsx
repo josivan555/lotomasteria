@@ -502,7 +502,7 @@ function DetalheBolao() {
                       <Label htmlFor="cotas" className="text-xs font-bold uppercase text-foreground">Quantidade de Cotas</Label>
                       <div className="flex items-center gap-4">
                         <Button type="button" variant="outline" className="h-12 w-12 rounded-lg bg-card text-xl font-bold" onClick={() => setForm({ ...form, cotas: Math.max(1, form.cotas - 1) })}>−</Button>
-                        <Input id="cotas" type="number" readOnly className="h-12 flex-1 bg-card text-center text-lg font-black" value={form.cotas} />
+                        <Input id="cotas" type="number" readOnly className="bolao-customer-input h-12 flex-1 text-center text-lg font-black" value={form.cotas} />
                         <Button type="button" variant="outline" className="h-12 w-12 rounded-lg bg-card text-xl font-bold" onClick={() => setForm({ ...form, cotas: Math.min(bolao.cotas_disponiveis, form.cotas + 1) })}>+</Button>
                       </div>
                       <p className="text-center text-[10px] font-medium text-muted-foreground">Máximo disponível: {bolao.cotas_disponiveis} cotas</p>
