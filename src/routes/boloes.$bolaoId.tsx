@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConferidorJogos } from "@/components/conferidor-jogos";
 
-import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, Download, Copy, Share2, Trash2, Edit2, Check, ExternalLink, TicketCheck, CreditCard, Search, AlertCircle, QrCode } from "lucide-react";
+import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, Download, Copy, Share2, Trash2, Edit2, Check, ExternalLink, TicketCheck, CreditCard, Search, AlertCircle, QrCode, ShoppingCart, ClipboardList, SearchCheck, ChevronRight } from "lucide-react";
 import { useState, useRef, type CSSProperties } from "react";
 import { toPng } from 'html-to-image';
 import { toast } from "sonner";
@@ -456,24 +456,26 @@ function DetalheBolao() {
           </div>
 
           <Tabs id="bolao-abas" value={activeTab} onValueChange={setActiveTab} className="bolao-shell w-full scroll-mt-4 p-4 sm:p-5">
-            <TabsList className="bolao-menu" aria-label="Opções do bolão">
-              <TabsTrigger className="bolao-menu-item" value="participantes">
-                <Users className="bolao-menu-icon" aria-hidden="true" />
-                <span className="bolao-menu-copy"><span>Participantes</span><span className="bolao-menu-caption">Quem está no bolão</span></span>
-              </TabsTrigger>
-              <TabsTrigger className={`bolao-menu-item${!esgotado ? " bolao-menu-buy" : ""}`} value="comprar">
-                <TicketCheck className="bolao-menu-icon" aria-hidden="true" />
-                <span className="bolao-menu-copy"><span>Comprar cotas</span><span className="bolao-menu-caption">{esgotado ? "Vendas encerradas" : "Garantir participação"}</span></span>
-              </TabsTrigger>
-              <TabsTrigger className="bolao-menu-item" value="conferir">
-                <CheckCircle2 className="bolao-menu-icon" aria-hidden="true" />
-                <span className="bolao-menu-copy"><span>Conferir</span><span className="bolao-menu-caption">Ver resultados</span></span>
-              </TabsTrigger>
-              <TabsTrigger className="bolao-menu-item" value="reserva">
-                <Search className="bolao-menu-icon" aria-hidden="true" />
-                <span className="bolao-menu-copy"><span>Ver reserva</span><span className="bolao-menu-caption">Consultar minhas cotas</span></span>
-              </TabsTrigger>
-            </TabsList>
+            <section className="bolao-actions" aria-labelledby="bolao-actions-title">
+              <div className="bolao-actions-heading">
+                <Users aria-hidden="true" />
+                <div><h2 id="bolao-actions-title">Ações do Bolão</h2><p>Escolha uma opção para gerenciar suas cotas</p></div>
+              </div>
+              <TabsList className="bolao-menu" aria-label="Opções do bolão">
+                {[
+                  { value: "participantes", title: "Participantes", caption: "Quem está no bolão", Icon: Users },
+                  { value: "comprar", title: "Comprar Cotas", caption: esgotado ? "Vendas encerradas" : "Garanta já sua participação", Icon: ShoppingCart },
+                  { value: "conferir", title: "Conferir", caption: "Ver resultados e prêmios", Icon: SearchCheck },
+                  { value: "reserva", title: "Ver reserva", caption: "Consultar cotas reservadas", Icon: ClipboardList },
+                ].map(({ value, title, caption, Icon }) => (
+                  <TabsTrigger key={value} className="bolao-menu-item" value={value}>
+                    <Icon className="bolao-menu-icon" aria-hidden="true" />
+                    <span className="bolao-menu-copy"><span>{title}</span><span className="bolao-menu-caption">{caption}</span><span className="bolao-menu-selected"><span aria-hidden="true">●</span> Selecionado</span></span>
+                    <ChevronRight className="bolao-menu-arrow" aria-hidden="true" />
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </section>
 
             <TabsContent value="comprar" className="mt-4">
               <div className="bolao-stat-strip mx-auto max-w-2xl p-5 sm:p-7">
