@@ -130,7 +130,6 @@ function DetalheBolao() {
   const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
   const prazoEncerrado = agora > dataPrazo;
   const esgotado = bolao.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada;
-  const ledAtivo = !esgotado;
 
   const handleCompartilhar = async () => {
     const nomeLimpo = bolao.nome.trim().replace(/^BOL[ÃA]O\s+/i, "");
@@ -457,17 +456,23 @@ function DetalheBolao() {
           </div>
 
           <Tabs id="bolao-abas" value={activeTab} onValueChange={setActiveTab} className="bolao-shell w-full scroll-mt-4 p-4 sm:p-5">
-            <TabsList className="bolao-tabs grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-4">
-              <TabsTrigger className="min-h-9" value="participantes">Participantes</TabsTrigger>
-              <TabsTrigger className="min-h-9" value="conferir">Conferir</TabsTrigger>
-              <TabsTrigger
-                className={ledAtivo ? "bolao-tab-led min-h-9" : "min-h-9"}
-                style={{ "--led-cor": cfg.cor } as CSSProperties}
-                value="comprar"
-              >
-                Comprar Cotas
+            <TabsList className="bolao-menu" aria-label="Opções do bolão">
+              <TabsTrigger className="bolao-menu-item" value="participantes">
+                <Users className="bolao-menu-icon" aria-hidden="true" />
+                <span className="bolao-menu-copy"><span>Participantes</span><span className="bolao-menu-caption">Quem está no bolão</span></span>
               </TabsTrigger>
-              <TabsTrigger className="min-h-9" value="reserva">Ver reserva</TabsTrigger>
+              <TabsTrigger className={`bolao-menu-item${!esgotado ? " bolao-menu-buy" : ""}`} value="comprar">
+                <TicketCheck className="bolao-menu-icon" aria-hidden="true" />
+                <span className="bolao-menu-copy"><span>Comprar cotas</span><span className="bolao-menu-caption">{esgotado ? "Vendas encerradas" : "Garantir participação"}</span></span>
+              </TabsTrigger>
+              <TabsTrigger className="bolao-menu-item" value="conferir">
+                <CheckCircle2 className="bolao-menu-icon" aria-hidden="true" />
+                <span className="bolao-menu-copy"><span>Conferir</span><span className="bolao-menu-caption">Ver resultados</span></span>
+              </TabsTrigger>
+              <TabsTrigger className="bolao-menu-item" value="reserva">
+                <Search className="bolao-menu-icon" aria-hidden="true" />
+                <span className="bolao-menu-copy"><span>Ver reserva</span><span className="bolao-menu-caption">Consultar minhas cotas</span></span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="comprar" className="mt-4">
