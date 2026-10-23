@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/integrations/backend/auth-middleware";
 import { LOTERIA_IDS, type LoteriaId } from "./loterias-config";
 
 const loteriaEnum = z.enum(LOTERIA_IDS as [LoteriaId, ...LoteriaId[]]);
@@ -163,7 +163,7 @@ export const listarParticipantesBolao = createServerFn({ method: "GET" })
     pageSize: z.number().default(20)
   }).parse(raw))
   .handler(async ({ data }) => {
-    const { supabaseAdmin: sb } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin: sb } = await import("@/integrations/backend/client.server");
     const from = (data.page - 1) * data.pageSize;
     const to = from + data.pageSize - 1;
 

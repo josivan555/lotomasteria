@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/backend/client";
 import { ensureBrowserSession } from "@/lib/session-guard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,7 +59,7 @@ function AuthPage() {
     setLoading(true);
     try {
       if (isSignup) {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -68,7 +68,12 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Conta criada! Agora entre com seus dados.");
+        if (signUpData.session) {
+          toast.success("Conta criada! Bem-vindo!");
+          navigate({ to: "/loterias", replace: true });
+          return;
+        }
+        toast.success("Conta criada! Confirme seu e-mail pelo link que enviamos e depois entre com seus dados.", { duration: 10000 });
         setEmail("");
         setPassword("");
         setDisplayName("");

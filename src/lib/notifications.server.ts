@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/integrations/supabase/client.server';
+import { supabaseAdmin } from '@/integrations/backend/client.server';
 
 export async function createNotification(userId: string, title: string, message: string, type = 'info', link?: string) {
   // Usando cast para any para contornar a falta dos tipos gerados no momento

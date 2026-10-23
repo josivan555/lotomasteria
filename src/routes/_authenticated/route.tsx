@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect, Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/backend/client";
 import { ensureBrowserSession } from "@/lib/session-guard";
 import { LogOut, Home, ShieldCheck, TicketCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";

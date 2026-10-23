@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabase } from "@/integrations/supabase/client";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/backend/auth-middleware";
+import { supabase } from "@/integrations/backend/client";
+import { supabaseAdmin } from "@/integrations/backend/client.server";
 import { LOTERIA_IDS, type LoteriaId } from "./loterias-config";
 import { bolaoConferidoOficial } from "./bolao-conferencia";
 export { bolaoConferidoOficial } from "./bolao-conferencia";

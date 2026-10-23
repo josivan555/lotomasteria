@@ -14,7 +14,7 @@ import { useRouter, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { AdminParticipantesDialog } from "@/components/admin-participantes-dialog";
 import { AdminAdicionarParticipante } from "@/components/admin-adicionar-participante";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/backend/client";
 import { capaUrl, capaMediaType } from "@/lib/capa";
 import { bolaoConferidoOficial } from "@/lib/bolao-conferencia";
 
