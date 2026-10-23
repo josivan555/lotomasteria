@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getRequestHeader } from "@tanstack/react-start/server";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseAuth } from "@/integrations/backend/auth-middleware";
 import { CREDIT_PACKAGES, creditosNecessarios, getPackage } from "./credits-config";
 import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "./loterias-config";
 
@@ -47,7 +47,7 @@ export const criarPedidoCreditos = createServerFn({ method: "POST" })
     const pkg = getPackage(data.packageId);
     if (!pkg) throw new Error("Pacote inválido.");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } = await import("@/integrations/backend/client.server");
     const { data: order, error } = await supabaseAdmin
       .from("credit_orders")
       .insert({
@@ -130,7 +130,7 @@ export const salvarJogosComCreditos = createServerFn({ method: "POST" })
     }
 
     const custo = creditosNecessarios(data.jogos.length);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } = await import("@/integrations/backend/client.server");
     const { data: saldoNovo, error: debErr } = await supabaseAdmin.rpc("consume_credits", {
       _user_id: context.userId,
       _amount: custo,

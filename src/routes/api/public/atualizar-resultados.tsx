@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/integrations/supabase/client.server';
+import { supabaseAdmin } from '@/integrations/backend/client.server';
 import { buscarResumoOficial } from '@/lib/caixa.server';
 import { notifyBolaoSorteado } from '@/lib/notifications.server';
 import { createFileRoute } from '@tanstack/react-router';

@@ -1,26 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { createClient } from "@supabase/supabase-js";
+import { requireSupabaseAuth } from "@/integrations/backend/auth-middleware";
+import { createServerPublicClient } from "@/integrations/backend/public-client.server";
 import type { Database } from "@/integrations/supabase/types";
 import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "./loterias-config";
 
 const loteriaEnum = z.enum(LOTERIA_IDS as [LoteriaId, ...LoteriaId[]]);
 
 function serverPublicClient() {
-  const url = process.env.SUPABASE_URL!;
-  const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
-  return createClient<Database>(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
-    global: {
-      fetch: (input, init) => {
-        const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
-        h.set("apikey", key);
-        return fetch(input, { ...init, headers: h });
-      },
-    },
-  });
+  return createServerPublicClient();
 }
 
 function apiPath(loteria: LoteriaId): string {
@@ -258,7 +246,7 @@ export const sincronizarConcursos = createServerFn({ method: "POST" })
       .parse(raw),
   )
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } = await import("@/integrations/backend/client.server");
 
     const latest = await fetchCaixa(data.loteria);
     if (!latest) throw new Error("Nao foi possivel acessar a API da Caixa agora. Tente novamente.");
@@ -360,7 +348,7 @@ export const detectarEspeciais = createServerFn({ method: "POST" })
       .parse(raw),
   )
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } = await import("@/integrations/backend/client.server");
 
     const { data: pendentes, error } = await supabaseAdmin
       .from("concursos")

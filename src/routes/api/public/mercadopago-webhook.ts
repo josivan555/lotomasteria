@@ -56,7 +56,7 @@ export const Route = createFileRoute("/api/public/mercadopago-webhook")({
           return new Response("not approved", { status: 200 });
         }
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { supabaseAdmin } = await import("@/integrations/backend/client.server");
         const { error } = await supabaseAdmin.rpc("apply_paid_order", {
           _order_id: pagamento.external_reference,
           _payment_id: pagamento.id,

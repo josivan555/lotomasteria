@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarBoloesPublicos, listarHistoricoBoloes, bolaoConferidoOficial } from "@/lib/boloes.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/backend/client";
 import { useState, useEffect } from "react";
 import { NotificationBell } from "@/components/notification-bell";
 import logoAsset from "@/assets/lotomaster-logo.png.asset.json";

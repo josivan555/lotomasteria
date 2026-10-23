@@ -6,7 +6,7 @@ export const Route = createFileRoute("/api/public/capa/$")({
       GET: async ({ params }) => {
         const path = String((params as any)._splat ?? "");
         if (!/^[\w-]+\/[\w.-]+$/.test(path)) return new Response("Not found", { status: 404 });
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { supabaseAdmin } = await import("@/integrations/backend/client.server");
 
         // Vídeos precisam de uma URL assinada do Storage para que o navegador
         // consiga usar streaming/range requests normalmente.

@@ -8,7 +8,7 @@ import { OG_BANNERS } from "@/lib/og-banners";
 import { listarParticipantesBolao, atualizarParticipanteBolao, excluirParticipanteBolao } from "@/lib/admin.functions";
 import { meuPerfil } from "@/lib/loterias.functions";
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/backend/client";
 import { formatBRL } from "@/lib/credits-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
