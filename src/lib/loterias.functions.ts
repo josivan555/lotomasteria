@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/backend/auth-middleware";
-import { createServerPublicClient } from "@/integrations/backend/public-client.server";
+import { createServerPublicClient } from "@/integrations/backend/public-client";
 import type { Database } from "@/integrations/supabase/types";
 import { LOTERIA_IDS, LOTERIAS, type LoteriaId } from "./loterias-config";
 
