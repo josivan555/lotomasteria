@@ -103,6 +103,7 @@ function Landing() {
   const { data: boloes = [], isLoading: isLoadingBoloes } = useQuery({
     queryKey: ["boloes-publicos", view],
     queryFn: () => view === "ativos" ? listarBoloesFn() : listarHistoricoFn(),
+    refetchInterval: 30_000,
   });
 
   const { data: userSession } = useQuery({
