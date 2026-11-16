@@ -11,12 +11,12 @@ import { Users, Ticket, ShieldCheck, Clock, CheckCircle2, AlertCircle, Trash2, E
 import { LOTERIAS, type LoteriaId } from "@/lib/loterias-config";
 import { toast } from "sonner";
 import { useRouter, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AdminParticipantesDialog } from "@/components/admin-participantes-dialog";
 import { AdminAdicionarParticipante } from "@/components/admin-adicionar-participante";
 import { supabase } from "@/integrations/backend/client";
 import { capaUrl, capaMediaType } from "@/lib/capa";
-import { bolaoConferidoOficial } from "@/lib/bolao-conferencia";
+import { bolaoNoHistorico } from "@/lib/bolao-historico";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
@@ -36,11 +36,25 @@ function AdminDashboard() {
   const [editBolaoForm, setEditBolaoForm] = useState<any>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [searchUser, setSearchUser] = useState("");
+  const [agora, setAgora] = useState(() => Date.now());
+
+  useEffect(() => {
+    const atualizar = () => setAgora(Date.now());
+    atualizar();
+    const timer = window.setInterval(atualizar, 30_000);
+    window.addEventListener("focus", atualizar);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", atualizar);
+    };
+  }, []);
+
   const [abaBoloes, setAbaBoloes] = useState<"ativos" | "historico">("ativos");
 
   const { data: boloes = [], isLoading: loadingBoloes } = useQuery({
     queryKey: ["admin-boloes"],
     queryFn: () => getBoloes(),
+    refetchInterval: 30_000,
   });
 
   const { data: usuarios = [], isLoading: loadingUsuarios } = useQuery({
@@ -91,16 +105,16 @@ function AdminDashboard() {
     );
   }, [boloes, searchTerm]);
 
-  // Apenas a conferência oficial completa permite mover o bolão para o Histórico.
+  // Mesma regra da listagem pública: histórico 12 horas após o último sorteio.
   const bolõesVisiveis = useMemo(() => {
     return filteredBoloes.filter((b: any) =>
-      abaBoloes === "historico" ? bolaoConferidoOficial(b) : !bolaoConferidoOficial(b)
+      abaBoloes === "historico" ? bolaoNoHistorico(b, agora) : !bolaoNoHistorico(b, agora)
     );
-  }, [filteredBoloes, abaBoloes]);
+  }, [filteredBoloes, abaBoloes, agora]);
 
   const totalHistorico = useMemo(
-    () => boloes.filter((b: any) => bolaoConferidoOficial(b)).length,
-    [boloes]
+    () => boloes.filter((b: any) => bolaoNoHistorico(b, agora)).length,
+    [boloes, agora]
   );
 
   const filteredUsuarios = useMemo(() => {
@@ -222,7 +236,7 @@ function AdminDashboard() {
 
             {abaBoloes === "historico" && (
               <span className="ml-1 text-[10px] font-bold text-muted-foreground">
-                Bolões com <strong className="text-foreground">conferência automática concluída</strong>
+                Bolões com <strong className="text-foreground">12 horas completas após o sorteio</strong>
               </span>
             )}
           </div>
