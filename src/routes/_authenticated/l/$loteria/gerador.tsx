@@ -1,3 +1,4 @@
+import { ExportarJogos } from "@/components/exportar-jogos";
 import { createFileRoute, useRouter, Link, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -1169,6 +1170,7 @@ function Gerador() {
         <div className="space-y-3">
           {resultados.length > 0 && (
             <div className="flex flex-wrap items-center justify-end gap-2">
+              <ExportarJogos cfg={cfg} jogos={resultados} />
               <Button variant="outline" size="sm" onClick={exportarCSV}>
                 <Download className="mr-2 h-4 w-4" /> Exportar CSV
               </Button>

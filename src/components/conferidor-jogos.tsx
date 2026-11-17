@@ -1,3 +1,4 @@
+import { ExportarJogos } from "@/components/exportar-jogos";
 import { useMemo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -285,6 +286,7 @@ export function ConferidorJogos({ jogos, loteriaId, resultadoOficial, resultadoM
         <p className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">
           {jogos.length} jogos conferidos
         </p>
+        <ExportarJogos cfg={cfg} jogos={jogos} />
         <select
           value={ordem}
           onChange={(e) => setOrdem(e.target.value as Ordem)}

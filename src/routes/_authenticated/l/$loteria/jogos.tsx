@@ -1,3 +1,4 @@
+import { ExportarJogos } from "@/components/exportar-jogos";
 import { createFileRoute, useRouter, useParams, Link } from "@tanstack/react-router";
 import { InfoDot } from "@/components/info-label";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -365,6 +366,7 @@ function Jogos() {
               <Download className="mr-2 h-4 w-4" />
               Baixar PDF (abertos)
             </Button>
+            <ExportarJogos cfg={cfg} jogos={vigentes} rotulo="Exportar abertos" />
             <Button size="sm" asChild className="flex-1 sm:flex-none">
               <Link to="/l/$loteria/volante" params={{ loteria }}>
                 <Printer className="mr-2 h-4 w-4" />
@@ -566,6 +568,7 @@ function Jogos() {
             {jogosSelecionados.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/60 bg-secondary/30 p-2">
                 <span className="px-2 text-xs text-muted-foreground">Ações em lote:</span>
+                <ExportarJogos cfg={cfg} jogos={vigentes.filter((j) => jogosSelecionados.includes(j.id))} rotulo="Exportar selecionados" />
                 <Button
                   variant="outline"
                   size="sm"
