@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LotoMasteria — Importador</title><link rel="stylesheet" href="importador.css"></head>
+<body>
+<main>
+  <header><div class="logo">LM</div><div><p class="eyebrow">LOTOMASTERIA · EXTENSÃO PARA COMPUTADOR</p><h1>Seus jogos, sem redigitar.</h1><p>Importe a lista, confira o concurso e acompanhe o preenchimento.</p></div><span class="version">Versão inicial · 0.1.0</span></header>
+  <div class="notice">Esta ferramenta é independente da Caixa. Preenche o carrinho; a conferência e o pagamento são feitos por você no portal oficial.</div>
+  <div class="columns">
+    <section class="card"><h2>1. Importe os jogos</h2>
+      <label>Modalidade<select id="modalidade"><option value="">Selecione (o JSON identifica automaticamente)</option></select></label>
+      <label class="file">Arquivo exportado pelo LotoMasteria<input id="arquivo" type="file" accept=".txt,.json,text/plain,application/json"></label>
+      <label>Ou cole o conteúdo<textarea id="texto" rows="7" spellcheck="false" placeholder="Um jogo por linha, ou o conteúdo do arquivo JSON"></textarea></label>
+      <button id="validar" class="primary">Conferir arquivo</button>
+      <p id="resumo" class="muted" role="status">Nenhum arquivo conferido.</p>
+      <pre id="previa" aria-label="Prévia das apostas"></pre>
+    </section>
+    <section class="card"><h2>2. Conecte ao portal da Caixa</h2>
+      <p class="muted">Abra a modalidade desejada no portal oficial. Se houver mais de uma aba, escolha a que será preenchida.</p>
+      <button id="abrir">Abrir portal da Caixa</button>
+      <label>Aba do portal<select id="abas"></select></label>
+      <button id="conectar">Atualizar abas e conectar</button>
+      <p id="conexao" role="status" class="muted">Sem conexão.</p>
+      <label>Concurso que você quer apostar<input id="concurso" type="number" min="1" step="1" placeholder="Digite o número para conferir com a Caixa"></label>
+      <label>Jogos neste lote<select id="limite"><option value="1">1 — recomendado para o primeiro teste</option><option value="5">5</option><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option><option value="500">Todos (até 500)</option></select></label>
+      <label class="check"><input id="confirmar" type="checkbox"><span>Conferi modalidade, concurso e jogos. Durante o preenchimento não vou alterar o volante nem o carrinho nesta aba.</span></label>
+      <div class="actions"><button id="iniciar" class="primary" disabled>Preencher lote</button><button id="pausar" disabled>Pausar</button></div>
+      <p class="muted">Teimosinha deve estar em zero e Aposta Espelho desmarcada. Comece com um jogo e confira o resultado no carrinho.</p>
+    </section>
+  </div>
+  <section class="card"><h2>3. Acompanhe o progresso</h2><progress id="progresso" value="0" max="1"></progress><p id="estado" role="status">Aguardando importação.</p>
+    <div id="incerto" hidden><p class="warning">A inclusão do último jogo ficou sem confirmação. Confira esse jogo no carrinho antes de continuar.</p><div class="actions"><button id="entrou">Conferi: o jogo entrou</button><button id="nao-entrou">Conferi: o jogo não entrou</button></div></div>
+    <div class="actions"><button id="retomar" disabled>Continuar próximo lote</button><button id="encerrar">Encerrar sessão</button><button id="relatorio" disabled>Baixar relatório</button></div>
+    <p class="muted">O relatório registra inclusões confirmadas no carrinho, não pagamentos nem comprovantes oficiais. Não repita os jogos já incluídos ao importar o mesmo arquivo novamente.</p>
+  </section>
+  <p id="erro" role="alert"></p>
+  <footer>Arquivos e progresso ficam neste navegador. Sem envio para servidores do LotoMasteria, sem acesso a senhas ou dados de pagamento. Não publicado na Chrome Web Store. A estrutura do portal pode mudar.</footer>
+</main>
+<script src="core.js"></script><script src="importador.js"></script>
+</body></html>
