@@ -1,3 +1,4 @@
+import { mesmaIdentidadeReserva, normalizarTelefoneReserva } from "./reserva-identidade";
 import { bolaoNoHistorico } from "./bolao-historico";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -407,13 +408,39 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
     z
       .object({
         bolaoId: z.string().uuid(),
-        nome: z.string().min(3),
-        celular: z.string().min(10),
+        nome: z.string().trim().min(3).max(200),
+        celular: z.string().refine(value => /^\d{10,11}$/.test(normalizarTelefoneReserva(value)), "Informe um telefone válido com DDD."),
         cotas: z.number().int().min(1),
+        substituirReservaId: z.string().uuid().optional(),
       })
       .parse(raw),
   )
   .handler(async ({ data }) => {
+    // Detectar reservas antes de verificar disponibilidade: as próprias cotas podem esgotar o bolão.
+    const { data: pendentes, error: erroPendentes } = await supabaseAdmin
+      .from("bolao_participantes")
+      .select("id, codigo_referencia, nome_completo, celular, quantidade_cotas, valor_total, payment_id")
+      .eq("bolao_id", data.bolaoId)
+      .eq("status", "reservado")
+      .order("created_at", { ascending: false });
+    if (erroPendentes) throw new Error("Não foi possível verificar reservas anteriores. Tente novamente.");
+    const correspondentes = (pendentes ?? []).filter(reserva => mesmaIdentidadeReserva(reserva, data));
+    const anterior = data.substituirReservaId
+      ? correspondentes.find(reserva => reserva.id === data.substituirReservaId)
+      : undefined;
+    if (data.substituirReservaId && !anterior) {
+      throw new Error("A reserva anterior mudou ou já foi paga. Consulte sua reserva antes de continuar.");
+    }
+    if (!data.substituirReservaId && correspondentes.length) {
+      return {
+        tipo: "reservas_pendentes" as const,
+        reservas: correspondentes.map(reserva => ({
+          id: reserva.id, codigoReferencia: reserva.codigo_referencia,
+          quantidadeCotas: reserva.quantidade_cotas, valorTotal: Number(reserva.valor_total),
+        })),
+      };
+    }
+
     // 1. Verificar disponibilidade
     const bolao = await obterBolao({ data: { id: data.bolaoId } });
     if (!bolao) throw new Error("Bolão não encontrado.");
@@ -444,33 +471,55 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
       throw new Error("O prazo para compra deste bolão já se encerrou.");
     }
 
-    if (bolao.cotas_disponiveis <= 0 || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status)) {
+    const disponiveis = bolao.cotas_disponiveis + (anterior?.quantidade_cotas ?? 0);
+    if (disponiveis <= 0 || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status)) {
       throw new Error("Este bolão já está esgotado ou encerrado.");
     }
 
-    if (data.cotas > bolao.cotas_disponiveis) {
-      throw new Error(`Apenas ${bolao.cotas_disponiveis} cotas disponíveis.`);
+    if (data.cotas > disponiveis) {
+      throw new Error(`Apenas ${disponiveis} cotas disponíveis, incluindo as da reserva anterior.`);
     }
 
     const valorTotal = data.cotas * bolao.valor_cota;
 
-    // 2. Criar registro de participante (status reservado)
-    const { data: participante, error } = await supabaseAdmin
-      .from("bolao_participantes")
-      .insert({
-        bolao_id: data.bolaoId,
-        user_id: userId,
-        nome_completo: data.nome,
-        celular: data.celular,
-        quantidade_cotas: data.cotas,
-        valor_total: valorTotal,
-        status: "reservado",
-        codigo_referencia: `BOL-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
-      })
-      .select("id, codigo_referencia")
-      .single();
+    // 2. Cancelar a cobrança antiga antes de substituir a reserva. Nunca cancelar cotas pagas.
+    if (anterior?.payment_id) {
+      const { cancelarPixPendente } = await import("./pix-bolao.server");
+      if (await cancelarPixPendente(anterior.payment_id, anterior.id) === "pago") {
+        await supabaseAdmin.from("bolao_participantes")
+          .update({ status: "pago", payment_method: "mercadopago_pix" })
+          .eq("id", anterior.id).eq("status", "reservado");
+        throw new Error("A reserva anterior já foi paga e foi mantida. Consulte sua reserva.");
+      }
+    }
 
+    const novaReserva = {
+      id: crypto.randomUUID(),
+      bolao_id: data.bolaoId,
+      user_id: userId,
+      nome_completo: data.nome,
+      celular: data.celular,
+      quantidade_cotas: data.cotas,
+      valor_total: valorTotal,
+      status: "reservado",
+      codigo_referencia: `BOL-${crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase()}`,
+      payment_id: null, pix_data: null, payment_method: null,
+      created_at: new Date().toISOString(), expires_at: null,
+    };
+    // Uma única escrita troca a reserva e suas cotas. Novo ID isola notificações do PIX antigo.
+    let escrita = anterior
+      ? supabaseAdmin.from("bolao_participantes").update(novaReserva)
+          .eq("id", anterior.id).eq("status", "reservado")
+          .eq("codigo_referencia", anterior.codigo_referencia)
+      : supabaseAdmin.from("bolao_participantes").insert(novaReserva);
+    if (anterior) {
+      escrita = anterior.payment_id
+        ? escrita.eq("payment_id", anterior.payment_id)
+        : escrita.is("payment_id", null);
+    }
+    const { data: participante, error } = await escrita.select("id, codigo_referencia").maybeSingle();
     if (error) throw new Error(error.message);
+    if (!participante) throw new Error("A reserva mudou durante a operação. Consulte sua reserva e tente novamente.");
 
     // 3. Gerar PIX via Mercado Pago
     const { gerarPixReserva } = await import("./pix-bolao.server");
@@ -489,8 +538,10 @@ export const comprarCotasBolao = createServerFn({ method: "POST" })
     }
 
     return {
+      tipo: "compra" as const,
       id: participante.id,
       codigoReferencia: participante.codigo_referencia,
+      quantidadeCotas: data.cotas,
       valorTotal,
       pix: pixData,
     };
@@ -538,10 +589,13 @@ export const buscarReservaBolao = createServerFn({ method: "GET" })
     }
 
     if (reserva.status !== "reservado") return reserva;
-    const { gerarPixReserva, pagamentoAprovado } = await import("./pix-bolao.server");
+    const { gerarPixReserva, consultarPagamentoReserva } = await import("./pix-bolao.server");
+    const statusPagamento = reserva.payment_id
+      ? await consultarPagamentoReserva(reserva.payment_id, reserva.id)
+      : null;
 
     // 3. Confirmar direto no Mercado Pago (caso o aviso automático não tenha chegado)
-    if (reserva.payment_id && (await pagamentoAprovado(reserva.payment_id, reserva.id))) {
+    if (statusPagamento === "approved" || statusPagamento === "authorized") {
       const { data: paga } = await supabaseAdmin
         .from("bolao_participantes")
         .update({ status: "pago", payment_method: "mercadopago_pix" })
@@ -556,13 +610,14 @@ export const buscarReservaBolao = createServerFn({ method: "GET" })
     const agora = Date.now();
     const criadoEm = new Date(reserva.created_at || agora).getTime();
     const semPix = !(reserva.pix_data as any)?.qrCode;
-    if (semPix || agora - criadoEm > TRINTA_MINUTOS) {
+    const pixCancelado = statusPagamento === "cancelled" || statusPagamento === "rejected";
+    if (semPix || pixCancelado || agora - criadoEm > TRINTA_MINUTOS) {
       const { pix } = await gerarPixReserva({
         reservaId: reserva.id,
         valor: Number(reserva.valor_total),
         descricao: `Bolão LotoMaster - ${reserva.boloes?.nome ?? ""}`,
         nome: reserva.nome_completo,
-        idempotencyKey: `${reserva.id}-${Math.floor(agora / TRINTA_MINUTOS)}`,
+        idempotencyKey: `${reserva.id}-${pixCancelado ? `${reserva.payment_id}-` : ""}${Math.floor(agora / TRINTA_MINUTOS)}`,
       });
       if (pix) {
         const { data: atualizada } = await supabaseAdmin

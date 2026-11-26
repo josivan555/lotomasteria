@@ -49,18 +49,50 @@ export async function gerarPixReserva(input: {
   }
 }
 
-/** Consulta o status do pagamento direto no Mercado Pago (não depende do webhook). */
-export async function pagamentoAprovado(paymentId: string, reservaId: string): Promise<boolean> {
+/** Consulta o provedor e confere o vínculo com a reserva. */
+export async function consultarPagamentoReserva(paymentId: string, reservaId: string): Promise<string | null> {
   const accessToken = process.env["MERCADOPAGO_ACCESS_TOKEN"];
-  if (!accessToken || !paymentId) return false;
+  if (!accessToken || !paymentId) return null;
   try {
     const res = await fetch(`https://api.mercadopago.com/v1/payments/${encodeURIComponent(paymentId)}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!res.ok) return false;
+    if (!res.ok) return null;
     const p = await res.json();
-    return (p.status === "approved" || p.status === "authorized") && p.external_reference === reservaId;
+    return p.external_reference === reservaId ? p.status : null;
   } catch {
-    return false;
+    return null;
   }
+}
+
+/** Consulta o status do pagamento direto no Mercado Pago (não depende do webhook). */
+export async function pagamentoAprovado(paymentId: string, reservaId: string): Promise<boolean> {
+  const status = await consultarPagamentoReserva(paymentId, reservaId);
+  return status === "approved" || status === "authorized";
+}
+
+/** Só libera a substituição depois de confirmar que o PIX antigo não pode ser pago. */
+export async function cancelarPixPendente(paymentId: string, reservaId: string): Promise<"cancelado" | "pago"> {
+  const accessToken = process.env["MERCADOPAGO_ACCESS_TOKEN"];
+  if (!accessToken) throw new Error("Não foi possível verificar o PIX anterior. Tente novamente mais tarde.");
+  const url = `https://api.mercadopago.com/v1/payments/${encodeURIComponent(paymentId)}`;
+  const headers = { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" };
+  const resposta = await fetch(url, { headers });
+  if (!resposta.ok) throw new Error("Não foi possível verificar o pagamento da reserva anterior.");
+  const pagamento = await resposta.json();
+  if (pagamento.external_reference !== reservaId) throw new Error("O pagamento não corresponde à reserva.");
+  if (["approved", "authorized"].includes(pagamento.status)) return "pago";
+  if (["cancelled", "rejected"].includes(pagamento.status)) return "cancelado";
+  if (!["pending", "in_process"].includes(pagamento.status)) {
+    throw new Error("Este pagamento não pode ser cancelado. Consulte sua reserva.");
+  }
+  const cancelamento = await fetch(url, {
+    method: "PUT", headers, body: JSON.stringify({ status: "cancelled" }),
+  });
+  if (!cancelamento.ok) throw new Error("Não foi possível cancelar o PIX anterior. Sua reserva foi mantida. Consulte o pagamento antes de tentar novamente.");
+  const resultado = await cancelamento.json();
+  if (resultado.status !== "cancelled" || resultado.external_reference !== reservaId) {
+    throw new Error("O cancelamento do PIX não foi confirmado. Sua reserva foi mantida.");
+  }
+  return "cancelado";
 }

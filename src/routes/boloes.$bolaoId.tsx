@@ -13,6 +13,7 @@ import { formatBRL } from "@/lib/credits-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConferidorJogos } from "@/components/conferidor-jogos";
@@ -95,11 +96,16 @@ function DetalheBolao() {
   const { tab } = useSearch({ from: "/boloes/$bolaoId" });
   const getBolao = useServerFn(obterBolao);
   const comprarCotas = useServerFn(comprarCotasBolao);
+  const retomarReserva = useServerFn(buscarReservaBolao);
   const [activeTab, setActiveTab] = useState(tab);
   const queryClient = useQueryClient();
 
   const [form, setForm] = useState({ nome: "", celular: "", cotas: 1 });
   const [sucesso, setSucesso] = useState<{ ref: string; total: number; pix?: any } | null>(null);
+  const [pendencias, setPendencias] = useState<{
+    reservas: { id: string; codigoReferencia: string; quantidadeCotas: number; valorTotal: number }[];
+    compra: { bolaoId: string; nome: string; celular: string; cotas: number };
+  } | null>(null);
   const comprovanteRef = useRef<HTMLDivElement>(null);
 
   const { data: bolao, isLoading, error } = useQuery({
@@ -110,12 +116,32 @@ function DetalheBolao() {
 
   const mutation = useMutation({
     mutationFn: (payload: any) => comprarCotas({ data: payload }),
-    onSuccess: (res) => {
+    onSuccess: (res, payload) => {
+      if (res.tipo === "reservas_pendentes") {
+        setPendencias({ reservas: res.reservas, compra: payload });
+        return;
+      }
+      setPendencias(null);
+      setForm({ nome: payload.nome, celular: payload.celular, cotas: res.quantidadeCotas });
+      queryClient.invalidateQueries({ queryKey: ["bolao", bolaoId] });
+      queryClient.invalidateQueries({ queryKey: ["bolao-participantes", bolaoId] });
       setSucesso({ ref: res.codigoReferencia, total: res.valorTotal, pix: res.pix });
       toast.success("Reserva realizada! Siga as instruções para pagamento.");
     },
     onError: (e) => toast.error(e.message),
   });
+
+  const mutationRetomar = useMutation({
+    mutationFn: (codigo: string) => retomarReserva({ data: { codigo, bolaoId } }),
+    onSuccess: (reserva) => {
+      setPendencias(null);
+      setForm({ nome: reserva.nome_completo, celular: reserva.celular, cotas: reserva.quantidade_cotas });
+      setSucesso({ ref: reserva.codigo_referencia, total: Number(reserva.valor_total) });
+      toast.success(reserva.status === "pago" ? "Esta reserva já está paga!" : "Reserva recuperada! Copie o PIX para pagar.");
+    },
+    onError: (e) => toast.error(e.message),
+  });
+  const processandoReserva = mutation.isPending || mutationRetomar.isPending;
 
   if (isLoading) return <div className="p-20 text-center text-muted-foreground">Carregando detalhes do bolão...</div>;
   if (error || !bolao) return <div className="p-20 text-center text-destructive">Bolão não encontrado.</div>;
@@ -129,7 +155,8 @@ function DetalheBolao() {
   const dataSorteioObj = new Date(`${bolao.data_sorteio}T00:00:00`);
   const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
   const prazoEncerrado = agora > dataPrazo;
-  const esgotado = bolao.cotas_disponiveis <= 0 || prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada;
+  const vendasEncerradas = prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada;
+  const esgotado = bolao.cotas_disponiveis <= 0 || vendasEncerradas;
 
   const handleCompartilhar = async () => {
     const nomeLimpo = bolao.nome.trim().replace(/^BOL[ÃA]O\s+/i, "");
@@ -304,6 +331,34 @@ function DetalheBolao() {
 
   return (
     <div className="bolao-experience" data-loteria={bolao.is_combo ? undefined : bolao.loteria_id} style={{ "--bolao-accent": cfg.corEscura } as CSSProperties}>
+    <AlertDialog open={!!pendencias} onOpenChange={(open) => { if (!open && !processandoReserva) setPendencias(null); }}>
+      <AlertDialogContent className="bolao-experience min-h-0 max-h-[90dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-lg" style={{ "--bolao-accent": cfg.corEscura } as CSSProperties}>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Você já tem uma reserva neste bolão</AlertDialogTitle>
+          <AlertDialogDescription>
+            Encontramos uma reserva pendente com o mesmo nome e telefone. Você quer pagar essa reserva ou cancelá-la e fazer uma nova compra?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <p className="text-sm text-muted-foreground">Nova compra solicitada: {pendencias?.compra.cotas} cota(s) · {formatBRL((pendencias?.compra.cotas ?? 0) * bolao.valor_cota)}</p>
+        <div className="space-y-4">
+          {pendencias?.reservas.map(reserva => (
+            <div key={reserva.id} className="space-y-3 rounded-lg border border-border p-4">
+              <p className="font-mono text-sm font-bold break-all">{reserva.codigoReferencia}</p>
+              <p className="text-sm">{reserva.quantidadeCotas} cota(s) · {formatBRL(reserva.valorTotal)}</p>
+              <Button className="h-auto min-h-12 w-full whitespace-normal" disabled={processandoReserva} onClick={() => mutationRetomar.mutate(reserva.codigoReferencia)}>
+                Pagar esta reserva
+              </Button>
+              <Button variant="outline" className="h-auto min-h-12 w-full whitespace-normal" disabled={processandoReserva} onClick={() => mutation.mutate({ ...pendencias.compra, substituirReservaId: reserva.id })}>
+                Cancelar esta reserva e fazer nova compra
+              </Button>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">A reserva escolhida só será substituída após a verificação do pagamento e da disponibilidade de cotas. Reservas pagas serão mantidas.</p>
+        <Button variant="ghost" disabled={processandoReserva} onClick={() => setPendencias(null)}>Voltar sem alterar a reserva</Button>
+        {processandoReserva && <p role="status" className="text-center text-sm text-muted-foreground">Processando, aguarde...</p>}
+      </AlertDialogContent>
+    </AlertDialog>
     <PublicHeader showSearch />
     <main className="mx-auto max-w-7xl px-4 py-5 md:px-6 md:py-8">
       <div className="flex justify-between items-center mb-6">
@@ -483,13 +538,15 @@ function DetalheBolao() {
                   <h2 className="flex items-center gap-3 text-xl font-black sm:text-2xl"><span className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground"><TicketCheck className="h-5 w-5" /></span>Comprar Cotas</h2>
                 </div>
 
-                {esgotado ? (
+                {vendasEncerradas ? (
                   <div className="rounded-lg bg-destructive/10 p-6 text-center text-destructive">
                     <p className="font-bold">{prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada ? "Bolão Encerrado" : "Bolão Esgotado"}</p>
                     <p className="mt-1 text-sm">{prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada ? "Este bolão não aceita mais novas participações." : "Todas as cotas já foram vendidas. Fique atento para os próximos lançamentos!"}</p>
                   </div>
                 ) : (
-                  <form className="space-y-5" onSubmit={(event) => { event.preventDefault(); mutation.mutate({ bolaoId, ...form }); }}>
+                  <form className="space-y-5" onSubmit={(event) => { event.preventDefault(); if (!processandoReserva) mutation.mutate({ bolaoId, ...form }); }}>
+                    {bolao.cotas_disponiveis <= 0 && <p className="rounded-lg bg-muted p-3 text-sm">Todas as cotas estão ocupadas. Se você já reservou, informe seu nome e telefone para recuperar o pagamento ou substituir sua reserva.</p>}
+                    <fieldset disabled={processandoReserva} className="space-y-5">
                     <div className="space-y-2">
                       <Label htmlFor="nome" className="text-xs font-bold uppercase text-foreground">Nome Completo</Label>
                       <Input id="nome" placeholder="Seu nome para o bolão" required className="bolao-customer-input h-12 text-base" value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} />
@@ -503,7 +560,7 @@ function DetalheBolao() {
                       <div className="flex items-center gap-4">
                         <Button type="button" variant="outline" className="h-12 w-12 rounded-lg bg-card text-xl font-bold" onClick={() => setForm({ ...form, cotas: Math.max(1, form.cotas - 1) })}>−</Button>
                         <Input id="cotas" type="number" readOnly className="bolao-customer-input h-12 flex-1 text-center text-lg font-black" value={form.cotas} />
-                        <Button type="button" variant="outline" className="h-12 w-12 rounded-lg bg-card text-xl font-bold" onClick={() => setForm({ ...form, cotas: Math.min(bolao.cotas_disponiveis, form.cotas + 1) })}>+</Button>
+                        <Button type="button" variant="outline" className="h-12 w-12 rounded-lg bg-card text-xl font-bold" onClick={() => setForm({ ...form, cotas: Math.min(Math.max(1, bolao.cotas_disponiveis), form.cotas + 1) })}>+</Button>
                       </div>
                       <p className="text-center text-[10px] font-medium text-muted-foreground">Máximo disponível: {bolao.cotas_disponiveis} cotas</p>
                     </div>
@@ -512,7 +569,8 @@ function DetalheBolao() {
                       <div className="flex justify-between border-t border-border pt-3 text-lg font-black"><span>Total a pagar</span><span className="text-primary">{formatBRL(form.cotas * bolao.valor_cota)}</span></div>
                     </div>
                     <Button className="h-14 w-full text-lg font-black" disabled={mutation.isPending}><CreditCard className="h-5 w-5" /> {mutation.isPending ? "Processando..." : "Confirmar e Pagar"}</Button>
-                    <p className="text-center text-[10px] text-muted-foreground">Ao confirmar, suas cotas serão reservadas e você seguirá para o pagamento. A reserva expira em 30 minutos sem confirmação.</p>
+                    <p className="text-center text-[10px] text-muted-foreground">Ao confirmar, verificaremos se você já tem uma reserva antes de seguir para o pagamento. O PIX tem validade de 30 minutos.</p>
+                    </fieldset>
                   </form>
                 )}
               </div>
