@@ -169,7 +169,7 @@ export const listarParticipantesBolao = createServerFn({ method: "GET" })
 
     const { data: participantes, error, count } = await sb
       .from("bolao_participantes")
-      .select("id, nome_completo, quantidade_cotas, status, created_at, celular", { count: 'exact' })
+      .select("id, nome_completo, quantidade_cotas, codigo_referencia, status, created_at, celular", { count: 'exact' })
       .eq("bolao_id", data.bolaoId)
       .order("created_at", { ascending: false })
       .range(from, to);

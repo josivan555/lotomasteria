@@ -750,7 +750,39 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
     onError: (e) => toast.error(e.message),
   });
 
+  const copiarCodigo = async (codigo: string) => {
+    try {
+      await navigator.clipboard.writeText(codigo);
+      toast.success("Código da reserva copiado!");
+    } catch {
+      toast.error("Não foi possível copiar. Selecione o código e copie manualmente.");
+    }
+  };
+
   const renderItem = (p: any) => {
+    const detalhesReserva = (
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-muted-foreground">
+        {isAdmin && p.celular && <span>{p.celular} ·</span>}
+        <span className="whitespace-nowrap">{p.quantidade_cotas} cota(s)</span>
+        {p.codigo_referencia && (
+          <span className="inline-flex max-w-full items-center gap-1">
+            <span>·</span>
+            <span className="font-mono break-all select-text text-foreground">{p.codigo_referencia}</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 shrink-0 text-muted-foreground"
+              aria-label={`Copiar código da reserva ${p.codigo_referencia}`}
+              title="Copiar código da reserva"
+              onClick={() => copiarCodigo(p.codigo_referencia)}
+            >
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+          </span>
+        )}
+      </div>
+    );
     const statusBadge = (
       <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all ${
         p.status === 'pago' 
@@ -768,7 +800,7 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
           <div className="bolao-avatar">{String(p.nome_completo || "P").trim().charAt(0).toUpperCase()}</div>
           <div className="flex-1 min-w-0 pr-4">
             <p className="font-bold truncate">{p.nome_completo}</p>
-            <p className="text-[10px] text-muted-foreground">{p.quantidade_cotas} cota(s)</p>
+            {detalhesReserva}
           </div>
           <div className="flex items-center gap-3">
             {statusBadge}
@@ -803,7 +835,7 @@ function ParticipantesList({ bolaoId, bolao }: { bolaoId: string; bolao: any }) 
           ) : (
             <>
               <p className="font-bold truncate">{p.nome_completo}</p>
-              <p className="text-[10px] text-muted-foreground">{p.celular} · {p.quantidade_cotas} cota(s)</p>
+              {detalhesReserva}
             </>
           )}
         </div>
