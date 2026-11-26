@@ -102,6 +102,23 @@ function Jogos() {
   const [porPagina, setPorPagina] = useState(5);
 
   const [jogosSelecionados, setJogosSelecionados] = useState<string[]>([]);
+  const jogosEscolhidos = useMemo(
+    () => jogos.filter(jogo => jogosSelecionados.includes(jogo.id)),
+    [jogos, jogosSelecionados],
+  );
+
+  const selecaoDoGrupo = (itens: typeof jogos) => {
+    const quantidade = itens.filter(jogo => jogosSelecionados.includes(jogo.id)).length;
+    return quantidade === 0 ? false : quantidade === itens.length ? true : "indeterminate" as const;
+  };
+
+  const selecionarGrupo = (itens: typeof jogos, selecionar: boolean) => {
+    const ids = new Set(itens.map(jogo => jogo.id));
+    setJogosSelecionados(anteriores => selecionar
+      ? [...new Set([...anteriores, ...ids])]
+      : anteriores.filter(id => !ids.has(id)));
+  };
+
   const [modalBolao, setModalBolao] = useState(false);
   const [formBolao, setFormBolao] = useState({
     nome: "",
@@ -253,8 +270,7 @@ function Jogos() {
   };
 
   const handleCriarBolao = () => {
-    const gamesToInclude = vigentes
-      .filter((j) => jogosSelecionados.includes(j.id))
+    const gamesToInclude = jogosEscolhidos
       .map((j) => ({
         dezenas: j.dezenas,
         score: j.score || undefined,
@@ -282,14 +298,9 @@ function Jogos() {
             {userProfile?.isAdmin && (
               <Checkbox
                 className="h-5 w-5"
-                checked={vigentes.length > 0 && jogosSelecionados.length === vigentes.length}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setJogosSelecionados(vigentes.map((j) => j.id));
-                  } else {
-                    setJogosSelecionados([]);
-                  }
-                }}
+                aria-label="Selecionar todos os jogos filtrados"
+                checked={selecaoDoGrupo(jogosFiltrados)}
+                onCheckedChange={(checked) => selecionarGrupo(jogosFiltrados, checked === true)}
               />
             )}
             <h2 className="text-xl font-bold md:text-2xl">Meus Jogos · {cfg.nome}</h2>
@@ -401,7 +412,7 @@ function Jogos() {
           <DialogHeader>
             <DialogTitle>Gerar Novo Bolão — {cfg.nome}</DialogTitle>
             <DialogDescription>
-              Configurar detalhes do bolão para os {jogosSelecionados.length} jogos selecionados.
+              Configurar detalhes do bolão para os {jogosEscolhidos.length} jogos selecionados.
             </DialogDescription>
           </DialogHeader>
 
@@ -495,9 +506,7 @@ function Jogos() {
             <h4 className="mb-2 text-sm font-medium">Jogos Incluídos</h4>
             <ScrollArea className="h-[120px] pr-4">
               <div className="space-y-1">
-                {vigentes
-                  .filter((j) => jogosSelecionados.includes(j.id))
-                  .map((j) => (
+                {jogosEscolhidos.map((j) => (
                     <div key={j.id} className="flex gap-1">
                       {j.dezenas.map((n) => (
                         <div key={n} className="h-4 w-4 rounded-full bg-primary/20 text-[8px] flex items-center justify-center font-bold">
@@ -537,14 +546,9 @@ function Jogos() {
                 {vigentes.length > 0 && (
                   <Checkbox
                     id="select-all-vigentes"
-                    checked={jogosSelecionados.length === vigentes.length && vigentes.length > 0}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setJogosSelecionados(vigentes.map((j) => j.id));
-                      } else {
-                        setJogosSelecionados([]);
-                      }
-                    }}
+                    aria-label="Selecionar todos os jogos em aberto"
+                    checked={selecaoDoGrupo(vigentes)}
+                    onCheckedChange={(checked) => selecionarGrupo(vigentes, checked === true)}
                   />
                 )}
                 <h3 className="text-lg font-semibold">Jogos em aberto</h3>
@@ -555,9 +559,9 @@ function Jogos() {
                 </span>
               )}
               <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
-                {jogosSelecionados.length > 0 && (
+                {jogosEscolhidos.length > 0 && (
                   <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                    {jogosSelecionados.length} selecionado{jogosSelecionados.length === 1 ? "" : "s"}
+                    {jogosEscolhidos.length} selecionado{jogosEscolhidos.length === 1 ? "" : "s"}
                   </span>
                 )}
                 <span className="text-xs text-muted-foreground">
@@ -565,10 +569,10 @@ function Jogos() {
                 </span>
               </div>
             </div>
-            {jogosSelecionados.length > 0 && (
+            {jogosEscolhidos.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/60 bg-secondary/30 p-2">
                 <span className="px-2 text-xs text-muted-foreground">Ações em lote:</span>
-                <ExportarJogos cfg={cfg} jogos={vigentes.filter((j) => jogosSelecionados.includes(j.id))} rotulo="Exportar selecionados" />
+                <ExportarJogos cfg={cfg} jogos={jogosEscolhidos} rotulo="Exportar selecionados" />
                 <Button
                   variant="outline"
                   size="sm"
@@ -577,10 +581,10 @@ function Jogos() {
                   onClick={() => {
                     if (
                       confirm(
-                        `Remover os ${jogosSelecionados.length} jogos selecionados?\n\nEssa ação não pode ser desfeita.`,
+                        `Remover os ${jogosEscolhidos.length} jogos selecionados?\n\nEssa ação não pode ser desfeita.`,
                       )
                     ) {
-                      delLote.mutate(jogosSelecionados);
+                      delLote.mutate(jogosEscolhidos.map(jogo => jogo.id));
                     }
                   }}
                 >
@@ -639,6 +643,20 @@ function Jogos() {
                   </select>
                 </div>
               </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const itens = historico.flatMap(grupo => grupo.itens);
+                    selecionarGrupo(itens, selecaoDoGrupo(itens) !== true);
+                  }}
+                >
+                  {selecaoDoGrupo(historico.flatMap(grupo => grupo.itens)) === true ? "Desmarcar todo o histórico" : "Selecionar todo o histórico"}
+                </Button>
+                <span className="text-xs text-muted-foreground">Inclui os concursos de todas as páginas, respeitando o filtro de datas.</span>
+              </div>
               <div className="space-y-2">
                 {historicoPagina.map((g) => {
                   const open = aberto === g.numero;
@@ -649,7 +667,7 @@ function Jogos() {
                       key={g.numero}
                       className="overflow-hidden rounded-xl border border-border/60 bg-card/60 backdrop-blur"
                     >
-                      <div className="flex items-center gap-1 pr-2 hover:bg-secondary/50">
+                      <div className="flex flex-wrap items-center gap-1 pr-2 hover:bg-secondary/50">
                         <button
                           type="button"
                           onClick={() => setAberto(open ? null : g.numero)}
@@ -670,6 +688,17 @@ function Jogos() {
                             {g.itens.length} jogo{g.itens.length === 1 ? "" : "s"}
                           </span>
                         </button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="my-1 h-8 text-xs"
+                          aria-label={`${selecaoDoGrupo(g.itens) === true ? "Desmarcar" : "Selecionar"} todos os jogos do concurso ${g.numero}`}
+                          aria-pressed={selecaoDoGrupo(g.itens) === true}
+                          onClick={() => selecionarGrupo(g.itens, selecaoDoGrupo(g.itens) !== true)}
+                        >
+                          {selecaoDoGrupo(g.itens) === true ? "Desmarcar todos" : "Selecionar todos"}
+                        </Button>
                         <Button
                           size="sm"
                           variant="ghost"
