@@ -1037,6 +1037,43 @@
   gap: 0.9rem;
   margin-bottom: 1.3rem;
 }
+/* Countdown stays inside the public pool theme, including on narrow screens. */
+.bolao-experience .bolao-actions-heading {
+  flex-wrap: wrap;
+}
+.bolao-experience .bolao-actions-copy {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+.bolao-experience .bolao-sales-countdown {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #ffca2880;
+  border-radius: 0.75rem;
+  background: #ffca2814;
+  color: #ffdc62;
+  text-align: center;
+}
+.bolao-experience .bolao-sales-countdown > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+.bolao-experience .bolao-sales-countdown svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+.bolao-experience .bolao-sales-countdown strong {
+  display: block;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
 .bolao-experience .bolao-actions-heading > svg {
   width: 2.5rem;
   height: 2.5rem;

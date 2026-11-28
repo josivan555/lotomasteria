@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConferidorJogos } from "@/components/conferidor-jogos";
 
 import { Clock, Users, Trophy, ChevronLeft, CheckCircle2, Download, Copy, Share2, Trash2, Edit2, Check, ExternalLink, TicketCheck, CreditCard, Search, AlertCircle, QrCode, ShoppingCart, ClipboardList, SearchCheck, ChevronRight } from "lucide-react";
-import { useState, useRef, type CSSProperties } from "react";
+import { useState, useRef, useEffect, type CSSProperties } from "react";
 import { toPng } from 'html-to-image';
 import { toast } from "sonner";
 import { PublicHeader } from "@/components/public-header";
@@ -107,6 +107,14 @@ function DetalheBolao() {
     compra: { bolaoId: string; nome: string; celular: string; cotas: number };
   } | null>(null);
   const comprovanteRef = useRef<HTMLDivElement>(null);
+  const [agoraMs, setAgoraMs] = useState<number | null>(null);
+
+  useEffect(() => {
+    const atualizar = () => setAgoraMs(Date.now());
+    atualizar();
+    const timer = window.setInterval(atualizar, 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const { data: bolao, isLoading, error } = useQuery({
     queryKey: ["bolao", bolaoId],
@@ -148,15 +156,23 @@ function DetalheBolao() {
 
   const cfg = LOTERIAS[bolao.loteria_id as LoteriaId];
   const progresso = (bolao.cotas_compradas / bolao.total_cotas) * 100;
-  const agora = new Date();
+  const agora = new Date(agoraMs ?? Date.now());
   const horarioRaw = String(bolao.horario_encerramento || '23:59:59');
   const horario = horarioRaw.length === 5 ? `${horarioRaw}:00` : horarioRaw.slice(0, 8);
   const dataPrazo = new Date(`${String(bolao.prazo_vendas).slice(0, 10)}T${horario}-03:00`);
   const dataSorteioObj = new Date(`${bolao.data_sorteio}T00:00:00`);
   const dataSorteioPassada = dataSorteioObj < new Date(new Date().setHours(0,0,0,0));
-  const prazoEncerrado = agora > dataPrazo;
+  const prazoEncerrado = agora >= dataPrazo;
   const vendasEncerradas = prazoEncerrado || ['encerrado', 'sorteado', 'conferido'].includes(bolao.status) || dataSorteioPassada;
   const esgotado = bolao.cotas_disponiveis <= 0 || vendasEncerradas;
+  const tempoRestanteMs = dataPrazo.getTime() - agora.getTime();
+  const mostrarContagem = agoraMs !== null && !esgotado && tempoRestanteMs > 0 && tempoRestanteMs <= 2 * 60 * 60 * 1000;
+  const segundosRestantes = Math.max(0, Math.ceil(tempoRestanteMs / 1000));
+  const contagemRegressiva = [
+    Math.floor(segundosRestantes / 3600),
+    Math.floor((segundosRestantes % 3600) / 60),
+    segundosRestantes % 60,
+  ].map(valor => String(valor).padStart(2, "0")).join(":");
 
   const handleCompartilhar = async () => {
     const nomeLimpo = bolao.nome.trim().replace(/^BOL[ÃA]O\s+/i, "");
@@ -514,7 +530,13 @@ function DetalheBolao() {
             <section className="bolao-actions" aria-labelledby="bolao-actions-title">
               <div className="bolao-actions-heading">
                 <Users aria-hidden="true" />
-                <div><h2 id="bolao-actions-title">Ações do Bolão</h2><p>Escolha uma opção para gerenciar suas cotas</p></div>
+                <div className="bolao-actions-copy"><h2 id="bolao-actions-title">Ações do Bolão</h2><p>Escolha uma opção para gerenciar suas cotas</p></div>
+                {mostrarContagem && (
+                  <div className="bolao-sales-countdown" role="timer" aria-live="off" aria-label={`Vendas encerram em ${contagemRegressiva}`}>
+                    <span><Clock aria-hidden="true" /> Vendas encerram em</span>
+                    <strong>{contagemRegressiva}</strong>
+                  </div>
+                )}
               </div>
               <TabsList className="bolao-menu" aria-label="Opções do bolão">
                 {[
